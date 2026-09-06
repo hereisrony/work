@@ -30,7 +30,11 @@ jobs:
       - name: Build
         run: python3 build.py
 
+      # enablement: turns Pages on for the repo (build type: GitHub Actions)
+      # on the first run, so deploying needs no manual settings toggle.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
