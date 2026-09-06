@@ -17,7 +17,8 @@ assets/js/site.js       grid reveal, mobile drawer
 assets/js/name.js       generated from content/questions.json
 assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback
 assets/fonts/           Inconsolata, self-hosted (two variable subsets)
-content/posts.json      the 18 projects: title, subtitle, date, body HTML
+content/posts.json      the 18 projects: title, subtitle, date, body HTML,
+                        and an optional "video" to embed
 content/pages.json      the six text pages
 content/questions.json  the questions the header asks about her name
 build.py                regenerates the HTML from content/
@@ -48,6 +49,30 @@ overwrite it next time it runs, so put lasting changes in `content/`.
 python3 -m http.server 8000
 # open http://localhost:8000
 ```
+
+## Caching
+
+GitHub Pages serves every file with `Cache-Control: max-age=600` and offers no
+way to change that, so a browser can hold on to a stylesheet for ten minutes
+after a deploy. To stop that ever pairing new HTML with an old stylesheet,
+`build.py` stamps each asset's own content hash into its URL:
+
+```html
+<link rel="stylesheet" href="/assets/css/site.css?v=fc5d2d33c4">
+```
+
+Change the file and the address changes with it, so the browser has to fetch
+it. Leave it alone and the address stays put, so it stays cached. The hash is
+of the file's bytes, so the same content always gives the same URL. CSS,
+JavaScript, the favicon and every image are covered.
+
+What this does *not* change is the ten minutes on the HTML itself: a reader who
+loaded a page nine minutes before a deploy keeps seeing that page, whole and
+consistent, until it lapses. There is no mixed state, and no hard reload is
+needed — it corrects itself.
+
+The fonts are the one exception, deliberately: their names never change because
+their contents never do. If you ever swap a font file, give it a new filename.
 
 ## Deploying
 
@@ -137,7 +162,13 @@ navigation, the project titles, the hover treatment on a tile and the loading
 bar.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
-or `press` opens. Nothing overlays the grid.
+or `press` opens. Nothing overlays the grid. A project page starts at its
+title: the still belongs to the grid and is not repeated underneath.
+
+Where a project's text opened with a link to a video, the player stands in its
+place. A project whose text never linked to one can name it with a `"video"`
+key in `content/posts.json`. Vimeo, YouTube and ARTE are understood; a link to
+a page that merely mentions a film stays a link.
 
 Motion, and only motion, was added to the original:
 

@@ -8,6 +8,7 @@ browser needs ends up in the repo root and assets/. There is no other
 toolchain — the output is plain HTML you can also edit by hand.
 """
 
+import hashlib
 import json
 import os
 import re
@@ -99,6 +100,12 @@ VIDEO_HOSTS = (
 )
 
 
+def player_frame(src):
+    return ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
+            'allow="autoplay; fullscreen; picture-in-picture" '
+            'allowfullscreen></iframe></div>' % src)
+
+
 def embed_url(href):
     """The player URL for a link to a video, or None if it is not one."""
     for pattern, template in VIDEO_HOSTS:
@@ -131,10 +138,19 @@ def embed_videos(html, slug=""):
         text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
         if not text.startswith(("findithere", "watchithere", "watchither")):
             return html
-    frame = ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
-             'allow="autoplay; fullscreen; picture-in-picture" '
-             'allowfullscreen></iframe></div>' % player)
-    return frame + html[m.end():]
+    return player_frame(player) + html[m.end():]
+
+
+def project_body(post):
+    """The body with its video in place: either the opening link turned into a
+    player, or one named by a "video" key for a project whose text never
+    linked to it."""
+    html = embed_videos(post["body"], post["slug"])
+    if 'class="embed"' not in html and post.get("video"):
+        src = embed_url(post["video"])
+        if src:
+            html = player_frame(src) + html
+    return html
 
 
 def blank_external(html):
@@ -174,7 +190,7 @@ def header(active):
     return """<header id="header">
   <div class="wrap">
     <div class="logo"><a href="/" aria-label="%(title)s &mdash; home"><span class="logo-text">%(title)s</span></a></div>
-    <script src="/assets/js/name.js"></script>
+    <script src="%(name_js)s"></script>
     %(nav)s
     %(social)s
     %(quote)s
@@ -191,6 +207,7 @@ def header(active):
         "title": TITLE,
         "quote": QUOTE,
         "nav": nav_list(active), "social": icons(),
+        "name_js": asset("/assets/js/name.js"),
     }
 
 
@@ -208,9 +225,9 @@ def document(*, title, description, canonical, body, active, og_image=None, json
         '<meta property="og:description" content="%s">' % esc(description),
         '<meta property="og:url" content="%s%s">' % (SITE, canonical),
         '<meta name="twitter:card" content="summary_large_image">',
-        '<link rel="icon" href="/assets/favicon.png">',
+        '<link rel="icon" href="%s">' % asset("/assets/favicon.png"),
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
-        '<link rel="stylesheet" href="/assets/css/site.css">',
+        '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
     if og_image:
         head.append('<meta property="og:image" content="%s%s">' % (SITE, og_image))
@@ -231,7 +248,7 @@ def document(*, title, description, canonical, body, active, og_image=None, json
 %(body)s
   </div>
 </main>
-<script src="/assets/js/site.js" defer></script>
+<script src="%(site_js)s" defer></script>
 </body>
 </html>
 """ % {
@@ -239,11 +256,30 @@ def document(*, title, description, canonical, body, active, og_image=None, json
         "cls": (' class="%s"' % body_class) if body_class else "",
         "header": header(active),
         "body": body,
+        "site_js": asset("/assets/js/site.js"),
     }
 
 
+_ASSET_HASH = {}
+
+
+def asset(path):
+    """A URL that changes whenever the file behind it does.
+
+    GitHub Pages serves everything with Cache-Control: max-age=600 and gives no
+    way to change that, so a browser can hold a stylesheet for ten minutes after
+    a deploy. Stamping the file's own content hash into the URL means new HTML
+    can never ask for an old stylesheet: the moment the file changes, so does
+    the address, and the browser has to fetch it.
+    """
+    if path not in _ASSET_HASH:
+        with open(os.path.join(ROOT, path.lstrip("/")), "rb") as fh:
+            _ASSET_HASH[path] = hashlib.sha256(fh.read()).hexdigest()[:10]
+    return "%s?v=%s" % (path, _ASSET_HASH[path])
+
+
 def srcset(post, ext):
-    return ", ".join("/assets/img/%s-%d.%s %dw" % (post["slug"], w, ext, w)
+    return ", ".join("%s %dw" % (asset("/assets/img/%s-%d.%s" % (post["slug"], w, ext)), w)
                      for w in post["sizes"])
 
 
@@ -253,7 +289,7 @@ def tile(post):
     return """    <a class="tile" href="/work/%(slug)s/" aria-label="%(aria)s">
       <picture>
         <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 31vw, 26vw">
-        <img src="/assets/img/%(slug)s-960.jpg" alt="%(alt)s" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
+        <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
       </picture>
     </a>""" % {
         "slug": post["slug"],
@@ -261,6 +297,7 @@ def tile(post):
         "alt": esc(alt),
         "aria": esc("%s, %s" % (post["title"], post["subtitle"]) if post["subtitle"]
                     else post["title"]),
+        "jpg": asset("/assets/img/%s-960.jpg" % post["slug"]),
         "w": post["w"], "h": post["h"],
     }
 
@@ -268,6 +305,29 @@ def tile(post):
 def build():
     posts = json.load(open(os.path.join(ROOT, "content/posts.json"), encoding="utf-8"))
     pages = json.load(open(os.path.join(ROOT, "content/pages.json"), encoding="utf-8"))
+
+    # --- the name question ---------------------------------------------------
+    # The header carries her name on the home page. Open anything else and it
+    # slips into one of the questions people actually ask about that name; the
+    # link still goes home, where the name is itself again.
+    questions = json.load(open(os.path.join(ROOT, "content/questions.json"),
+                               encoding="utf-8"))
+    write("assets/js/name.js", """/* Generated by build.py from content/questions.json — do not edit. */
+(function () {
+    'use strict';
+    var QUESTIONS = %(questions)s;
+
+    var el = document.querySelector('.logo-text');
+    if (!el) return;
+
+    // The home page is where the name stays put.
+    if (document.body && document.body.classList.contains('index-page')) return;
+
+    var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+    el.textContent = q;
+    el.parentNode.parentNode.classList.add('is-question');
+}());
+""" % {"questions": json.dumps(questions, ensure_ascii=False, indent=8)})
 
     # --- index ---------------------------------------------------------------
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
@@ -299,29 +359,16 @@ def build():
 
     # --- project permalinks --------------------------------------------------
     for p in posts:
-        # The image shows at its own size, never enlarged to fill the column,
-        # and never wider than the 800px measure the text pages use.
-        media_w = min(p["w"], 800)
         body = """  <article class="project">
-    <div class="project-media" style="max-width:%(mw)dpx">
-      <picture>
-        <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, %(mw)dpx">
-        <img src="/assets/img/%(slug)s-960.jpg" alt="%(alt)s" width="%(w)d" height="%(h)d" decoding="async">
-      </picture>
-    </div>
     <div class="project-text">
       <h1>%(title)s</h1>
       %(subtitle)s
       %(body)s
     </div>
   </article>""" % {
-            "webp": srcset(p, "webp"),
-            "slug": p["slug"],
-            "alt": esc(p["title"]),
-            "w": p["w"], "h": p["h"], "mw": media_w,
             "title": esc(p["title"]),
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
-            "body": embed_videos(p["body"], p["slug"]),
+            "body": project_body(p),
         }
         write("work/%s/index.html" % p["slug"], document(
             title="%s — %s" % (p["title"], TITLE),
@@ -420,29 +467,6 @@ def build():
           '<rss version="2.0"><channel>\n'
           "    <title>%s</title>\n    <link>%s/</link>\n    <description>%s</description>\n%s"
           "</channel></rss>\n" % (esc(TITLE), SITE, esc(TAGLINE), items))
-
-    # --- the name question ---------------------------------------------------
-    # The header carries her name on the home page. Open anything else and it
-    # slips into one of the questions people actually ask about that name; the
-    # link still goes home, where the name is itself again.
-    questions = json.load(open(os.path.join(ROOT, "content/questions.json"),
-                               encoding="utf-8"))
-    write("assets/js/name.js", """/* Generated by build.py from content/questions.json — do not edit. */
-(function () {
-    'use strict';
-    var QUESTIONS = %(questions)s;
-
-    var el = document.querySelector('.logo-text');
-    if (!el) return;
-
-    // The home page is where the name stays put.
-    if (document.body && document.body.classList.contains('index-page')) return;
-
-    var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
-    el.textContent = q;
-    el.parentNode.parentNode.classList.add('is-question');
-}());
-""" % {"questions": json.dumps(questions, ensure_ascii=False, indent=8)})
 
     write("robots.txt", "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE)
     open(os.path.join(ROOT, ".nojekyll"), "w").close()
