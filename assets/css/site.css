@@ -166,6 +166,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     position: relative;
     display: block;
     overflow: hidden;
+    isolation: isolate;   /* keeps the screen blend inside the tile */
     background: #f2f2f2;
     aspect-ratio: 1 / 1;
     /* entrance state; cleared by .in */
@@ -179,27 +180,35 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .tile img {
     height: 100%;
     object-fit: cover;
-    transition: transform 0.7s var(--ease-soft), filter 0.5s linear;
+    transition: transform 0.7s var(--ease-soft), filter 0.45s var(--ease-out);
     will-change: transform;
 }
 
-/* Hover: the image eases in, and the accent washes up from the floor of the
-   tile. No text is added — the tile is a link to the project's own page. */
+/* Hover: the image eases in and turns into a two-colour print — the accent in
+   the shadows, white in the highlights, the way a duotone works.
+
+   Desaturating the photograph and screening a flat accent over it is exactly
+   that mapping: screen gives 1-(1-a)(1-b), so with #00CC00 over grey L the
+   result runs from the accent itself at L=0 to white at L=1. No second copy of
+   the image and no SVG filter — and unlike filter: url(), both grayscale() and
+   opacity interpolate, so it cross-fades instead of snapping. */
 .tile::after {
     content: "";
     position: absolute;
     inset: 0;
     background: var(--accent);
+    mix-blend-mode: screen;
     opacity: 0;
-    transform: scaleY(0);
-    transform-origin: 50% 100%;
-    transition: transform 0.45s var(--ease-out), opacity 0.45s var(--ease-out);
+    transition: opacity 0.45s var(--ease-out);
     pointer-events: none;
 }
 .tile:hover img,
-.tile:focus-visible img { transform: scale(1.045); }
+.tile:focus-visible img {
+    transform: scale(1.045);
+    filter: grayscale(1);
+}
 .tile:hover::after,
-.tile:focus-visible::after { opacity: 0.22; transform: scaleY(1); }
+.tile:focus-visible::after { opacity: 1; }
 
 .tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
@@ -386,9 +395,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     #main { margin-top: 70px; }
     #main > .wrap { padding: 0 15px; }
     .grid { row-gap: calc(3cqw + 10px); }
-    /* no hover state on touch — the accent wash is pointer-only */
-    .tile:hover img { transform: none; }
-    .tile:hover::after { opacity: 0; transform: scaleY(0); }
+    /* no hover treatment on touch — the duotone is pointer-only */
+    .tile:hover img { transform: none; filter: none; }
+    .tile:hover::after { opacity: 0; }
 
     .page { max-width: 100%; }
     body.text-page #main > .wrap { padding-left: 15px; }
