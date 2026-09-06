@@ -6,13 +6,39 @@
 
 :root {
     --ink: #000000;
+    --ink-soft: #6f766f;   /* the neutral, nudged toward the accent */
     --paper: #ffffff;
-    --accent: #009933;   /* green screen green */
+    --accent: #00CC00;   /* green screen green */
     --sidebar-w: 17%;
     --gutter: 3%;
     --meta-gap: 20px;
     --ease-out: cubic-bezier(0.165, 0.84, 0.44, 1);
     --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Consolas where it exists (Windows, and Macs with Office); Inconsolata —
+   drawn as a free counterpart to Consolas — everywhere else, so the page reads
+   the same on every platform. One variable file per subset covers 400 to 700.
+   Self-hosted: the site makes no third-party requests. */
+@font-face {
+    font-family: "Inconsolata";
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url(../fonts/inconsolata-latin.woff2) format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+        U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: "Inconsolata";
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url(../fonts/inconsolata-latin-ext.woff2) format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+        U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+        U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -21,7 +47,7 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
     margin: 0;
-    font: 400 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font: 400 13px/1.4 Consolas, Inconsolata, Menlo, Monaco, "Courier New", monospace;
     color: var(--ink);
     background: var(--paper);
     overflow-x: hidden;
@@ -32,7 +58,7 @@ body.no-scroll { overflow: hidden; }
 
 a { color: var(--ink); text-decoration: none; }
 
-img { display: block; width: 100%; border: 0; }
+img { display: block; width: 100%; height: auto; border: 0; }
 
 h1, h2, h3, h4, h5, h6 { font-size: 30px; margin: 0; color: var(--ink); }
 
@@ -103,21 +129,12 @@ p { margin: 0 0 14px; }
 .navigation { margin-bottom: 30px; }
 .navigation li { line-height: 1.4; }
 
-/* Nav links: an accent rule that draws in from the left on hover.
-   Painted as a background so the link box stays inline, as in the original. */
-.nav-link {
-    background-image: linear-gradient(var(--accent), var(--accent));
-    background-repeat: no-repeat;
-    background-position: 0 100%;
-    background-size: 0% 1px;
-    transition: background-size 0.35s var(--ease-out);
-}
+/* Nav links behave like every other link: they take the accent. Nothing on
+   this site is underlined. */
+.nav-link { transition: color 0.3s linear; }
 .nav-link:hover,
-.nav-link:focus-visible { background-size: 100% 1px; }
-.nav-link[aria-current="page"] {
-    background-image: linear-gradient(var(--ink), var(--ink));
-    background-size: 100% 1px;
-}
+.nav-link:focus-visible,
+.nav-link[aria-current="page"] { color: var(--accent); }
 
 .social { margin-bottom: 30px; }
 .social ul { display: flex; align-items: center; gap: 12px; }
@@ -132,13 +149,19 @@ p { margin: 0 0 14px; }
 .social a { color: var(--accent); }
 
 .header-description {
+    margin: 0;
     max-width: 90%;
     font-size: 11px;
     font-weight: 400;
     line-height: 1.4;
     text-transform: none;
 }
+.header-description blockquote { margin: 0; }
 .header-description p { margin: 0; }
+.header-description figcaption {
+    margin-top: 10px;
+    color: var(--ink-soft);
+}
 
 .nav-toggle { display: none; }
 
@@ -166,6 +189,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     position: relative;
     display: block;
     overflow: hidden;
+    isolation: isolate;   /* keeps the screen blend inside the tile */
     background: #f2f2f2;
     aspect-ratio: 1 / 1;
     /* entrance state; cleared by .in */
@@ -179,27 +203,35 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .tile img {
     height: 100%;
     object-fit: cover;
-    transition: transform 0.7s var(--ease-soft), filter 0.5s linear;
+    transition: transform 0.7s var(--ease-soft), filter 0.45s var(--ease-out);
     will-change: transform;
 }
 
-/* Hover: the image eases in, and the accent washes up from the floor of the
-   tile. No text is added — the tile is a link to the project's own page. */
+/* Hover: the image eases in and turns into a two-colour print — the accent in
+   the shadows, white in the highlights, the way a duotone works.
+
+   Desaturating the photograph and screening a flat accent over it is exactly
+   that mapping: screen gives 1-(1-a)(1-b), so with #00CC00 over grey L the
+   result runs from the accent itself at L=0 to white at L=1. No second copy of
+   the image and no SVG filter — and unlike filter: url(), both grayscale() and
+   opacity interpolate, so it cross-fades instead of snapping. */
 .tile::after {
     content: "";
     position: absolute;
     inset: 0;
     background: var(--accent);
+    mix-blend-mode: screen;
     opacity: 0;
-    transform: scaleY(0);
-    transform-origin: 50% 100%;
-    transition: transform 0.45s var(--ease-out), opacity 0.45s var(--ease-out);
+    transition: opacity 0.45s var(--ease-out);
     pointer-events: none;
 }
 .tile:hover img,
-.tile:focus-visible img { transform: scale(1.045); }
+.tile:focus-visible img {
+    transform: scale(1.045);
+    filter: grayscale(1);
+}
 .tile:hover::after,
-.tile:focus-visible::after { opacity: 0.22; transform: scaleY(1); }
+.tile:focus-visible::after { opacity: 1; }
 
 .tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
@@ -216,6 +248,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 700;
     line-height: 1;
     margin: 0 0 20px;
+    text-transform: lowercase;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
     animation: rise 0.7s var(--ease-soft) 0.05s forwards;
@@ -259,11 +292,13 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .project { padding-bottom: 90px; }
 .project .project-media {
     margin: 0 0 24px;
+    /* width is capped per project to the image's own size — see build.py */
     opacity: 0;
     transform: translate3d(0, 22px, 0);
     animation: rise 0.8s var(--ease-soft) forwards;
 }
 .project .project-text {
+    max-width: 800px;   /* the same measure the text pages use */
     font-size: 13px;
     line-height: 1.4;
     opacity: 0;
@@ -277,16 +312,28 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     line-height: 1;
     margin: 0 0 10px;
 }
-.project .project-text p { margin: 0 0 20px; }
-.project .back {
-    display: inline-block;
-    font-size: 12px;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    transition: color 0.25s linear;
+.project h1 {
+    color: var(--accent);
+    text-transform: lowercase;
 }
-.project .back:hover { color: var(--accent); }
+
+/* An embedded player stands in for the link that used to point at it. */
+.embed {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+    margin: 0 0 20px;
+    background: #000;
+}
+.embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+.project .project-text p { margin: 0 0 20px; }
 
 /* --- Mobile ---------------------------------------------------------------- */
 
@@ -393,9 +440,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     #main { margin-top: 70px; }
     #main > .wrap { padding: 0 15px; }
     .grid { row-gap: calc(3cqw + 10px); }
-    /* no hover state on touch — the accent wash is pointer-only */
-    .tile:hover img { transform: none; }
-    .tile:hover::after { opacity: 0; transform: scaleY(0); }
+    /* no hover treatment on touch — the duotone is pointer-only */
+    .tile:hover img { transform: none; filter: none; }
+    .tile:hover::after { opacity: 0; }
 
     .page { max-width: 100%; }
     body.text-page #main > .wrap { padding-left: 15px; }

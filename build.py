@@ -17,14 +17,22 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = "https://www.ronyefrat.work"
 TITLE = "Rony Efrat"
 TAGLINE = "technology is the campfire around which we tell our stories."
+QUOTE_BY = "Laurie Anderson"
+
+# The line has always been Laurie Anderson's; the sidebar now says so. No
+# quotation marks, no dash — the attribution is set apart by weight and space.
+QUOTE = ('<figure class="header-description">'
+         '<blockquote><p>%s</p></blockquote>'
+         '<figcaption>%s</figcaption>'
+         '</figure>' % (TAGLINE, QUOTE_BY))
 
 NAV = [
     ("/upcoming/", "upcoming"),
     ("/about/", "about"),
-    ("/filmography/", "Filmography"),
-    ("/academia/", "Academia"),
-    ("/ai/", "AI"),
-    ("/press/", "Press"),
+    ("/filmography/", "filmography"),
+    ("/academia/", "academia"),
+    ("/ai/", "ai"),
+    ("/press/", "press"),
 ]
 
 SOCIAL = [
@@ -74,14 +82,71 @@ def strip_tags(s):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s)).strip()
 
 
-def short(title, limit=38):
-    """Trim a neighbour's title so the prev/next line stays on one row."""
-    return title if len(title) <= limit else title[:limit].rstrip(" —,-") + "\u2026"
-
-
 def lazy_iframes(html):
     """Defer third-party embeds until they are scrolled to."""
     return re.sub(r"<iframe(?![^>]*loading=)", '<iframe loading="lazy"', html)
+
+
+VIDEO_HOSTS = (
+    (re.compile(r"^https?://(?:www\.)?vimeo\.com/(\d+)"),
+     "https://player.vimeo.com/video/%s"),
+    (re.compile(r"^https?://(?:www\.)?youtube\.com/watch\?v=([\w-]+)"),
+     "https://www.youtube.com/embed/%s"),
+    (re.compile(r"^https?://youtu\.be/([\w-]+)"),
+     "https://www.youtube.com/embed/%s"),
+    (re.compile(r"^https?://(?:www\.)?arte\.tv/(\w\w)/videos/([\w-]+)/"),
+     "https://www.arte.tv/embeds/%s/%s"),
+)
+
+
+def embed_url(href):
+    """The player URL for a link to a video, or None if it is not one."""
+    for pattern, template in VIDEO_HOSTS:
+        m = pattern.match(href)
+        if m:
+            return template % m.groups()
+    return None
+
+
+def embed_videos(html, slug=""):
+    """Swap a project's opening 'find it here' link for the video itself.
+
+    Only the first paragraph is considered, and only when it holds nothing but
+    that link and its punctuation — which is the shape every one of these has.
+    Links to pages that merely mention a film (france.tv, fawesome, a festival
+    write-up) have no player to embed and are left alone.
+    """
+    m = re.match(r"\s*<p>(.*?)</p>", html, re.S)
+    if not m:
+        return html
+    para = m.group(1)
+    player = None
+    for href in re.findall(r'<a href="([^"]+)"', para):
+        player = player or embed_url(href)
+    if not player:
+        return html
+    # the paragraph must be just the link(s) and punctuation
+    if re.sub(r"<[^>]+>|[\s.,;:]", "", para) not in ("findithere", "watchithere",
+                                                     "watchither", "seeithere"):
+        text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
+        if not text.startswith(("findithere", "watchithere", "watchither")):
+            return html
+    frame = ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
+             'allow="autoplay; fullscreen; picture-in-picture" '
+             'allowfullscreen></iframe></div>' % player)
+    return frame + html[m.end():]
+
+
+def blank_external(html):
+    """Every link off the site opens in a new tab."""
+    def fix(m):
+        attrs = m.group(1)
+        if "target=" not in attrs:
+            attrs += ' target="_blank"'
+        if "rel=" not in attrs:
+            attrs += ' rel="noopener"'
+        return "<a %s>" % attrs.strip()
+    return re.sub(r'<a ([^>]*href="https?://[^"]*"[^>]*)>', fix, html)
 
 
 def icons(extra_class=""):
@@ -101,7 +166,7 @@ def nav_list(active):
     lis = []
     for href, label in NAV:
         cur = ' aria-current="page"' if href == active else ""
-        lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, label))
+        lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, esc(label)))
     return '<nav class="navigation" aria-label="Main"><ul>%s</ul></nav>' % "".join(lis)
 
 
@@ -112,7 +177,7 @@ def header(active):
     <script src="/assets/js/name.js"></script>
     %(nav)s
     %(social)s
-    <div class="header-description"><p>%(tagline)s</p></div>
+    %(quote)s
     <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="drawer">
       <span></span><span></span><span></span>
     </button>
@@ -121,9 +186,10 @@ def header(active):
 <aside id="drawer" aria-hidden="true">
   %(nav)s
   %(social)s
-  <div class="header-description"><p>%(tagline)s</p></div>
+  %(quote)s
 </aside>""" % {
-        "title": TITLE, "tagline": TAGLINE,
+        "title": TITLE,
+        "quote": QUOTE,
         "nav": nav_list(active), "social": icons(),
     }
 
@@ -232,20 +298,14 @@ def build():
         ))
 
     # --- project permalinks --------------------------------------------------
-    for i, p in enumerate(posts):
-        prev_p = posts[i - 1] if i else None
-        next_p = posts[i + 1] if i + 1 < len(posts) else None
-        nav = []
-        if prev_p:
-            nav.append('<a class="back" href="/work/%s/">&larr; %s</a>'
-                       % (prev_p["slug"], esc(short(prev_p["title"]))))
-        if next_p:
-            nav.append('<a class="back" href="/work/%s/">%s &rarr;</a>'
-                       % (next_p["slug"], esc(short(next_p["title"]))))
+    for p in posts:
+        # The image shows at its own size, never enlarged to fill the column,
+        # and never wider than the 800px measure the text pages use.
+        media_w = min(p["w"], 800)
         body = """  <article class="project">
-    <div class="project-media">
+    <div class="project-media" style="max-width:%(mw)dpx">
       <picture>
-        <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, 62vw">
+        <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, %(mw)dpx">
         <img src="/assets/img/%(slug)s-960.jpg" alt="%(alt)s" width="%(w)d" height="%(h)d" decoding="async">
       </picture>
     </div>
@@ -253,18 +313,15 @@ def build():
       <h1>%(title)s</h1>
       %(subtitle)s
       %(body)s
-      <p><a class="back" href="/">&larr; All work</a></p>
-      <p>%(nav)s</p>
     </div>
   </article>""" % {
             "webp": srcset(p, "webp"),
             "slug": p["slug"],
             "alt": esc(p["title"]),
-            "w": p["w"], "h": p["h"],
+            "w": p["w"], "h": p["h"], "mw": media_w,
             "title": esc(p["title"]),
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
-            "body": p["body"],
-            "nav": " &nbsp;&nbsp; ".join(nav),
+            "body": embed_videos(p["body"], p["slug"]),
         }
         write("work/%s/index.html" % p["slug"], document(
             title="%s — %s" % (p["title"], TITLE),
@@ -319,7 +376,8 @@ def build():
     main { padding: 70px 25px 70px 50px; max-width: 800px; }
     h1 { font-size: 30px; font-weight: 700; line-height: 1; margin: 0 0 20px;
          text-transform: lowercase; }
-    a { color: #000; font-weight: 700; transition: color .25s linear; }
+    a { color: #000; font-weight: 700; text-decoration: none;
+        transition: color .25s linear; }
     a:hover { color: #ff6f26; }
   </style>
 </head>
@@ -421,6 +479,7 @@ def relativize(html, depth):
 
 def write(path, content):
     if path.endswith(".html"):
+        content = blank_external(content)
         content = relativize(content, path.count("/"))
     full = os.path.join(ROOT, path)
     os.makedirs(os.path.dirname(full) or ROOT, exist_ok=True)
