@@ -107,9 +107,8 @@ p { margin: 0 0 14px; }
 
 #header > .wrap { padding: 70px 25px 70px 50px; }
 
-.logo { margin-bottom: 30px; line-height: 1.1; }
+.logo { margin-bottom: 30px; line-height: 1.1; font-size: 20px; }
 .logo a {
-    font-size: 16px;
     font-weight: 700;
     display: inline-block;
     color: var(--accent);
@@ -118,11 +117,11 @@ p { margin: 0 0 14px; }
 .logo a:hover { transform: translateX(3px); }
 
 /* When the header is asking a question rather than stating the name it wraps.
-   Two lines are reserved so the nav below sits in the same place from one
-   question to the next; the three longest run to a third line. */
+   Three lines are reserved so the nav below sits in the same place from one
+   question to the next; only the two longest run past it. */
 .logo.is-question a { line-height: 1.25; }
 .logo.is-question {
-    min-height: 2.5em;      /* 2 lines at 1.25 */
+    min-height: 3.75em;     /* 3 lines at 1.25 */
     margin-bottom: 26px;
 }
 
