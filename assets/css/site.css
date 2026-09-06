@@ -248,6 +248,10 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 700;
     line-height: 1;
     margin: 0 0 20px;
+    /* the page titles are the one underscored thing on the site */
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
     animation: rise 0.7s var(--ease-soft) 0.05s forwards;
@@ -310,6 +314,27 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 400;
     line-height: 1;
     margin: 0 0 10px;
+}
+.project h1 {
+    color: var(--accent);
+    text-transform: lowercase;
+}
+
+/* An embedded player stands in for the link that used to point at it. */
+.embed {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+    margin: 0 0 20px;
+    background: #000;
+}
+.embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 .project .project-text p { margin: 0 0 20px; }
 

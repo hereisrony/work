@@ -31,7 +31,7 @@ NAV = [
     ("/about/", "about"),
     ("/filmography/", "Filmography"),
     ("/academia/", "Academia"),
-    ("/ai/", "AI"),
+    ("/ai/", "ai & why"),
     ("/press/", "Press"),
 ]
 
@@ -87,6 +87,68 @@ def lazy_iframes(html):
     return re.sub(r"<iframe(?![^>]*loading=)", '<iframe loading="lazy"', html)
 
 
+VIDEO_HOSTS = (
+    (re.compile(r"^https?://(?:www\.)?vimeo\.com/(\d+)"),
+     "https://player.vimeo.com/video/%s"),
+    (re.compile(r"^https?://(?:www\.)?youtube\.com/watch\?v=([\w-]+)"),
+     "https://www.youtube.com/embed/%s"),
+    (re.compile(r"^https?://youtu\.be/([\w-]+)"),
+     "https://www.youtube.com/embed/%s"),
+    (re.compile(r"^https?://(?:www\.)?arte\.tv/(\w\w)/videos/([\w-]+)/"),
+     "https://www.arte.tv/embeds/%s/%s"),
+)
+
+
+def embed_url(href):
+    """The player URL for a link to a video, or None if it is not one."""
+    for pattern, template in VIDEO_HOSTS:
+        m = pattern.match(href)
+        if m:
+            return template % m.groups()
+    return None
+
+
+def embed_videos(html, slug=""):
+    """Swap a project's opening 'find it here' link for the video itself.
+
+    Only the first paragraph is considered, and only when it holds nothing but
+    that link and its punctuation — which is the shape every one of these has.
+    Links to pages that merely mention a film (france.tv, fawesome, a festival
+    write-up) have no player to embed and are left alone.
+    """
+    m = re.match(r"\s*<p>(.*?)</p>", html, re.S)
+    if not m:
+        return html
+    para = m.group(1)
+    player = None
+    for href in re.findall(r'<a href="([^"]+)"', para):
+        player = player or embed_url(href)
+    if not player:
+        return html
+    # the paragraph must be just the link(s) and punctuation
+    if re.sub(r"<[^>]+>|[\s.,;:]", "", para) not in ("findithere", "watchithere",
+                                                     "watchither", "seeithere"):
+        text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
+        if not text.startswith(("findithere", "watchithere", "watchither")):
+            return html
+    frame = ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
+             'allow="autoplay; fullscreen; picture-in-picture" '
+             'allowfullscreen></iframe></div>' % player)
+    return frame + html[m.end():]
+
+
+def blank_external(html):
+    """Every link off the site opens in a new tab."""
+    def fix(m):
+        attrs = m.group(1)
+        if "target=" not in attrs:
+            attrs += ' target="_blank"'
+        if "rel=" not in attrs:
+            attrs += ' rel="noopener"'
+        return "<a %s>" % attrs.strip()
+    return re.sub(r'<a ([^>]*href="https?://[^"]*"[^>]*)>', fix, html)
+
+
 def icons(extra_class=""):
     lis = []
     for href, label, path in SOCIAL:
@@ -104,7 +166,7 @@ def nav_list(active):
     lis = []
     for href, label in NAV:
         cur = ' aria-current="page"' if href == active else ""
-        lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, label))
+        lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, esc(label)))
     return '<nav class="navigation" aria-label="Main"><ul>%s</ul></nav>' % "".join(lis)
 
 
@@ -259,7 +321,7 @@ def build():
             "w": p["w"], "h": p["h"], "mw": media_w,
             "title": esc(p["title"]),
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
-            "body": p["body"],
+            "body": embed_videos(p["body"], p["slug"]),
         }
         write("work/%s/index.html" % p["slug"], document(
             title="%s — %s" % (p["title"], TITLE),
@@ -416,6 +478,7 @@ def relativize(html, depth):
 
 def write(path, content):
     if path.endswith(".html"):
+        content = blank_external(content)
         content = relativize(content, path.count("/"))
     full = os.path.join(ROOT, path)
     os.makedirs(os.path.dirname(full) or ROOT, exist_ok=True)
