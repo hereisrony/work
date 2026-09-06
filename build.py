@@ -74,11 +74,6 @@ def strip_tags(s):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s)).strip()
 
 
-def short(title, limit=38):
-    """Trim a neighbour's title so the prev/next line stays on one row."""
-    return title if len(title) <= limit else title[:limit].rstrip(" —,-") + "\u2026"
-
-
 def lazy_iframes(html):
     """Defer third-party embeds until they are scrolled to."""
     return re.sub(r"<iframe(?![^>]*loading=)", '<iframe loading="lazy"', html)
@@ -232,20 +227,14 @@ def build():
         ))
 
     # --- project permalinks --------------------------------------------------
-    for i, p in enumerate(posts):
-        prev_p = posts[i - 1] if i else None
-        next_p = posts[i + 1] if i + 1 < len(posts) else None
-        nav = []
-        if prev_p:
-            nav.append('<a class="back" href="/work/%s/">&larr; %s</a>'
-                       % (prev_p["slug"], esc(short(prev_p["title"]))))
-        if next_p:
-            nav.append('<a class="back" href="/work/%s/">%s &rarr;</a>'
-                       % (next_p["slug"], esc(short(next_p["title"]))))
+    for p in posts:
+        # The image shows at its own size, never enlarged to fill the column,
+        # and never wider than the 800px measure the text pages use.
+        media_w = min(p["w"], 800)
         body = """  <article class="project">
-    <div class="project-media">
+    <div class="project-media" style="max-width:%(mw)dpx">
       <picture>
-        <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, 62vw">
+        <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, %(mw)dpx">
         <img src="/assets/img/%(slug)s-960.jpg" alt="%(alt)s" width="%(w)d" height="%(h)d" decoding="async">
       </picture>
     </div>
@@ -253,18 +242,15 @@ def build():
       <h1>%(title)s</h1>
       %(subtitle)s
       %(body)s
-      <p><a class="back" href="/">&larr; All work</a></p>
-      <p>%(nav)s</p>
     </div>
   </article>""" % {
             "webp": srcset(p, "webp"),
             "slug": p["slug"],
             "alt": esc(p["title"]),
-            "w": p["w"], "h": p["h"],
+            "w": p["w"], "h": p["h"], "mw": media_w,
             "title": esc(p["title"]),
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
             "body": p["body"],
-            "nav": " &nbsp;&nbsp; ".join(nav),
         }
         write("work/%s/index.html" % p["slug"], document(
             title="%s — %s" % (p["title"], TITLE),

@@ -7,7 +7,7 @@
 :root {
     --ink: #000000;
     --paper: #ffffff;
-    --accent: #009933;   /* green screen green */
+    --accent: #00FF00;   /* green screen green */
     --sidebar-w: 17%;
     --gutter: 3%;
     --meta-gap: 20px;
@@ -32,7 +32,7 @@ body.no-scroll { overflow: hidden; }
 
 a { color: var(--ink); text-decoration: none; }
 
-img { display: block; width: 100%; border: 0; }
+img { display: block; width: 100%; height: auto; border: 0; }
 
 h1, h2, h3, h4, h5, h6 { font-size: 30px; margin: 0; color: var(--ink); }
 
@@ -259,11 +259,13 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .project { padding-bottom: 90px; }
 .project .project-media {
     margin: 0 0 24px;
+    /* width is capped per project to the image's own size — see build.py */
     opacity: 0;
     transform: translate3d(0, 22px, 0);
     animation: rise 0.8s var(--ease-soft) forwards;
 }
 .project .project-text {
+    max-width: 800px;   /* the same measure the text pages use */
     font-size: 13px;
     line-height: 1.4;
     opacity: 0;
@@ -278,15 +280,6 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     margin: 0 0 10px;
 }
 .project .project-text p { margin: 0 0 20px; }
-.project .back {
-    display: inline-block;
-    font-size: 12px;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    transition: color 0.25s linear;
-}
-.project .back:hover { color: var(--accent); }
 
 /* --- Mobile ---------------------------------------------------------------- */
 
