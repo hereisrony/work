@@ -49,6 +49,30 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
+## Caching
+
+GitHub Pages serves every file with `Cache-Control: max-age=600` and offers no
+way to change that, so a browser can hold on to a stylesheet for ten minutes
+after a deploy. To stop that ever pairing new HTML with an old stylesheet,
+`build.py` stamps each asset's own content hash into its URL:
+
+```html
+<link rel="stylesheet" href="/assets/css/site.css?v=fc5d2d33c4">
+```
+
+Change the file and the address changes with it, so the browser has to fetch
+it. Leave it alone and the address stays put, so it stays cached. The hash is
+of the file's bytes, so the same content always gives the same URL. CSS,
+JavaScript, the favicon and every image are covered.
+
+What this does *not* change is the ten minutes on the HTML itself: a reader who
+loaded a page nine minutes before a deploy keeps seeing that page, whole and
+consistent, until it lapses. There is no mixed state, and no hard reload is
+needed — it corrects itself.
+
+The fonts are the one exception, deliberately: their names never change because
+their contents never do. If you ever swap a font file, give it a new filename.
+
 ## Deploying
 
 Pushes to `main` are built and published by
