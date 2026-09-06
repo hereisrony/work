@@ -57,20 +57,28 @@ To turn it on the first time: **Settings → Pages → Build and deployment →
 Source: GitHub Actions**. The site then goes live at
 `https://<user>.github.io/<repo>/`.
 
-### Previewing before you merge
+### The preview site
 
-Actions → **Deploy to GitHub Pages** → **Run workflow**, and pick the branch.
-It publishes that branch to the same Pages URL, so you can look at the whole
-site before anything touches `main`.
+The Pages URL, `https://<user>.github.io/<repo>/`, is the preview. It is not the
+public site — that stays on Tumblr until the DNS change below — so `main` can be
+used freely to look at work in progress.
 
-Every internal path is relative, so the preview at
-`https://<user>.github.io/<repo>/` works exactly like the finished site — styles,
-images, navigation, the project modal, the old-permalink redirects. Nothing
-needs rebuilding when the custom domain is switched on later.
+Every internal path is relative, so the preview behaves exactly like the
+finished site: styles, images, navigation, the project pages, the old-permalink
+redirects. Nothing needs rebuilding when the custom domain is switched on later.
 
-The one thing that differs on the preview: `canonical` and `og:` tags point at
-`www.ronyefrat.work`, since that is where the site is headed. Harmless while
-previewing, correct once live.
+Only `canonical` and `og:` tags differ, pointing at `www.ronyefrat.work` since
+that is where the site is headed. Harmless while previewing, correct once live.
+
+**Previewing a branch without merging** takes one setting. By default the
+`github-pages` environment only accepts deployments from the default branch, so
+running the workflow on a branch builds fine and then fails at the deploy step
+with no logs. To allow it: **Settings → Environments → `github-pages` →
+Deployment branches**, and add a pattern such as `claude/*`. After that,
+Actions → **Deploy to GitHub Pages** → **Run workflow** → pick the branch
+publishes it to the same Pages URL.
+
+Without that setting, seeing a branch means merging it to `main` first.
 
 ### Pointing www.ronyefrat.work at it
 
