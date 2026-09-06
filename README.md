@@ -16,6 +16,7 @@ assets/css/site.css     all styling
 assets/js/site.js       grid reveal, mobile drawer
 assets/js/name.js       generated from content/questions.json
 assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback
+assets/fonts/           Inconsolata, self-hosted (two variable subsets)
 content/posts.json      the 18 projects: title, subtitle, date, body HTML
 content/pages.json      the six text pages
 content/questions.json  the questions the header asks about her name
@@ -108,11 +109,26 @@ and the page title, `og:` tags and structured data all carry the real name, so
 screen readers and search engines are unaffected. With JavaScript off, the
 header simply reads Rony Efrat everywhere.
 
+## Type
+
+Everything is set in Consolas, with Inconsolata — drawn as a free counterpart
+to Consolas — self-hosted for the machines that do not have it, so the page
+reads the same everywhere and makes no third-party requests. One variable file
+per subset (latin, latin-ext) covers regular through bold, about 65KB in all.
+
+The `@font-face` URLs are relative to the stylesheet rather than the site root:
+CSS resolves `url()` against the stylesheet, so the fonts load at the domain
+root and at a Pages subpath alike. The HTML path rewriter never sees inside
+CSS.
+
+Nothing on the site is underlined. Links, including the navigation, take the
+accent on hover; the current page stays in it.
+
 ## Notes on the rebuild
 
 Layout, type and spacing are reproduced from the original: the fixed 17% left
 column, the 800px text measure, the three-column grid at 31.33% with a 3%
-gutter, 13px/1.4 Helvetica Neue, black on white. Tile positions match the
+gutter, black on white. Tile positions match the
 original to the pixel at 1440px. The one accent is green screen green
 `#00CC00` — it carries the name, the social icons, the navigation underline,
 the hover treatment on a tile and the loading bar.

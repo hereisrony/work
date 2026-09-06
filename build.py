@@ -17,6 +17,14 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = "https://www.ronyefrat.work"
 TITLE = "Rony Efrat"
 TAGLINE = "technology is the campfire around which we tell our stories."
+QUOTE_BY = "Laurie Anderson"
+
+# The line has always been Laurie Anderson's; the sidebar now says so. No
+# quotation marks, no dash — the attribution is set apart by weight and space.
+QUOTE = ('<figure class="header-description">'
+         '<blockquote><p>%s</p></blockquote>'
+         '<figcaption>%s</figcaption>'
+         '</figure>' % (TAGLINE, QUOTE_BY))
 
 NAV = [
     ("/upcoming/", "upcoming"),
@@ -107,7 +115,7 @@ def header(active):
     <script src="/assets/js/name.js"></script>
     %(nav)s
     %(social)s
-    <div class="header-description"><p>%(tagline)s</p></div>
+    %(quote)s
     <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="drawer">
       <span></span><span></span><span></span>
     </button>
@@ -116,9 +124,10 @@ def header(active):
 <aside id="drawer" aria-hidden="true">
   %(nav)s
   %(social)s
-  <div class="header-description"><p>%(tagline)s</p></div>
+  %(quote)s
 </aside>""" % {
-        "title": TITLE, "tagline": TAGLINE,
+        "title": TITLE,
+        "quote": QUOTE,
         "nav": nav_list(active), "social": icons(),
     }
 
