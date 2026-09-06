@@ -17,7 +17,8 @@ assets/js/site.js       grid reveal, mobile drawer
 assets/js/name.js       generated from content/questions.json
 assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback
 assets/fonts/           Inconsolata, self-hosted (two variable subsets)
-content/posts.json      the 18 projects: title, subtitle, date, body HTML
+content/posts.json      the 18 projects: title, subtitle, date, body HTML,
+                        and an optional "video" to embed
 content/pages.json      the six text pages
 content/questions.json  the questions the header asks about her name
 build.py                regenerates the HTML from content/
@@ -161,7 +162,13 @@ navigation, the project titles, the hover treatment on a tile and the loading
 bar.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
-or `press` opens. Nothing overlays the grid.
+or `press` opens. Nothing overlays the grid. A project page starts at its
+title: the still belongs to the grid and is not repeated underneath.
+
+Where a project's text opened with a link to a video, the player stands in its
+place. A project whose text never linked to one can name it with a `"video"`
+key in `content/posts.json`. Vimeo, YouTube and ARTE are understood; a link to
+a page that merely mentions a film stays a link.
 
 Motion, and only motion, was added to the original:
 

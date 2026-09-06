@@ -100,6 +100,12 @@ VIDEO_HOSTS = (
 )
 
 
+def player_frame(src):
+    return ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
+            'allow="autoplay; fullscreen; picture-in-picture" '
+            'allowfullscreen></iframe></div>' % src)
+
+
 def embed_url(href):
     """The player URL for a link to a video, or None if it is not one."""
     for pattern, template in VIDEO_HOSTS:
@@ -132,10 +138,19 @@ def embed_videos(html, slug=""):
         text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
         if not text.startswith(("findithere", "watchithere", "watchither")):
             return html
-    frame = ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
-             'allow="autoplay; fullscreen; picture-in-picture" '
-             'allowfullscreen></iframe></div>' % player)
-    return frame + html[m.end():]
+    return player_frame(player) + html[m.end():]
+
+
+def project_body(post):
+    """The body with its video in place: either the opening link turned into a
+    player, or one named by a "video" key for a project whose text never
+    linked to it."""
+    html = embed_videos(post["body"], post["slug"])
+    if 'class="embed"' not in html and post.get("video"):
+        src = embed_url(post["video"])
+        if src:
+            html = player_frame(src) + html
+    return html
 
 
 def blank_external(html):
@@ -344,30 +359,16 @@ def build():
 
     # --- project permalinks --------------------------------------------------
     for p in posts:
-        # The image shows at its own size, never enlarged to fill the column,
-        # and never wider than the 800px measure the text pages use.
-        media_w = min(p["w"], 800)
         body = """  <article class="project">
-    <div class="project-media" style="max-width:%(mw)dpx">
-      <picture>
-        <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, %(mw)dpx">
-        <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" decoding="async">
-      </picture>
-    </div>
     <div class="project-text">
       <h1>%(title)s</h1>
       %(subtitle)s
       %(body)s
     </div>
   </article>""" % {
-            "webp": srcset(p, "webp"),
-            "slug": p["slug"],
-            "alt": esc(p["title"]),
-            "jpg": asset("/assets/img/%s-960.jpg" % p["slug"]),
-            "w": p["w"], "h": p["h"], "mw": media_w,
             "title": esc(p["title"]),
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
-            "body": embed_videos(p["body"], p["slug"]),
+            "body": project_body(p),
         }
         write("work/%s/index.html" % p["slug"], document(
             title="%s — %s" % (p["title"], TITLE),
