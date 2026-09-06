@@ -29,10 +29,10 @@ QUOTE = ('<figure class="header-description">'
 NAV = [
     ("/upcoming/", "upcoming"),
     ("/about/", "about"),
-    ("/filmography/", "Filmography"),
-    ("/academia/", "Academia"),
-    ("/ai/", "ai & why"),
-    ("/press/", "Press"),
+    ("/filmography/", "filmography"),
+    ("/academia/", "academia"),
+    ("/ai/", "ai"),
+    ("/press/", "press"),
 ]
 
 SOCIAL = [
@@ -376,7 +376,8 @@ def build():
     main { padding: 70px 25px 70px 50px; max-width: 800px; }
     h1 { font-size: 30px; font-weight: 700; line-height: 1; margin: 0 0 20px;
          text-transform: lowercase; }
-    a { color: #000; font-weight: 700; transition: color .25s linear; }
+    a { color: #000; font-weight: 700; text-decoration: none;
+        transition: color .25s linear; }
     a:hover { color: #ff6f26; }
   </style>
 </head>

@@ -121,8 +121,10 @@ CSS resolves `url()` against the stylesheet, so the fonts load at the domain
 root and at a Pages subpath alike. The HTML path rewriter never sees inside
 CSS.
 
-Nothing on the site is underlined. Links, including the navigation, take the
-accent on hover; the current page stays in it.
+Nothing on the site is underlined, anywhere. Links, including the navigation,
+take the accent on hover; the current page stays in it. Page names are lower
+case, and so are the project titles — those by `text-transform`, so
+`content/posts.json` keeps the capitals they were written with.
 
 ## Notes on the rebuild
 
@@ -130,8 +132,9 @@ Layout, type and spacing are reproduced from the original: the fixed 17% left
 column, the 800px text measure, the three-column grid at 31.33% with a 3%
 gutter, black on white. Tile positions match the
 original to the pixel at 1440px. The one accent is green screen green
-`#00CC00` — it carries the name, the social icons, the navigation underline,
-the hover treatment on a tile and the loading bar.
+`#00CC00` — it carries the name, the social icons, the current and hovered
+navigation, the project titles, the hover treatment on a tile and the loading
+bar.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
 or `press` opens. Nothing overlays the grid.
@@ -142,7 +145,6 @@ Motion, and only motion, was added to the original:
 - grid tiles rise and fade in, staggered, as they enter the viewport
 - on hover a tile eases in slightly and turns into a two-colour print: the
   accent in the shadows, white in the highlights
-- nav links draw an accent underline from the left
 - on mobile the top bar retracts as you scroll down and returns on scroll up,
   and the drawer's links cascade in
 - everything above is disabled under `prefers-reduced-motion`
