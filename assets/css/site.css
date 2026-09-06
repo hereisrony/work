@@ -7,7 +7,7 @@
 :root {
     --ink: #000000;
     --paper: #ffffff;
-    --accent: #ff6f26;
+    --accent: #009933;   /* green screen green */
     --sidebar-w: 17%;
     --gutter: 3%;
     --meta-gap: 20px;
@@ -86,9 +86,19 @@ p { margin: 0 0 14px; }
     font-size: 16px;
     font-weight: 700;
     display: inline-block;
+    color: var(--accent);
     transition: transform 0.4s var(--ease-out);
 }
 .logo a:hover { transform: translateX(3px); }
+
+/* When the header is asking a question rather than stating the name it wraps.
+   Two lines are reserved so the nav below sits in the same place from one
+   question to the next; the three longest run to a third line. */
+.logo.is-question a { line-height: 1.25; }
+.logo.is-question {
+    min-height: 2.5em;      /* 2 lines at 1.25 */
+    margin-bottom: 26px;
+}
 
 .navigation { margin-bottom: 30px; }
 .navigation li { line-height: 1.4; }
@@ -117,8 +127,9 @@ p { margin: 0 0 14px; }
     height: 22px;
     transition: transform 0.35s var(--ease-out), color 0.3s linear;
 }
-.social a:hover { transform: translateY(-3px); color: var(--accent); }
+.social a:hover { transform: translateY(-3px); opacity: 0.65; }
 .social svg { width: 16px; height: 16px; fill: currentColor; display: block; }
+.social a { color: var(--accent); }
 
 .header-description {
     max-width: 90%;
@@ -172,8 +183,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     will-change: transform;
 }
 
-/* Hover: the image eases in, and the theme's accent washes up from the floor
-   of the tile. No text is added — the caption still lives in the modal. */
+/* Hover: the image eases in, and the accent washes up from the floor of the
+   tile. No text is added — the tile is a link to the project's own page. */
 .tile::after {
     content: "";
     position: absolute;
@@ -277,132 +288,6 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 }
 .project .back:hover { color: var(--accent); }
 
-/* --- Modal ----------------------------------------------------------------- */
-
-.modal {
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 90px;
-    visibility: hidden;
-    pointer-events: none;
-}
-.modal.open { visibility: visible; pointer-events: auto; }
-
-.modal-scrim {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.77);
-    opacity: 0;
-    backdrop-filter: blur(7px);
-    -webkit-backdrop-filter: blur(7px);
-    transition: opacity 0.45s var(--ease-out);
-}
-.modal.open .modal-scrim { opacity: 1; }
-
-.modal-inner {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    max-width: 1180px;
-    width: 100%;
-    max-height: 100%;
-    opacity: 0;
-    transform: translate3d(0, 40px, 0);
-    transition: opacity 0.45s var(--ease-out), transform 0.55s var(--ease-out);
-}
-.modal.open .modal-inner { opacity: 1; transform: none; }
-
-/* directional nudge when stepping between projects */
-.modal-inner.step-next { animation: stepNext 0.5s var(--ease-out); }
-.modal-inner.step-prev { animation: stepPrev 0.5s var(--ease-out); }
-@keyframes stepNext { from { opacity: 0; transform: translate3d(34px, 0, 0); } }
-@keyframes stepPrev { from { opacity: 0; transform: translate3d(-34px, 0, 0); } }
-
-.modal-media {
-    flex: 0 1 auto;
-    min-width: 0;
-    max-height: calc(100vh - 120px);
-}
-.modal-media img {
-    max-height: calc(100vh - 120px);
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-}
-
-.modal-caption {
-    flex: 0 0 300px;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    color: #fff;
-    font-size: 12px;
-    line-height: 1.4;
-    padding-right: 6px;
-}
-.modal-caption h2 { font-size: 16px; font-weight: 700; margin: 0; color: #fff; }
-.modal-caption .subtitle { font-size: 16px; font-weight: 700; margin: 0 0 14px; }
-.modal-caption a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
-.modal-caption a:hover { color: var(--accent); }
-.modal-caption .permalink {
-    display: inline-block;
-    margin-top: 6px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-}
-.modal-caption::-webkit-scrollbar { width: 4px; }
-.modal-caption::-webkit-scrollbar-track { background: transparent; }
-.modal-caption::-webkit-scrollbar-thumb { background: #fff; }
-
-.modal-close,
-.modal-nav button {
-    position: fixed;
-    background: none;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    color: #fff;
-    z-index: 1001;
-}
-.modal-close {
-    top: 41px; left: 41px;
-    width: 18px; height: 18px;
-    opacity: 0;
-    transform: rotate(-45deg);
-    transition: opacity 0.35s var(--ease-out) 0.15s, transform 0.45s var(--ease-out) 0.15s;
-}
-.modal.open .modal-close { opacity: 1; transform: none; }
-.modal-close:hover { color: var(--accent); }
-.modal-close svg { width: 18px; height: 18px; fill: currentColor; display: block; }
-
-.modal-nav button {
-    right: 0;
-    top: 50%;
-    width: 64px; height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transform: translate3d(100%, -50%, 0);
-    transition: opacity 0.4s var(--ease-out) 0.2s, transform 0.5s var(--ease-out) 0.2s, color 0.25s linear;
-}
-.modal-nav .m-prev { margin-top: -34px; }
-.modal-nav .m-next { margin-top: 34px; }
-.modal.open .modal-nav button { opacity: 1; transform: translate3d(0, -50%, 0); }
-.modal-nav button:hover { color: var(--accent); }
-.modal-nav button[disabled] { opacity: 0.3 !important; cursor: default; }
-.modal-nav svg { width: 20px; height: 20px; fill: currentColor; }
-
-/* the fixed header steps out of the way while a project is open */
-html.modal-open #header { opacity: 0; visibility: hidden; }
-
 /* --- Mobile ---------------------------------------------------------------- */
 
 @media (max-width: 740px) {
@@ -425,6 +310,24 @@ html.modal-open #header { opacity: 0; visibility: hidden; }
         height: 30px;
     }
     .logo { margin: 0; line-height: 30px; }
+    /* a question is longer than a name: shrink it and hold it to two lines
+       so the bar keeps its height */
+    .logo.is-question {
+        flex: 1;
+        min-width: 0;
+        padding-right: 14px;
+        /* the desktop two-line reservation must not apply inside the 50px bar */
+        min-height: 0;
+        margin: 0;
+    }
+    .logo.is-question a {
+        font-size: 12px;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
     #header .navigation,
     #header .social,
     #header .header-description { display: none; }
@@ -498,37 +401,6 @@ html.modal-open #header { opacity: 0; visibility: hidden; }
     body.text-page #main > .wrap { padding-left: 15px; }
     .page .page-body h2, .project h1, .project .subtitle { font-size: 22px; }
 
-    .modal { padding: 0; }
-    .modal-scrim { background: var(--paper); }
-    .modal-inner {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0;
-        max-height: 100%;
-        height: 100%;
-        overflow-y: auto;
-        padding: 56px 15px 40px;
-        -webkit-overflow-scrolling: touch;
-    }
-    .modal-media { max-height: none; margin-bottom: 16px; }
-    .modal-media img { max-height: none; width: 100%; }
-    .modal-caption {
-        flex: 1 1 auto;
-        max-height: none;
-        overflow: visible;
-        color: var(--ink);
-        padding: 0;
-    }
-    .modal-caption h2 { color: var(--ink); }
-    .modal-caption a { color: var(--ink); }
-    .modal-caption .permalink { border-bottom-color: rgba(0, 0, 0, 0.4); }
-    .modal-close { top: 14px; left: 14px; color: var(--ink); }
-    .modal-nav button { display: none; }
-    html.modal-open #header { opacity: 0; visibility: hidden; }
-}
-
-@media (max-width: 740px) and (min-width: 561px) {
-    .modal-inner { padding-left: 40px; padding-right: 40px; }
 }
 
 /* --- Reduced motion -------------------------------------------------------- */
