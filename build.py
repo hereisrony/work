@@ -307,36 +307,66 @@ def build():
 
     # --- legacy Tumblr permalinks -------------------------------------------
     # /post/<id>/<slug> was the shape of every old link; keep them alive.
-    for p in posts:
-        target = "/work/%s/" % p["slug"]
-        stub = ("""<!DOCTYPE html>
+    # The meta-refresh and the script target are not plain link attributes, so
+    # they are written relative here rather than by the rewriter.
+    def stub(post, depth):
+        rel = "../" * depth + "work/%s/" % post["slug"]
+        return """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=%(t)s">
-  <link rel="canonical" href="%(site)s%(t)s">
+  <meta http-equiv="refresh" content="0; url=%(rel)s">
+  <link rel="canonical" href="%(site)s/work/%(slug)s/">
   <title>%(title)s</title>
   <meta name="robots" content="noindex">
 </head>
-<body><p>Moved to <a href="%(t)s">%(t)s</a>.</p>
-<script>location.replace("%(t)s");</script>
+<body><p>Moved to <a href="%(rel)s">%(title)s</a>.</p>
+<script>location.replace("%(rel)s");</script>
 </body>
 </html>
-""" % {"t": target, "site": SITE, "title": esc(p["title"])})
-        write("post/%s/%s/index.html" % (p["id"], p["slug"]), stub)
-        write("post/%s/index.html" % p["id"], stub)
+""" % {"rel": rel, "site": SITE, "slug": post["slug"], "title": esc(post["title"])}
+
+    for p in posts:
+        write("post/%s/%s/index.html" % (p["id"], p["slug"]), stub(p, 3))
+        write("post/%s/index.html" % p["id"], stub(p, 2))
 
     # --- 404 -----------------------------------------------------------------
-    write("404.html", document(
-        title="Not found — %s" % TITLE,
-        description=TAGLINE,
-        canonical="/404.html",
-        body='  <article class="page"><h1>not found</h1>'
-             '<div class="page-body"><p>That page has moved or never existed. '
-             '<a href="/">Back to the work</a>.</p></div></article>',
-        active="/",
-        body_class="text-page",
-    ))
+    # GitHub Pages serves this for any unknown path while the address bar keeps
+    # the path that was asked for, so relative URLs would resolve from the wrong
+    # place. It is therefore standalone: styles inline, home link worked out at
+    # runtime so it is right on the domain root and on a project subpath alike.
+    write("404.html", """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not found &mdash; %(title)s</title>
+  <meta name="robots" content="noindex">
+  <style>
+    body { margin: 0; font: 400 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+           color: #000; background: #fff; }
+    main { padding: 70px 25px 70px 50px; max-width: 800px; }
+    h1 { font-size: 30px; font-weight: 700; line-height: 1; margin: 0 0 20px;
+         text-transform: lowercase; }
+    a { color: #000; font-weight: 700; transition: color .25s linear; }
+    a:hover { color: #ff6f26; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>not found</h1>
+    <p>That page has moved or never existed.
+       <a id="home" href="/">Back to the work</a>.</p>
+  </main>
+  <script>
+    // On user.github.io/repo/ the site root is the first path segment.
+    var seg = location.pathname.split("/")[1];
+    document.getElementById("home").href =
+      /\.github\.io$/.test(location.hostname) && seg ? "/" + seg + "/" : "/";
+  </script>
+</body>
+</html>
+""" % {"title": esc(TITLE)})
 
     # --- sitemap & feed ------------------------------------------------------
     urls = ["/"] + [h for h, _ in NAV] + ["/work/%s/" % p["slug"] for p in posts]
@@ -368,7 +398,36 @@ def build():
     print("built %d projects, %d pages" % (len(posts), len(NAV)))
 
 
+# Every internal path is authored root-absolute, then rewritten relative to the
+# page that carries it. That way one build serves correctly from the domain root
+# (www.ronyefrat.work) and from a GitHub Pages project subpath
+# (user.github.io/repo/) without rebuilding.
+
+_ATTR = re.compile(r'\b(href|src|data-full|action)="/(?!/)([^"]*)"')
+_SET = re.compile(r'\b(srcset|data-fullset)="([^"]*)"')
+
+
+def relativize(html, depth):
+    prefix = "../" * depth if depth else "./"
+
+    def attr(m):
+        return '%s="%s%s"' % (m.group(1), prefix, m.group(2))
+
+    def srcset(m):
+        parts = []
+        for entry in m.group(2).split(","):
+            entry = entry.strip()
+            if entry.startswith("/") and not entry.startswith("//"):
+                entry = prefix + entry[1:]
+            parts.append(entry)
+        return '%s="%s"' % (m.group(1), ", ".join(parts))
+
+    return _SET.sub(srcset, _ATTR.sub(attr, html))
+
+
 def write(path, content):
+    if path.endswith(".html"):
+        content = relativize(content, path.count("/"))
     full = os.path.join(ROOT, path)
     os.makedirs(os.path.dirname(full) or ROOT, exist_ok=True)
     with open(full, "w", encoding="utf-8") as fh:

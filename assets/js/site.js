@@ -106,16 +106,30 @@
     var mNext = $('.m-next', modal);
     var mClose = $('.modal-close', modal);
 
+    // Paths in the markup are relative so one build serves from the domain root
+    // and from a Pages project subpath alike. pushState moves the document's
+    // base URL, so resolve everything once, now, against the base we loaded on.
+    var BASE = document.baseURI;
+    var abs = function (u) { return new URL(u, BASE).href; };
+    var absSet = function (set) {
+        if (!set) return '';
+        return set.split(',').map(function (part) {
+            var bits = part.trim().split(/\s+/);
+            bits[0] = abs(bits[0]);
+            return bits.join(' ');
+        }).join(', ');
+    };
+
     var items = tiles.map(function (t) {
         return {
             el: t,
             slug: t.dataset.slug,
-            href: t.getAttribute('href'),
+            href: t.href,                       // already absolute
             title: t.dataset.title,
             subtitle: t.dataset.subtitle,
             body: $('template', t) ? $('template', t).innerHTML : '',
-            src: t.dataset.full,
-            srcset: t.dataset.fullset,
+            src: abs(t.dataset.full),
+            srcset: absSet(t.dataset.fullset),
             alt: $('img', t) ? $('img', t).alt : ''
         };
     });

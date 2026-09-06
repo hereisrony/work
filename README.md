@@ -55,6 +55,21 @@ To turn it on the first time: **Settings → Pages → Build and deployment →
 Source: GitHub Actions**. The site then goes live at
 `https://<user>.github.io/<repo>/`.
 
+### Previewing before you merge
+
+Actions → **Deploy to GitHub Pages** → **Run workflow**, and pick the branch.
+It publishes that branch to the same Pages URL, so you can look at the whole
+site before anything touches `main`.
+
+Every internal path is relative, so the preview at
+`https://<user>.github.io/<repo>/` works exactly like the finished site — styles,
+images, navigation, the project modal, the old-permalink redirects. Nothing
+needs rebuilding when the custom domain is switched on later.
+
+The one thing that differs on the preview: `canonical` and `og:` tags point at
+`www.ronyefrat.work`, since that is where the site is headed. Harmless while
+previewing, correct once live.
+
 ### Pointing www.ronyefrat.work at it
 
 Do this only once the Pages build looks right, because it takes the domain away
