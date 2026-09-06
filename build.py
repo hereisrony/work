@@ -335,7 +335,7 @@ def build():
     # the path that was asked for, so relative URLs would resolve from the wrong
     # place. It is therefore standalone: styles inline, home link worked out at
     # runtime so it is right on the domain root and on a project subpath alike.
-    write("404.html", """<!DOCTYPE html>
+    write("404.html", r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
