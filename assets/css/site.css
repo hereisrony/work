@@ -9,8 +9,13 @@
     --ink-soft: #6f766f;   /* the neutral, nudged toward the accent */
     --rule: #d3dad3;       /* the same neutral, much lighter */
     --paper: #ffffff;
-    --accent: #00CC00;   /* green screen green */
-    --accent-wash: #eefdee; /* the accent at a whisper, for filled rows */
+    /* Two greens, because one colour cannot do both jobs. #00FF33 is
+       brilliant as a shape — 15.3:1 against black — and unreadable as a
+       letter on white, at 1.4:1. So the bright one fills and the deeper one
+       writes; on a bright fill the text is black, never white. */
+    --accent: #00FF33;      /* fills: the day block, a hovered row, the duotone */
+    --accent-ink: #00CC00;  /* letters, hairlines, thin strokes */
+    --accent-wash: #e9ffee; /* the bright one at a whisper, for a resting row */
     --sidebar-w: 17%;
     --gutter: 3%;
     --meta-gap: 20px;
@@ -83,7 +88,7 @@ p { margin: 0 0 14px; }
     top: 0; left: 0;
     height: 2px;
     width: 100%;
-    background: var(--accent);
+    background: var(--accent-ink);
     transform: scaleX(0);
     transform-origin: 0 50%;
     z-index: 10000;
@@ -113,7 +118,7 @@ p { margin: 0 0 14px; }
 .logo a {
     font-weight: 700;
     display: inline-block;
-    color: var(--accent);
+    color: var(--accent-ink);
     transition: transform 0.4s var(--ease-out);
 }
 .logo a:hover { transform: translateX(3px); }
@@ -135,7 +140,7 @@ p { margin: 0 0 14px; }
 .nav-link { transition: color 0.3s linear; }
 .nav-link:hover,
 .nav-link:focus-visible,
-.nav-link[aria-current="page"] { color: var(--accent); }
+.nav-link[aria-current="page"] { color: var(--accent-ink); }
 
 .social { margin-bottom: 30px; }
 .social ul { display: flex; align-items: center; gap: 12px; }
@@ -147,7 +152,7 @@ p { margin: 0 0 14px; }
 }
 .social a:hover { transform: translateY(-3px); opacity: 0.65; }
 .social svg { width: 16px; height: 16px; fill: currentColor; display: block; }
-.social a { color: var(--accent); }
+.social a { color: var(--accent-ink); }
 
 .header-description {
     margin: 0;
@@ -256,7 +261,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 400;
     line-height: 1.1;
     margin: 0 0 14px;
-    color: var(--accent);
+    color: var(--accent-ink);
     text-transform: lowercase;
 }
 .up-title .up-year { color: var(--ink); }
@@ -301,14 +306,14 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     align-items: center;
     justify-content: center;
     background: var(--accent);
-    color: var(--paper);
+    color: var(--ink);        /* 15.3:1 on the bright green; white is 1.4 */
     font-size: 18px;
     font-weight: 700;
     line-height: 1;
     transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
 .up-row:hover .up-num,
-.up-row:focus-visible .up-num { background: var(--paper); color: var(--accent); }
+.up-row:focus-visible .up-num { background: var(--paper); color: var(--accent-ink); }
 
 .up-text {
     flex: 1 1 auto;
@@ -340,7 +345,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .up-row:hover .up-what,
 .up-row:hover .up-note,
 .up-row:focus-visible .up-what,
-.up-row:focus-visible .up-note { color: var(--paper); }
+.up-row:focus-visible .up-note { color: var(--ink); }
 
 /* the mark in the corner, from the listing she sent */
 .up-star {
@@ -349,21 +354,23 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     right: 6px;
     font-size: 12px;
     line-height: 1;
-    color: var(--accent);
+    color: var(--accent-ink);
     transition: color 0.3s var(--ease-out);
 }
 .up-row:hover .up-star,
-.up-row:focus-visible .up-star { color: var(--paper); }
+.up-row:focus-visible .up-star { color: var(--ink); }
 
+/* it belongs to the second column, under the last month it lists */
 .up-more {
-    margin: 16px 0 0;
+    margin: 12px 0 0;
     font-size: 13px;
+    text-align: right;
 }
 .up-more a {
     font-weight: 700;
     transition: color 0.25s linear;
 }
-.up-more a:hover { color: var(--accent); }
+.up-more a:hover { color: var(--accent-ink); }
 
 /* --- Text pages ------------------------------------------------------------
    Metrics taken from the original: 800px column, 30px headings at normal
@@ -396,7 +403,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 400;
     line-height: 1.1;
     margin: 34px 0 12px;
-    color: var(--accent);
+    color: var(--accent-ink);
     text-transform: lowercase;
 }
 .page .page-body h2:first-child { margin-top: 0; }
@@ -408,10 +415,10 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     transition: color 0.25s linear;
 }
 .page .page-body a:hover,
-.project .project-text a:hover { color: var(--accent); }
+.project .project-text a:hover { color: var(--accent-ink); }
 
 /* 2026_September 11_ — the date is in the accent, what follows it is not */
-.page .page-body .ev-date { color: var(--accent); }
+.page .page-body .ev-date { color: var(--accent-ink); }
 .page .page-body iframe {
     max-width: 100%;
     width: 100%;
@@ -443,7 +450,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     margin: 0 0 10px;
 }
 .project h1 {
-    color: var(--accent);
+    color: var(--accent-ink);
     text-transform: lowercase;
 }
 
@@ -487,13 +494,13 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     transition: transform 0.35s var(--ease-out);
 }
 .embed-play svg { width: 100%; height: 100%; display: block; }
-.embed-play circle { fill: var(--accent); }
+.embed-play circle { fill: var(--accent-ink); }
 .embed-play .play-tri { fill: #fff; }
 .embed-poster:hover img,
 .embed-poster:focus-visible img { transform: scale(1.03); }
 .embed-poster:hover .embed-play,
 .embed-poster:focus-visible .embed-play { transform: scale(1.09); }
-.embed-poster:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.embed-poster:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: -2px; }
 
 /* The prompt she would have typed at a model — a text box that types itself,
    then clears and starts again. */
@@ -520,7 +527,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     width: 0.5em;
     height: 1.05em;
     margin-left: 1px;
-    background: var(--accent);
+    background: var(--accent-ink);
     vertical-align: -0.18em;
     animation: caret 1.05s steps(1, end) infinite;
 }
@@ -531,7 +538,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     line-height: 0;
 }
 .typebox-send svg { width: 100%; height: 100%; display: block; }
-.typebox-send circle { fill: var(--accent); }
+.typebox-send circle { fill: var(--accent-ink); }
 .typebox-send .send-arrow { fill: #fff; }
 
 @keyframes caret { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
@@ -546,7 +553,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     /* the two columns become one, the months following each other */
     .up-cols { grid-template-columns: 1fr; gap: 0; }
     .up-col + .up-col { margin-top: 14px; }
-    .up-num { flex-basis: 40px; font-size: 19px; }
+    .up-num { flex-basis: 36px; font-size: 19px; }
+    /* the narrowest phone needs every pixel for the line to fit whole */
+    .up-text { padding-right: 17px; }
     .up-what { font-size: 14px; }
     .up-note { font-size: 12px; }
 

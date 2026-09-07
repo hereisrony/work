@@ -340,19 +340,26 @@ def project_body(post):
 UPCOMING_FROM = (2026, 9)     # the first month shown
 UPCOMING_MONTHS = 3           # september, then october and november
 
-# The few words that name a date, and where that date sends you. The line
-# underneath comes from the upcoming page. A date missing from here falls back
-# to the first title on that line, and to the upcoming page for its link.
+# For each date: the few words that name it, where it sends you, and the short
+# line the row shows. The upcoming page keeps the full sentence; a row has space
+# for a glance. A date missing from here falls back to the first title on its
+# line, the first link in it, and that line cut to length.
 UPCOMING_CARDS = {
-    "2026-09-07": ("caidp clinic", "https://www.caidp.org/"),
+    "2026-09-07": ("caidp clinic", "https://www.caidp.org/",
+                   "ai policy clinic"),
     "2026-09-11": ("adagp jury",
                    "https://www.adagp.fr/fr/soutien-la-creation-artistique"
-                   "/aides-directes-aux-artistes/les-revelations"),
+                   "/aides-directes-aux-artistes/les-revelations",
+                   "révélation art numérique, le fresnoy"),
     "2026-09-14": ("sciences po",
-                   "https://www.linkedin.com/company/ai-safety-hub-sciencespo/"),
-    "2026-09-29": ("agentic academy", "https://uni-r.org/"),
-    "2026-10-10": ("iagora festival", "https://iagora.fr/"),
-    "2026-11-14": ("iagora festival", "https://iagora.fr/"),
+                   "https://www.linkedin.com/company/ai-safety-hub-sciencespo/",
+                   "ai, information, economics, democracy"),
+    "2026-09-29": ("agentic academy", "https://uni-r.org/",
+                   "ai literacy day for refugees"),
+    "2026-10-10": ("iagora festival", "https://iagora.fr/",
+                   "paris 13th city hall, 10:00-18:00"),
+    "2026-11-14": ("iagora festival", "https://iagora.fr/",
+                   "le shadok, strasbourg"),
 }
 
 NOTE_CHARS = 70               # the row shows one line and elides the rest
@@ -384,7 +391,7 @@ def date_markers(html):
 
 
 def card_for(iso, line):
-    """(name, url) for a date: hers where she gave them, else from her line."""
+    """(name, url, note) for a date: hers where given, else from her own line."""
     named = UPCOMING_CARDS.get(iso)
     if named:
         return named
@@ -393,7 +400,7 @@ def card_for(iso, line):
     if len(name) > 24:
         name = name[:24].rsplit(" ", 1)[0] + "\u2026"
     href = re.search(r'<a\b[^>]*href="([^"]+)"', line)
-    return name, (href.group(1) if href else "/upcoming/")
+    return name, (href.group(1) if href else "/upcoming/"), short_note(line)
 
 
 def short_note(line):
@@ -430,9 +437,9 @@ def upcoming_months(body):
             continue
         end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
         line = body[mark.end():end]
-        name, url = card_for("%04d-%02d-%02d" % (key[0], mo, d), line)
-        if name:
-            found[(key, d)] = (name, url, short_note(line))
+        card = card_for("%04d-%02d-%02d" % (key[0], mo, d), line)
+        if card[0]:
+            found[(key, d)] = card
 
     out = []
     for key in window:
@@ -466,17 +473,24 @@ def upcoming_block(pages):
                 % (esc(url), d, esc(name), esc(note))
                 for d, name, url, note in rows)))
 
-    columns = [[months[0]], months[1:]]
+    columns = [c for c in ([months[0]], months[1:]) if c]
+    more = ('        <p class="up-more">'
+            '<a href="/upcoming/">more upcoming</a></p>')
+
+    cols = []
+    for i, col in enumerate(columns):
+        parts = [month_html(mo, rows) for mo, rows in col]
+        # the way through sits under the last month it lists, on the right
+        if i == len(columns) - 1:
+            parts.append(more)
+        cols.append('      <div class="up-col">\n%s\n      </div>'
+                    % "\n".join(parts))
+
     return ('  <section class="up" aria-labelledby="up-title">\n'
             '    <h2 class="up-title" id="up-title">upcoming '
             '<span class="up-year">%d</span></h2>\n'
             '    <div class="up-cols">\n%s\n    </div>\n'
-            '    <p class="up-more"><a href="/upcoming/">more upcoming</a></p>\n'
-            '  </section>' % (
-                UPCOMING_FROM[0],
-                "\n".join('      <div class="up-col">\n%s\n      </div>'
-                           % "\n".join(month_html(mo, rows) for mo, rows in col)
-                           for col in columns if col)))
+            '  </section>' % (UPCOMING_FROM[0], "\n".join(cols)))
 
 
 def mark_dates(html):

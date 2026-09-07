@@ -122,10 +122,11 @@ Until step 2, no `CNAME` file should exist in the repo — one would redirect th
 
 ## Upcoming, on the front page
 
-Three months as a small listing: the day set in a block of accent, the name
-beside it, and the line from the upcoming page under that, elided to one line
-whatever the column's width. The first month stands in the left column, the
-rest share the right one. Each row goes where the event goes.
+Three months as a small listing: the day set in a block of the bright accent
+with black numerals, the name beside it, and one short line under that. The
+first month stands in the left column, the rest share the right one, with the
+way through to the page under the last of them. Each row goes where its event
+goes.
 
 The dates come from the upcoming page, so an event is written once in
 `content/pages.json`. `build.py` reads every line of the shape
@@ -136,23 +137,25 @@ UPCOMING_FROM = (2026, 9)     # the first month shown
 UPCOMING_MONTHS = 3           # september, then october and november
 ```
 
-The name and the link are separate, because a row holds a few words and the
-line on the upcoming page is a sentence pointing at several places:
+Each date's name, destination and short line live together, because a row holds
+a glance and the line on the upcoming page is a sentence pointing at several
+places at once:
 
 ```python
 UPCOMING_CARDS = {
-    "2026-09-11": ("adagp jury", "https://www.adagp.fr/..."),
+    "2026-09-11": ("adagp jury", "https://www.adagp.fr/...",
+                   "révélation art numérique, le fresnoy"),
 }
 ```
 
-A date missing from there falls back to the first title on its line and the
-first link in it, so a new event still appears with somewhere to go; a name and
-a destination of your own are better. The line underneath is always hers, cut
-on a word at `NOTE_CHARS` and then by the column.
+Keep a line to about 33 characters and it fits whole down to a 320px phone;
+past that the row elides it and the whole of it is on the upcoming page anyway.
+A date missing from the table falls back to the first title on its line, the
+first link in it, and that line cut at `NOTE_CHARS` — so a new event still
+appears with somewhere to go, though your own three read better.
 
 On a phone the two columns become one and the months follow each other; every
-row keeps its number to the left rather than stacking. `more upcoming` goes to
-the page itself.
+row keeps its number to the left rather than stacking.
 
 The months take every date they find, whether or not the upcoming page has
 moved one under `P A S T`. To show only what is still ahead, cut the body at
@@ -198,10 +201,25 @@ case, and so are the project titles — those by `text-transform`, so
 Layout, type and spacing are reproduced from the original: the fixed 17% left
 column, the 800px text measure, the three-column grid at 31.33% with a 3%
 gutter, black on white. Tile positions match the
-original to the pixel at 1440px. The one accent is green screen green
-`#00CC00` — it carries the name, the social icons, the current and hovered
-navigation, the project titles, the hover treatment on a tile and the loading
-bar.
+original to the pixel at 1440px.
+
+The accent is green screen green, in two values, because one colour cannot both
+fill and be read:
+
+| | | on white | on black |
+|---|---|---|---|
+| `--accent` | `#00FF33` | 1.4:1 | 15.3:1 |
+| `--accent-ink` | `#00CC00` | 2.2:1 | 9.6:1 |
+
+`--accent` fills — the day blocks in the upcoming listing, a hovered row, the
+duotone over a tile — where it is a shape and what sits on it is black.
+`--accent-ink` writes: her name, the social icons, the current and hovered
+navigation, the project titles, the dates on the upcoming page, the loading bar,
+and every thin stroke.
+
+Neither passes WCAG AA on white, which asks 4.5:1 for text and 3:1 for large
+text; no bright green can. `#00881B` is the darkest of that hue that does, at
+4.6:1, if reading ever matters more than the colour.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
 or `press` opens. Nothing overlays the grid. A project page starts at its
