@@ -122,30 +122,40 @@ Until step 2, no `CNAME` file should exist in the repo — one would redirect th
 
 ## Upcoming, on the front page
 
-The front page opens on a short listing — September and October 2026, a month
-and then its dates — taken from the upcoming page, so an event is written once
-in `content/pages.json` and appears in both places. `build.py` reads every line
-of the shape `2026_September 11_` and keeps the two months it is showing.
+One month, its dates laid across the page as cards: the day in a block of
+accent, a short name beside it, and the line from the upcoming page underneath.
+A band rather than a column, shorter than a row of the work below it.
 
-Two things control it:
+The dates come from the upcoming page, so an event is written once in
+`content/pages.json`. `build.py` reads every line of the shape
+`2026_September 11_` and keeps the month it is showing.
+
+**Each month, move one line:**
 
 ```python
-UPCOMING_FROM = (2026, 9)      # the first month shown; the next one follows
-UPCOMING_LABEL = {             # the few words that name a date
+UPCOMING_FROM = (2026, 9)      # the month the front page shows
+```
+
+The names on the cards are separate, because a card holds a few words and the
+lines on the upcoming page are sentences:
+
+```python
+UPCOMING_LABEL = {
     "2026-09-11": "adagp jury",
 }
 ```
 
-Move `UPCOMING_FROM` to move the window. A date with no entry in
-`UPCOMING_LABEL` falls back to the first title on its line, clamped to fit — so
-a new event appears without an edit here, though a short name of your own reads
-better.
+A date with no name here falls back to the first title on its line, so a new
+event still appears; a short name of your own reads better. The line underneath
+is always hers, cut at `NOTE_CHARS` on a word.
 
-The window takes every date in those months, whether or not the upcoming page
-has moved it under `P A S T`. To list only what is still ahead, cut the body at
-that divider before parsing.
+The month takes every date it finds, whether or not the upcoming page has moved
+one under `P A S T`. To show only what is still ahead, cut the body at that
+divider before parsing.
 
-`more upcoming` goes to the page itself, where the rest is.
+Cards flow to fit: four across on a wide screen, fewer as it narrows, one per
+row on a phone — each still a band, never a stack. `more upcoming` goes to the
+page itself.
 
 ## The name in the header
 

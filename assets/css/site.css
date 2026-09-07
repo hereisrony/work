@@ -236,9 +236,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* --- Upcoming, on the front page --------------------------------------------
-   A month, then its dates: the day in the margin and a few words beside it,
-   the way a listing reads. Short enough that the work still begins near the
-   top, and the same shape at every width. */
+   One month, its dates laid across the page the way a row of the grid runs:
+   the day in a block of accent, the name beside it, her own line underneath.
+   A band rather than a column, so the work still begins near the top. */
 
 .up {
     padding-bottom: 44px;
@@ -250,52 +250,84 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-size: 22px;
     font-weight: 400;
     line-height: 1.1;
-    margin: 0 0 18px;
+    margin: 0 0 4px;
     color: var(--accent);
     text-transform: lowercase;
 }
-.up-title .up-year { color: var(--ink); }
-
-.up-name {
+.up-month {
     font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    text-transform: lowercase;
+}
+
+/* auto-fill rather than auto-fit: a month with one date keeps a card's width
+   instead of stretching the whole way across */
+.up-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 14px;
+}
+
+.up-card {
+    display: flex;
+    align-items: stretch;
+    min-height: 76px;
+    border: 1px solid var(--accent);
+    overflow: hidden;
+    transition: background-color 0.3s var(--ease-out);
+}
+.up-card:hover,
+.up-card:focus-visible { background: var(--accent); }
+.up-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* the day, in the one solid block of colour */
+.up-num {
+    flex: 0 0 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: var(--paper);
+    font-size: 30px;
     font-weight: 700;
     line-height: 1;
-    margin: 0 0 9px;
-    text-transform: lowercase;
+    letter-spacing: -0.02em;
+    transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
-.up-name + .up-days { margin-bottom: 20px; }
-.up-days:last-child { margin-bottom: 0; }
+.up-card:hover .up-num,
+.up-card:focus-visible .up-num { background: var(--paper); color: var(--accent); }
 
-.up-days {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.up-text {
+    flex: 1 1 auto;
+    min-width: 0;             /* so a long line wraps instead of widening */
+    padding: 9px 11px;
+}
+.up-name {
+    display: block;
     font-size: 15px;
-    line-height: 1.4;
-}
-.up-days li {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 5px;
-}
-.up-days li:last-child { margin-bottom: 0; }
-
-/* the day sits in a column of its own so the names line up under each other */
-.up-day {
-    flex: 0 0 22px;
-    text-align: right;
-    color: var(--ink-soft);
-}
-.up-what {
     font-weight: 700;
-    color: var(--accent);
-    transition: color 0.25s linear;
+    line-height: 1.2;
+    text-transform: lowercase;
+    transition: color 0.3s var(--ease-out);
 }
-.up-what:hover,
-.up-what:focus-visible { color: var(--ink); }
+.up-note {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--ink-soft);
+    overflow-wrap: break-word;
+    transition: color 0.3s var(--ease-out);
+}
+.up-card:hover .up-name,
+.up-card:hover .up-note,
+.up-card:focus-visible .up-name,
+.up-card:focus-visible .up-note { color: var(--paper); }
 
 .up-more {
-    margin: 20px 0 0;
+    margin: 18px 0 0;
     font-size: 15px;
 }
 .up-more a {
@@ -481,7 +513,12 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 @media (max-width: 740px) {
     /* --- upcoming ------------------------------------------------------- */
     .up { padding-bottom: 32px; }
-    .up-title { font-size: 20px; margin-bottom: 15px; }
+    .up-title { font-size: 20px; }
+    .up-month { margin-bottom: 13px; }
+    /* one card per row on a phone, each still a band rather than a stack */
+    .up-cards { grid-template-columns: 1fr; gap: 10px; }
+    .up-num { flex-basis: 58px; font-size: 27px; }
+    .up-note { font-size: 13px; }
 
     #header {
         width: 100%;

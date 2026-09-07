@@ -337,11 +337,11 @@ def project_body(post):
 # A short list above the work, taken from the upcoming page so an event is
 # written once. Only the two months below, and only what has not happened yet —
 # the page's own P A S T divider says where that stops.
-UPCOMING_FROM = (2026, 9)     # September 2026; the month after it follows
-UPCOMING_MONTHS = 2
+UPCOMING_FROM = (2026, 9)     # the month the front page shows
 
-# A row holds a few words. These are the short names; a date with no entry here
-# falls back to the first title on its line on the upcoming page.
+# The few words that name a date on a card. The line underneath it is her own,
+# taken from the upcoming page; a date with no name here falls back to the first
+# title on that line.
 UPCOMING_LABEL = {
     "2026-09-07": "caidp clinic",
     "2026-09-11": "adagp jury",
@@ -349,6 +349,8 @@ UPCOMING_LABEL = {
     "2026-09-29": "agentic academy",
     "2026-10-10": "iagora festival",
 }
+
+NOTE_CHARS = 78               # what fits under a name without crowding the card
 
 MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december")
@@ -383,66 +385,70 @@ def short_label(iso, line):
         return label
     title = re.search(r"<(strong|a)\b[^>]*>(.*?)</\1>", line, re.S)
     label = htmllib.unescape(strip_tags(title.group(2))).strip().lower() if title else ""
-    if len(label) > 24:           # a row cannot hold a sentence
+    if len(label) > 24:
         label = label[:24].rsplit(" ", 1)[0] + "\u2026"
     return label
 
 
-def upcoming_by_month(body):
-    """[(month, [(day, label)])] for the months the front page shows."""
-    window, y, m = [], *UPCOMING_FROM
-    for _ in range(UPCOMING_MONTHS):
-        window.append((y, m))
-        m = 1 if m == 12 else m + 1
-        y = y + 1 if m == 1 else y
+def short_note(line):
+    """Her own words for a date, cut to what a card holds."""
+    note = htmllib.unescape(strip_tags(line))
+    note = re.sub(r"\s+", " ", note)
+    # strip_tags leaves a space where a tag was, which can land in front of a
+    # comma: "UniR's Agentic Academy , an AI literacy day"
+    note = re.sub(r"\s+([,.;:!?)\u2019'])", r"\1", note)
+    note = re.sub(r"([(\u2018])\s+", r"\1", note)
+    note = note.strip(" \u00a0.,;:")
+    if len(note) <= NOTE_CHARS:
+        return note
+    return note[:NOTE_CHARS].rsplit(" ", 1)[0] + "\u2026"
 
+
+def upcoming_month(body):
+    """(month, year, [(day, name, note)]) for the month the front page shows."""
+    year, month = UPCOMING_FROM
     days, hits = {}, date_markers(body)
     for i, mark in enumerate(hits):
-        month = next((k for k, name in enumerate(MONTH_NAMES, 1)
-                      if name.startswith(mark.group(2).lower()[:3])), None)
-        if month is None or (int(mark.group(1)), month) not in window:
+        mo = next((k for k, name in enumerate(MONTH_NAMES, 1)
+                   if name.startswith(mark.group(2).lower()[:3])), None)
+        if mo != month or int(mark.group(1)) != year:
             continue
         d = int(mark.group(3))
-        iso = "%s-%02d-%02d" % (mark.group(1), month, d)
-        if (month, d) in days:    # the first line for a day wins
+        if d in days:                 # the first line for a day wins
             continue
         end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
-        label = short_label(iso, body[mark.end():end])
-        if label:
-            days[(month, d)] = label
-
-    return [(mo, sorted((d, days[(m2, d)]) for (m2, d) in days if m2 == mo))
-            for _, mo in window
-            if any(m2 == mo for (m2, _) in days)]
+        line = body[mark.end():end]
+        name = short_label("%04d-%02d-%02d" % (year, mo, d), line)
+        if name:
+            days[d] = (name, short_note(line))
+    return month, year, [(d,) + days[d] for d in sorted(days)]
 
 
 def upcoming_block(pages):
     """The upcoming rubric that opens the front page.
 
-    A month, then its dates: the day in the margin and a few words beside it,
-    the way a listing reads. Compact enough that the work still starts near the
-    top, and the same shape at every width.
+    One month, its dates laid across the page the way a row of the grid runs:
+    the day in a block of accent, the name beside it, her own line underneath.
     """
-    months = upcoming_by_month(pages["upcoming"]["body"])
-    if not months:
+    month, year, dates = upcoming_month(pages["upcoming"]["body"])
+    if not dates:
         return ""
 
-    blocks = []
-    for mo, dates in months:
-        rows = "\n".join(
-            '        <li><span class="up-day">%d</span>'
-            '<a class="up-what" href="/upcoming/">%s</a></li>' % (d, esc(label))
-            for d, label in dates)
-        blocks.append('      <h3 class="up-name">%s</h3>\n'
-                      '      <ul class="up-days">\n%s\n      </ul>'
-                      % (MONTH_NAMES[mo - 1], rows))
+    cards = "\n".join(
+        '      <a class="up-card" href="/upcoming/">\n'
+        '        <span class="up-num">%02d</span>\n'
+        '        <span class="up-text">'
+        '<span class="up-name">%s</span>'
+        '<span class="up-note">%s</span></span>\n'
+        '      </a>' % (d, esc(name), esc(note))
+        for d, name, note in dates)
 
     return ('  <section class="up" aria-labelledby="up-title">\n'
-            '    <h2 class="up-title" id="up-title">upcoming '
-            '<span class="up-year">%d</span></h2>\n'
-            '    <div class="up-body">\n%s\n    </div>\n'
+            '    <h2 class="up-title" id="up-title">upcoming</h2>\n'
+            '    <p class="up-month">%s %d</p>\n'
+            '    <div class="up-cards">\n%s\n    </div>\n'
             '    <p class="up-more"><a href="/upcoming/">more upcoming</a></p>\n'
-            '  </section>' % (UPCOMING_FROM[0], "\n".join(blocks)))
+            '  </section>' % (MONTH_NAMES[month - 1], year, cards))
 
 
 def mark_dates(html):
