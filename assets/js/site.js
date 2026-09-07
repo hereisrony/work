@@ -110,7 +110,7 @@
         });
     });
 
-    /* --- the prompt that types itself, on a loop -------------------------- */
+    /* --- the prompt that types itself ------------------------------------- */
 
     $$('.typebox').forEach(function (box) {
         var out = $('.typebox-out', box);
@@ -119,37 +119,29 @@
 
         if (reduced) { out.textContent = text; return; }
 
-        var i = 0, phase = 'type', timer = null, visible = false;
+        var i = 0, started = false;
 
-        function at(ms) { timer = window.setTimeout(step, ms); }
+        function type() {
+            out.textContent = text.slice(0, ++i);
+            // uneven, the way typing is
+            if (i < text.length) window.setTimeout(type, 30 + Math.random() * 55);
+            // and then nothing: the line stays, the caret goes on blinking
+        }
 
-        function step() {
-            timer = null;
-            if (!visible) return;                 // picked up again when scrolled back to
-            if (phase === 'type') {
-                out.textContent = text.slice(0, ++i);
-                if (i >= text.length) { phase = 'hold'; at(2600); }
-                else at(30 + Math.random() * 55);  // uneven, the way typing is
-            } else if (phase === 'hold') {
-                phase = 'clear'; at(30);
-            } else if (phase === 'clear') {
-                out.textContent = text.slice(0, --i);
-                if (i <= 0) { phase = 'wait'; at(900); }
-                else at(16 + Math.random() * 12);  // deleting runs faster
-            } else {
-                phase = 'type'; at(140);
+        function start() {
+            if (started) return;
+            started = true;
+            type();
+        }
+
+        if (!('IntersectionObserver' in window)) { start(); return; }
+        var io = new IntersectionObserver(function (entries) {
+            if (entries.some(function (e) { return e.isIntersecting; })) {
+                io.disconnect();
+                start();
             }
-        }
-
-        function setVisible(v) {
-            visible = v;
-            if (v && timer === null) step();
-        }
-
-        if (!('IntersectionObserver' in window)) { setVisible(true); return; }
-        new IntersectionObserver(function (entries) {
-            setVisible(entries.some(function (e) { return e.isIntersecting; }));
-        }, { threshold: 0.25 }).observe(box);
+        }, { threshold: 0.25 });
+        io.observe(box);
     });
 
 })();
