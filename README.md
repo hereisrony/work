@@ -122,40 +122,41 @@ Until step 2, no `CNAME` file should exist in the repo — one would redirect th
 
 ## Upcoming, on the front page
 
-One month, its dates laid across the page as cards: the day in a block of
-accent, a short name beside it, and the line from the upcoming page underneath.
-A band rather than a column, shorter than a row of the work below it.
+Three months as a small listing: the day set in a block of accent, the name
+beside it, and the line from the upcoming page under that, elided to one line
+whatever the column's width. The first month stands in the left column, the
+rest share the right one. Each row goes where the event goes.
 
 The dates come from the upcoming page, so an event is written once in
 `content/pages.json`. `build.py` reads every line of the shape
-`2026_September 11_` and keeps the month it is showing.
-
-**Each month, move one line:**
+`2026_September 11_` and keeps the months it is showing.
 
 ```python
-UPCOMING_FROM = (2026, 9)      # the month the front page shows
+UPCOMING_FROM = (2026, 9)     # the first month shown
+UPCOMING_MONTHS = 3           # september, then october and november
 ```
 
-The names on the cards are separate, because a card holds a few words and the
-lines on the upcoming page are sentences:
+The name and the link are separate, because a row holds a few words and the
+line on the upcoming page is a sentence pointing at several places:
 
 ```python
-UPCOMING_LABEL = {
-    "2026-09-11": "adagp jury",
+UPCOMING_CARDS = {
+    "2026-09-11": ("adagp jury", "https://www.adagp.fr/..."),
 }
 ```
 
-A date with no name here falls back to the first title on its line, so a new
-event still appears; a short name of your own reads better. The line underneath
-is always hers, cut at `NOTE_CHARS` on a word.
+A date missing from there falls back to the first title on its line and the
+first link in it, so a new event still appears with somewhere to go; a name and
+a destination of your own are better. The line underneath is always hers, cut
+on a word at `NOTE_CHARS` and then by the column.
 
-The month takes every date it finds, whether or not the upcoming page has moved
-one under `P A S T`. To show only what is still ahead, cut the body at that
-divider before parsing.
+On a phone the two columns become one and the months follow each other; every
+row keeps its number to the left rather than stacking. `more upcoming` goes to
+the page itself.
 
-Cards flow to fit: four across on a wide screen, fewer as it narrows, one per
-row on a phone — each still a band, never a stack. `more upcoming` goes to the
-page itself.
+The months take every date they find, whether or not the upcoming page has
+moved one under `P A S T`. To show only what is still ahead, cut the body at
+that divider before parsing.
 
 ## The name in the header
 

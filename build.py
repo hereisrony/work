@@ -337,20 +337,25 @@ def project_body(post):
 # A short list above the work, taken from the upcoming page so an event is
 # written once. Only the two months below, and only what has not happened yet —
 # the page's own P A S T divider says where that stops.
-UPCOMING_FROM = (2026, 9)     # the month the front page shows
+UPCOMING_FROM = (2026, 9)     # the first month shown
+UPCOMING_MONTHS = 3           # september, then october and november
 
-# The few words that name a date on a card. The line underneath it is her own,
-# taken from the upcoming page; a date with no name here falls back to the first
-# title on that line.
-UPCOMING_LABEL = {
-    "2026-09-07": "caidp clinic",
-    "2026-09-11": "adagp jury",
-    "2026-09-14": "sciences po",
-    "2026-09-29": "agentic academy",
-    "2026-10-10": "iagora festival",
+# The few words that name a date, and where that date sends you. The line
+# underneath comes from the upcoming page. A date missing from here falls back
+# to the first title on that line, and to the upcoming page for its link.
+UPCOMING_CARDS = {
+    "2026-09-07": ("caidp clinic", "https://www.caidp.org/"),
+    "2026-09-11": ("adagp jury",
+                   "https://www.adagp.fr/fr/soutien-la-creation-artistique"
+                   "/aides-directes-aux-artistes/les-revelations"),
+    "2026-09-14": ("sciences po",
+                   "https://www.linkedin.com/company/ai-safety-hub-sciencespo/"),
+    "2026-09-29": ("agentic academy", "https://uni-r.org/"),
+    "2026-10-10": ("iagora festival", "https://iagora.fr/"),
+    "2026-11-14": ("iagora festival", "https://iagora.fr/"),
 }
 
-NOTE_CHARS = 78               # what fits under a name without crowding the card
+NOTE_CHARS = 70               # the row shows one line and elides the rest
 
 MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december")
@@ -378,20 +383,21 @@ def date_markers(html):
             if any(a <= m.start() < b for a, b in spans)]
 
 
-def short_label(iso, line):
-    """The few words that name a date, hers where she gave them."""
-    label = UPCOMING_LABEL.get(iso)
-    if label:
-        return label
+def card_for(iso, line):
+    """(name, url) for a date: hers where she gave them, else from her line."""
+    named = UPCOMING_CARDS.get(iso)
+    if named:
+        return named
     title = re.search(r"<(strong|a)\b[^>]*>(.*?)</\1>", line, re.S)
-    label = htmllib.unescape(strip_tags(title.group(2))).strip().lower() if title else ""
-    if len(label) > 24:
-        label = label[:24].rsplit(" ", 1)[0] + "\u2026"
-    return label
+    name = htmllib.unescape(strip_tags(title.group(2))).strip().lower() if title else ""
+    if len(name) > 24:
+        name = name[:24].rsplit(" ", 1)[0] + "\u2026"
+    href = re.search(r'<a\b[^>]*href="([^"]+)"', line)
+    return name, (href.group(1) if href else "/upcoming/")
 
 
 def short_note(line):
-    """Her own words for a date, cut to what a card holds."""
+    """Her own words for a date, cut to what a row can hold."""
     note = htmllib.unescape(strip_tags(line))
     note = re.sub(r"\s+", " ", note)
     # strip_tags leaves a space where a tag was, which can land in front of a
@@ -404,51 +410,73 @@ def short_note(line):
     return note[:NOTE_CHARS].rsplit(" ", 1)[0] + "\u2026"
 
 
-def upcoming_month(body):
-    """(month, year, [(day, name, note)]) for the month the front page shows."""
-    year, month = UPCOMING_FROM
-    days, hits = {}, date_markers(body)
+def upcoming_months(body):
+    """[(month, [(day, name, url, note)])] for the months the front page shows."""
+    window, y, m = [], *UPCOMING_FROM
+    for _ in range(UPCOMING_MONTHS):
+        window.append((y, m))
+        m = 1 if m == 12 else m + 1
+        y = y + 1 if m == 1 else y
+
+    found, hits = {}, date_markers(body)
     for i, mark in enumerate(hits):
         mo = next((k for k, name in enumerate(MONTH_NAMES, 1)
                    if name.startswith(mark.group(2).lower()[:3])), None)
-        if mo != month or int(mark.group(1)) != year:
+        key = (int(mark.group(1)), mo)
+        if mo is None or key not in window:
             continue
         d = int(mark.group(3))
-        if d in days:                 # the first line for a day wins
+        if (key, d) in found:         # the first line for a day wins
             continue
         end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
         line = body[mark.end():end]
-        name = short_label("%04d-%02d-%02d" % (year, mo, d), line)
+        name, url = card_for("%04d-%02d-%02d" % (key[0], mo, d), line)
         if name:
-            days[d] = (name, short_note(line))
-    return month, year, [(d,) + days[d] for d in sorted(days)]
+            found[(key, d)] = (name, url, short_note(line))
+
+    out = []
+    for key in window:
+        days = sorted(d for (k, d) in found if k == key)
+        if days:
+            out.append((key[1], [(d,) + found[(key, d)] for d in days]))
+    return out
 
 
 def upcoming_block(pages):
     """The upcoming rubric that opens the front page.
 
-    One month, its dates laid across the page the way a row of the grid runs:
-    the day in a block of accent, the name beside it, her own line underneath.
+    The listing she sent, at the site's scale: the day in a block of accent,
+    the name beside it, her line under that, each row going where the event
+    does. The first month stands on its own; the rest share the second column.
     """
-    month, year, dates = upcoming_month(pages["upcoming"]["body"])
-    if not dates:
+    months = upcoming_months(pages["upcoming"]["body"])
+    if not months:
         return ""
 
-    cards = "\n".join(
-        '      <a class="up-card" href="/upcoming/">\n'
-        '        <span class="up-num">%02d</span>\n'
-        '        <span class="up-text">'
-        '<span class="up-name">%s</span>'
-        '<span class="up-note">%s</span></span>\n'
-        '      </a>' % (d, esc(name), esc(note))
-        for d, name, note in dates)
+    def month_html(month, rows):
+        return ('        <h3 class="up-name">%s</h3>\n%s' % (
+            MONTH_NAMES[month - 1],
+            "\n".join(
+                '        <a class="up-row" href="%s">'
+                '<span class="up-num">%02d</span>'
+                '<span class="up-text">'
+                '<span class="up-what">%s</span>'
+                '<span class="up-note">%s</span></span>'
+                '<span class="up-star" aria-hidden="true">*</span></a>'
+                % (esc(url), d, esc(name), esc(note))
+                for d, name, url, note in rows)))
 
+    columns = [[months[0]], months[1:]]
     return ('  <section class="up" aria-labelledby="up-title">\n'
-            '    <h2 class="up-title" id="up-title">upcoming</h2>\n'
-            '    <p class="up-month">%s %d</p>\n'
-            '    <div class="up-cards">\n%s\n    </div>\n'
+            '    <h2 class="up-title" id="up-title">upcoming '
+            '<span class="up-year">%d</span></h2>\n'
+            '    <div class="up-cols">\n%s\n    </div>\n'
             '    <p class="up-more"><a href="/upcoming/">more upcoming</a></p>\n'
-            '  </section>' % (MONTH_NAMES[month - 1], year, cards))
+            '  </section>' % (
+                UPCOMING_FROM[0],
+                "\n".join('      <div class="up-col">\n%s\n      </div>'
+                           % "\n".join(month_html(mo, rows) for mo, rows in col)
+                           for col in columns if col)))
 
 
 def mark_dates(html):

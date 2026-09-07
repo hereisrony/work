@@ -10,6 +10,7 @@
     --rule: #d3dad3;       /* the same neutral, much lighter */
     --paper: #ffffff;
     --accent: #00CC00;   /* green screen green */
+    --accent-wash: #eefdee; /* the accent at a whisper, for filled rows */
     --sidebar-w: 17%;
     --gutter: 3%;
     --meta-gap: 20px;
@@ -236,99 +237,127 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* --- Upcoming, on the front page --------------------------------------------
-   One month, its dates laid across the page the way a row of the grid runs:
-   the day in a block of accent, the name beside it, her own line underneath.
-   A band rather than a column, so the work still begins near the top. */
+   The listing she sent, at this site's scale and in its colours: the day set
+   in a block of accent, the name beside it, her own line under that, each row
+   going where the event goes. Small and quiet — it introduces the page, it is
+   not the page. The first month stands alone, the rest share the column. */
 
 .up {
-    padding-bottom: 44px;
+    /* the measure the text pages use, so the rows keep a card's proportion
+       instead of stretching into slivers across the full width */
+    max-width: 800px;
+    padding-bottom: 40px;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
     animation: rise 0.7s var(--ease-soft) 0.05s forwards;
 }
 .up-title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 400;
     line-height: 1.1;
-    margin: 0 0 4px;
+    margin: 0 0 14px;
     color: var(--accent);
     text-transform: lowercase;
 }
-.up-month {
-    font-size: 15px;
+.up-title .up-year { color: var(--ink); }
+
+.up-cols {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+    align-items: start;
+}
+.up-col { min-width: 0; }
+
+.up-name {
+    font-size: 12px;
     font-weight: 700;
-    line-height: 1.2;
-    margin: 0 0 16px;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    margin: 0 0 6px;
     text-transform: lowercase;
 }
+.up-row + .up-name { margin-top: 14px; }
 
-/* auto-fill rather than auto-fit: a month with one date keeps a card's width
-   instead of stretching the whole way across */
-.up-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
-    gap: 14px;
-}
-
-.up-card {
+/* the row: a pale field with the day in the one solid block of colour */
+.up-row {
+    position: relative;
     display: flex;
     align-items: stretch;
-    min-height: 76px;
-    border: 1px solid var(--accent);
+    min-height: 42px;
+    margin-bottom: 5px;
+    background: var(--accent-wash);
     overflow: hidden;
     transition: background-color 0.3s var(--ease-out);
 }
-.up-card:hover,
-.up-card:focus-visible { background: var(--accent); }
-.up-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.up-row:last-child { margin-bottom: 0; }
+.up-row:hover,
+.up-row:focus-visible { background: var(--accent); }
+.up-row:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-/* the day, in the one solid block of colour */
 .up-num {
-    flex: 0 0 62px;
+    flex: 0 0 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--accent);
     color: var(--paper);
-    font-size: 30px;
+    font-size: 18px;
     font-weight: 700;
     line-height: 1;
-    letter-spacing: -0.02em;
     transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
-.up-card:hover .up-num,
-.up-card:focus-visible .up-num { background: var(--paper); color: var(--accent); }
+.up-row:hover .up-num,
+.up-row:focus-visible .up-num { background: var(--paper); color: var(--accent); }
 
 .up-text {
     flex: 1 1 auto;
-    min-width: 0;             /* so a long line wraps instead of widening */
-    padding: 9px 11px;
+    min-width: 0;             /* so the line elides instead of widening the row */
+    padding: 6px 22px 6px 9px;
+    align-self: center;
 }
-.up-name {
+.up-what {
     display: block;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
     text-transform: lowercase;
     transition: color 0.3s var(--ease-out);
 }
+/* one line, whatever the column's width — the whole of it is on the
+   upcoming page */
 .up-note {
     display: block;
-    margin-top: 3px;
-    font-size: 12px;
+    margin-top: 1px;
+    font-size: 11px;
     line-height: 1.3;
     color: var(--ink-soft);
-    overflow-wrap: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transition: color 0.3s var(--ease-out);
 }
-.up-card:hover .up-name,
-.up-card:hover .up-note,
-.up-card:focus-visible .up-name,
-.up-card:focus-visible .up-note { color: var(--paper); }
+.up-row:hover .up-what,
+.up-row:hover .up-note,
+.up-row:focus-visible .up-what,
+.up-row:focus-visible .up-note { color: var(--paper); }
+
+/* the mark in the corner, from the listing she sent */
+.up-star {
+    position: absolute;
+    top: 3px;
+    right: 6px;
+    font-size: 12px;
+    line-height: 1;
+    color: var(--accent);
+    transition: color 0.3s var(--ease-out);
+}
+.up-row:hover .up-star,
+.up-row:focus-visible .up-star { color: var(--paper); }
 
 .up-more {
-    margin: 18px 0 0;
-    font-size: 15px;
+    margin: 16px 0 0;
+    font-size: 13px;
 }
 .up-more a {
     font-weight: 700;
@@ -512,13 +541,14 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 @media (max-width: 740px) {
     /* --- upcoming ------------------------------------------------------- */
-    .up { padding-bottom: 32px; }
-    .up-title { font-size: 20px; }
-    .up-month { margin-bottom: 13px; }
-    /* one card per row on a phone, each still a band rather than a stack */
-    .up-cards { grid-template-columns: 1fr; gap: 10px; }
-    .up-num { flex-basis: 58px; font-size: 27px; }
-    .up-note { font-size: 13px; }
+    .up { padding-bottom: 28px; }
+    .up-title { font-size: 18px; margin-bottom: 12px; }
+    /* the two columns become one, the months following each other */
+    .up-cols { grid-template-columns: 1fr; gap: 0; }
+    .up-col + .up-col { margin-top: 14px; }
+    .up-num { flex-basis: 40px; font-size: 19px; }
+    .up-what { font-size: 14px; }
+    .up-note { font-size: 12px; }
 
     #header {
         width: 100%;
