@@ -92,4 +92,54 @@
         }, 1500);
     }
 
+    /* --- video: the host's player only on request ------------------------- */
+
+    $$('.embed[data-player]').forEach(function (box) {
+        var poster = $('.embed-poster', box);
+        if (!poster) return;
+        poster.addEventListener('click', function (e) {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;   // let it open the video page
+            e.preventDefault();
+            var f = document.createElement('iframe');
+            f.src = box.dataset.player;
+            f.title = 'Video';
+            f.allow = 'autoplay; fullscreen; picture-in-picture';
+            f.setAttribute('allowfullscreen', '');
+            box.innerHTML = '';
+            box.appendChild(f);
+        });
+    });
+
+    /* --- the line that types itself --------------------------------------- */
+
+    $$('.typeline').forEach(function (line) {
+        var out = $('.typeline-out', line);
+        var text = line.dataset.type || '';
+        if (!out || !text) return;
+
+        if (reduced) { out.textContent = text; line.classList.add('done'); return; }
+
+        var started = false;
+        var type = function () {
+            if (started) return;
+            started = true;
+            var i = 0;
+            (function step() {
+                out.textContent = text.slice(0, ++i);
+                if (i < text.length) {
+                    // uneven, the way typing actually is
+                    window.setTimeout(step, 28 + Math.random() * 55);
+                } else {
+                    window.setTimeout(function () { line.classList.add('done'); }, 1800);
+                }
+            }());
+        };
+
+        if (!('IntersectionObserver' in window)) { type(); return; }
+        var io = new IntersectionObserver(function (entries) {
+            if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); type(); }
+        }, { threshold: 0.5 });
+        io.observe(line);
+    });
+
 })();
