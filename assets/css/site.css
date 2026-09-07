@@ -9,13 +9,13 @@
     --ink-soft: #6f766f;   /* the neutral, nudged toward the accent */
     --rule: #d3dad3;       /* the same neutral, much lighter */
     --paper: #ffffff;
-    /* Two greens, because one colour cannot do both jobs. #00FF33 is
-       brilliant as a shape — 15.3:1 against black — and unreadable as a
-       letter on white, at 1.4:1. So the bright one fills and the deeper one
-       writes; on a bright fill the text is black, never white. */
-    --accent: #00FF33;      /* fills: the day block, a hovered row, the duotone */
-    --accent-ink: #00CC00;  /* letters, hairlines, thin strokes */
-    --accent-wash: #e9ffee; /* the bright one at a whisper, for a resting row */
+    /* Black, white, and one green. #00FF33 reads 1.4:1 against white and
+       15.3:1 against black, so the whole palette turns on a single rule: the
+       green is a ground, never a letter. Anywhere it used to write it now
+       sits behind black type — a marker rather than an ink. There is one
+       green, and every pairing clears what WCAG asks. */
+    --accent: #00FF33;
+    --accent-wash: #e9ffee; /* the same green at a whisper, for a resting row */
     --sidebar-w: 17%;
     --gutter: 3%;
     --meta-gap: 20px;
@@ -86,9 +86,12 @@ p { margin: 0 0 14px; }
 .loadbar {
     position: fixed;
     top: 0; left: 0;
-    height: 2px;
+    height: 3px;
     width: 100%;
-    background: var(--accent-ink);
+    background: var(--accent);
+    /* a bright green hairline vanishes on white; the rule gives it an edge to
+       be seen against */
+    box-shadow: 0 0 0 1px var(--rule);
     transform: scaleX(0);
     transform-origin: 0 50%;
     z-index: 10000;
@@ -97,6 +100,38 @@ p { margin: 0 0 14px; }
 }
 .loadbar.run { transform: scaleX(0.7); }
 .loadbar.done { transform: scaleX(1); opacity: 0; }
+
+/* Green behind black type, cloned so a phrase that wraps takes a band per
+   line rather than one box around the block. Every green word on the site is
+   set this way. */
+.logo a,
+.nav-link:hover,
+.nav-link:focus-visible,
+.nav-link[aria-current="page"],
+.page .page-body h2,
+.page .page-body .ev-date,
+.page .page-body a:hover,
+.page .page-body a:focus-visible,
+.project h1,
+.project .project-text a:hover,
+.project .project-text a:focus-visible,
+.up-title .up-mark,
+.up-more a:hover,
+.up-more a:focus-visible {
+    background: var(--accent);
+    color: var(--ink);
+    padding: 0 0.16em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+/* A heading is a block, and a block's background fills its whole width, so
+   these two are told to hug their words instead. */
+.page .page-body h2,
+.project h1 {
+    width: fit-content;
+    max-width: 100%;
+}
 
 /* --- Header ---------------------------------------------------------------- */
 
@@ -117,11 +152,12 @@ p { margin: 0 0 14px; }
 .logo { margin-bottom: 30px; line-height: 1.1; font-size: 22px; }
 .logo a {
     font-weight: 700;
-    display: inline-block;
-    color: var(--accent-ink);
-    transition: transform 0.4s var(--ease-out);
+    margin-left: -0.16em;
+    transition: background-color 0.3s linear, color 0.3s linear;
 }
-.logo a:hover { transform: translateX(3px); }
+/* hovering turns the marker inside out — green on black is the same 15.3:1 */
+.logo a:hover,
+.logo a:focus-visible { background: var(--ink); color: var(--accent); }
 
 /* When the header is asking a question rather than stating the name it wraps.
    Three lines are reserved so the nav below sits in the same place from one
@@ -135,24 +171,35 @@ p { margin: 0 0 14px; }
 .navigation { margin-bottom: 30px; }
 .navigation li { line-height: 1.4; }
 
-/* Nav links behave like every other link: they take the accent. Nothing on
-   this site is underlined. */
-.nav-link { transition: color 0.3s linear; }
-.nav-link:hover,
-.nav-link:focus-visible,
-.nav-link[aria-current="page"] { color: var(--accent-ink); }
+/* The page you are on, and the one under the cursor, are marked in green
+   rather than written in it. The pull left keeps the column of names aligned
+   whether or not a name is carrying its band. */
+.nav-link {
+    /* the padding is on at rest so a name does not move when it is marked;
+       the pull keeps the column aligned with everything above it */
+    padding: 0 0.16em;
+    margin-left: -0.16em;
+    transition: background-color 0.25s linear, color 0.25s linear;
+}
 
 .social { margin-bottom: 30px; }
 .social ul { display: flex; align-items: center; gap: 12px; }
 .social a {
     display: flex;
     align-items: center;
-    height: 22px;
-    transition: transform 0.35s var(--ease-out), color 0.3s linear;
+    padding: 3px;
+    background: var(--accent);
+    color: var(--ink);
+    transition: transform 0.35s var(--ease-out),
+                background-color 0.3s linear, color 0.3s linear;
 }
-.social a:hover { transform: translateY(-3px); opacity: 0.65; }
+.social a:hover,
+.social a:focus-visible {
+    transform: translateY(-3px);
+    background: var(--ink);
+    color: var(--accent);
+}
 .social svg { width: 16px; height: 16px; fill: currentColor; display: block; }
-.social a { color: var(--accent-ink); }
 
 .header-description {
     margin: 0;
@@ -261,10 +308,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 400;
     line-height: 1.1;
     margin: 0 0 14px;
-    color: var(--accent-ink);
     text-transform: lowercase;
 }
-.up-title .up-year { color: var(--ink); }
 
 .up-cols {
     display: grid;
@@ -305,6 +350,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     display: flex;
     align-items: center;
     justify-content: center;
+    align-self: stretch;
     background: var(--accent);
     color: var(--ink);        /* 15.3:1 on the bright green; white is 1.4 */
     font-size: 18px;
@@ -313,39 +359,19 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
 .up-row:hover .up-num,
-.up-row:focus-visible .up-num { background: var(--paper); color: var(--accent-ink); }
+.up-row:focus-visible .up-num { background: var(--paper); color: var(--ink); }
 
+/* her sentence, whole and in her own capitals — the row is the one link, so
+   nothing inside it is a link of its own */
 .up-text {
     flex: 1 1 auto;
-    min-width: 0;             /* so the line elides instead of widening the row */
-    padding: 6px 22px 6px 9px;
+    min-width: 0;
+    padding: 7px 22px 7px 10px;
     align-self: center;
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: break-word;
 }
-.up-what {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.2;
-    text-transform: lowercase;
-    transition: color 0.3s var(--ease-out);
-}
-/* one line, whatever the column's width — the whole of it is on the
-   upcoming page */
-.up-note {
-    display: block;
-    margin-top: 1px;
-    font-size: 11px;
-    line-height: 1.3;
-    color: var(--ink-soft);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.3s var(--ease-out);
-}
-.up-row:hover .up-what,
-.up-row:hover .up-note,
-.up-row:focus-visible .up-what,
-.up-row:focus-visible .up-note { color: var(--ink); }
 
 /* the mark in the corner, from the listing she sent */
 .up-star {
@@ -354,11 +380,11 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     right: 6px;
     font-size: 12px;
     line-height: 1;
-    color: var(--accent-ink);
-    transition: color 0.3s var(--ease-out);
+    color: var(--ink);
+    opacity: 0.3;
 }
 .up-row:hover .up-star,
-.up-row:focus-visible .up-star { color: var(--ink); }
+.up-row:focus-visible .up-star { opacity: 0.55; }
 
 /* it belongs to the second column, under the last month it lists */
 .up-more {
@@ -370,7 +396,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 700;
     transition: color 0.25s linear;
 }
-.up-more a:hover { color: var(--accent-ink); }
+
 
 /* --- Text pages ------------------------------------------------------------
    Metrics taken from the original: 800px column, 30px headings at normal
@@ -403,7 +429,6 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-weight: 400;
     line-height: 1.1;
     margin: 34px 0 12px;
-    color: var(--accent-ink);
     text-transform: lowercase;
 }
 .page .page-body h2:first-child { margin-top: 0; }
@@ -412,13 +437,12 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .page .page-body a,
 .project .project-text a {
     font-weight: 700;
-    transition: color 0.25s linear;
+    transition: background-color 0.25s linear, color 0.25s linear;
 }
-.page .page-body a:hover,
-.project .project-text a:hover { color: var(--accent-ink); }
 
-/* 2026_September 11_ — the date is in the accent, what follows it is not */
-.page .page-body .ev-date { color: var(--accent-ink); }
+
+/* 2026_September 11_ — the date is marked in green, what follows it is not */
+.page .page-body .ev-date { white-space: nowrap; }
 .page .page-body iframe {
     max-width: 100%;
     width: 100%;
@@ -449,10 +473,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     line-height: 1;
     margin: 0 0 10px;
 }
-.project h1 {
-    color: var(--accent-ink);
-    text-transform: lowercase;
-}
+.project h1 { text-transform: lowercase; }
 
 /* A player stands in for the link that used to point at it. Until someone
    asks for it, all that shows is the still and a play button — no host
@@ -494,13 +515,13 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     transition: transform 0.35s var(--ease-out);
 }
 .embed-play svg { width: 100%; height: 100%; display: block; }
-.embed-play circle { fill: var(--accent-ink); }
-.embed-play .play-tri { fill: #fff; }
+.embed-play circle { fill: var(--accent); }
+.embed-play .play-tri { fill: var(--ink); }
 .embed-poster:hover img,
 .embed-poster:focus-visible img { transform: scale(1.03); }
 .embed-poster:hover .embed-play,
 .embed-poster:focus-visible .embed-play { transform: scale(1.09); }
-.embed-poster:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: -2px; }
+.embed-poster:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
 /* The prompt she would have typed at a model — a text box that types itself,
    then clears and starts again. */
@@ -527,7 +548,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     width: 0.5em;
     height: 1.05em;
     margin-left: 1px;
-    background: var(--accent-ink);
+    background: var(--accent);
     vertical-align: -0.18em;
     animation: caret 1.05s steps(1, end) infinite;
 }
@@ -538,8 +559,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     line-height: 0;
 }
 .typebox-send svg { width: 100%; height: 100%; display: block; }
-.typebox-send circle { fill: var(--accent-ink); }
-.typebox-send .send-arrow { fill: #fff; }
+.typebox-send circle { fill: var(--accent); }
+.typebox-send .send-arrow { fill: var(--ink); }
 
 @keyframes caret { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 .project .project-text p { margin: 0 0 20px; }
@@ -554,10 +575,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     .up-cols { grid-template-columns: 1fr; gap: 0; }
     .up-col + .up-col { margin-top: 14px; }
     .up-num { flex-basis: 36px; font-size: 19px; }
-    /* the narrowest phone needs every pixel for the line to fit whole */
-    .up-text { padding-right: 17px; }
-    .up-what { font-size: 14px; }
-    .up-note { font-size: 12px; }
+    .up-text { padding-right: 18px; font-size: 13px; }
 
     #header {
         width: 100%;

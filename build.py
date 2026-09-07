@@ -28,7 +28,8 @@ QUOTE = ('<figure class="header-description">'
          '<figcaption>%s</figcaption>'
          '</figure>' % (TAGLINE, QUOTE_BY))
 
-NAV = [
+# Every text page, in the order they were written.
+PAGES = [
     ("/upcoming/", "upcoming"),
     ("/about/", "about"),
     ("/filmography/", "filmography"),
@@ -36,6 +37,12 @@ NAV = [
     ("/ai/", "ai"),
     ("/press/", "press"),
 ]
+
+# The menu is those pages minus upcoming: the front page already opens on what
+# is coming and carries "more upcoming" through to the rest, so a second way in
+# from the sidebar only says the same thing twice. The page stays where it is,
+# in the sitemap and in the feed.
+NAV = [(h, l) for h, l in PAGES if h != "/upcoming/"]
 
 # Tra il dire e il fare carries every link preview and search result.
 SOCIAL_IMAGE = "/assets/img/traildire-960.jpg"
@@ -229,6 +236,82 @@ def work_seo(p):
         TITLE, ROLE, prose(p["body"])[:130])
 
 
+def page_body(href, body):
+    """A text page's body, ready to write."""
+    html = tidy_headings(lazy_iframes(strip_inline_styles(body)))
+    if href == "/upcoming/":
+        html = one_list(html)
+    return mark_dates(html)
+
+
+def tidy_headings(html):
+    """Headings the old build left behind.
+
+    One on the press page holds nothing but a non-breaking space inside a link
+    to an emoji page — it rendered as air, and now that a heading carries a
+    green band it renders as a green swatch. Another opens with a line break
+    before its word, which puts an empty line inside the band. Neither is
+    content, so both go.
+    """
+    def fix(m):
+        inner = m.group(2)
+        if not strip_tags(htmllib.unescape(inner)).strip():
+            return ""                       # a heading with nothing in it
+        inner = re.sub(r"^(?:\s|<br\s*/?>)+", "", inner)
+        inner = re.sub(r"(?:\s|<br\s*/?>)+$", "", inner)
+        return "<%s>%s</%s>" % (m.group(1), inner, m.group(1))
+
+    return re.sub(r"<(h[1-6])(?:\s[^>]*)?>(.*?)</\1>", fix, html, flags=re.S)
+
+
+def one_list(body):
+    """The upcoming page as a single run of dates, newest first.
+
+    It was written in two halves — what is coming, in the order it arrives,
+    and then P A S T counting back. One list reads the same whether an event
+    has happened or not, so the divider goes and everything sorts by date, the
+    newest at the top. Each entry comes out in its own paragraph, which also
+    tidies the line breaks the old build left between them.
+    """
+    hits = date_markers(body)
+    if not hits:
+        return body
+    divider = body.find("P A S T")
+
+    entries = []
+    for i, mark in enumerate(hits):
+        month = next((k for k, name in enumerate(MONTH_NAMES, 1)
+                      if name.startswith(mark.group(2).lower()[:3])), 0)
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
+        if mark.end() < divider < end:
+            end = divider              # the divider is not part of the entry
+        entries.append(((int(mark.group(1)), month, int(mark.group(3))),
+                        mark.group(0), tidy_entry(body[mark.end():end])))
+
+    entries.sort(key=lambda e: e[0], reverse=True)
+    return "".join("<p>%s%s</p>" % (marker, text)
+                   for _, marker, text in entries if text)
+
+
+def tidy_entry(html):
+    """One entry with the paragraph scaffolding taken off.
+
+    Entries were separated by line breaks, sometimes inside the anchor that
+    ended them, and Tumblr left empty tags behind. None of that survives being
+    put in a paragraph of its own.
+    """
+    html = re.sub(r"</?p>", " ", html)
+    for _ in range(4):                 # each pass can uncover the next
+        html = re.sub(r"(?:\s|&nbsp;|<br\s*/?>)+$", "", html.strip())
+        html = re.sub(r"(?:\s|&nbsp;|<br\s*/?>)+(?=(?:</[a-z]+>)+$)", "", html)
+        html = re.sub(r"<a\b[^>]*>\s*</a>$", "", html)
+        html = re.sub(r"<(strong|i|em|b)>\s*</\1>$", "", html)
+        # an opening tag with nothing after it — the last entry before the old
+        # divider ended on the <strong> that used to open it
+        html = re.sub(r"<(?:a|strong|em|i|b|span|u|small)\b[^>]*>\s*$", "", html)
+    return re.sub(r"\s+", " ", html).strip()
+
+
 def lazy_iframes(html):
     """Defer third-party embeds until they are scrolled to."""
     return re.sub(r"<iframe(?![^>]*loading=)", '<iframe loading="lazy"', html)
@@ -340,29 +423,19 @@ def project_body(post):
 UPCOMING_FROM = (2026, 9)     # the first month shown
 UPCOMING_MONTHS = 3           # september, then october and november
 
-# For each date: the few words that name it, where it sends you, and the short
-# line the row shows. The upcoming page keeps the full sentence; a row has space
-# for a glance. A date missing from here falls back to the first title on its
-# line, the first link in it, and that line cut to length.
-UPCOMING_CARDS = {
-    "2026-09-07": ("caidp clinic", "https://www.caidp.org/",
-                   "ai policy clinic"),
-    "2026-09-11": ("adagp jury",
-                   "https://www.adagp.fr/fr/soutien-la-creation-artistique"
-                   "/aides-directes-aux-artistes/les-revelations",
-                   "révélation art numérique, le fresnoy"),
-    "2026-09-14": ("sciences po",
-                   "https://www.linkedin.com/company/ai-safety-hub-sciencespo/",
-                   "ai, information, economics, democracy"),
-    "2026-09-29": ("agentic academy", "https://uni-r.org/",
-                   "ai literacy day for refugees"),
-    "2026-10-10": ("iagora festival", "https://iagora.fr/",
-                   "paris 13th city hall, 10:00-18:00"),
-    "2026-11-14": ("iagora festival", "https://iagora.fr/",
-                   "le shadok, strasbourg"),
+# Where each date sends you. The words are hers, taken whole from the upcoming
+# page — her sentence, her capitals — so nothing on the front page is written
+# twice. Her lines link several places at once; a row is one link, and this
+# says which. A date missing from here sends you to the upcoming page.
+UPCOMING_LINKS = {
+    "2026-09-07": "https://www.caidp.org/",
+    "2026-09-11": "https://www.adagp.fr/fr/soutien-la-creation-artistique"
+                  "/aides-directes-aux-artistes/les-revelations",
+    "2026-09-14": "https://www.linkedin.com/company/ai-safety-hub-sciencespo/",
+    "2026-09-29": "https://uni-r.org/",
+    "2026-10-10": "https://iagora.fr/",
+    "2026-11-14": "https://iagora.fr/",
 }
-
-NOTE_CHARS = 70               # the row shows one line and elides the rest
 
 MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december")
@@ -390,41 +463,32 @@ def date_markers(html):
             if any(a <= m.start() < b for a, b in spans)]
 
 
-def card_for(iso, line):
-    """(name, url, note) for a date: hers where given, else from her own line."""
-    named = UPCOMING_CARDS.get(iso)
-    if named:
-        return named
-    title = re.search(r"<(strong|a)\b[^>]*>(.*?)</\1>", line, re.S)
-    name = htmllib.unescape(strip_tags(title.group(2))).strip().lower() if title else ""
-    if len(name) > 24:
-        name = name[:24].rsplit(" ", 1)[0] + "\u2026"
-    href = re.search(r'<a\b[^>]*href="([^"]+)"', line)
-    return name, (href.group(1) if href else "/upcoming/"), short_note(line)
+def event_text(line):
+    """One line of the upcoming page as running words.
 
-
-def short_note(line):
-    """Her own words for a date, cut to what a row can hold."""
-    note = htmllib.unescape(strip_tags(line))
-    note = re.sub(r"\s+", " ", note)
+    Her sentence and her capitals, with the markup taken out: the row is a
+    single link, so the words inside it are no longer links of their own.
+    """
+    text = htmllib.unescape(strip_tags(line))
+    text = re.sub(r"\s+", " ", text)
     # strip_tags leaves a space where a tag was, which can land in front of a
     # comma: "UniR's Agentic Academy , an AI literacy day"
-    note = re.sub(r"\s+([,.;:!?)\u2019'])", r"\1", note)
-    note = re.sub(r"([(\u2018])\s+", r"\1", note)
-    note = note.strip(" \u00a0.,;:")
-    if len(note) <= NOTE_CHARS:
-        return note
-    return note[:NOTE_CHARS].rsplit(" ", 1)[0] + "\u2026"
+    text = re.sub(r"\s+([,.;:!?)\u2019'])", r"\1", text)
+    text = re.sub(r"([(\u2018])\s+", r"\1", text)
+    return text.strip(" \u00a0,;:")
 
 
 def upcoming_months(body):
-    """[(month, [(day, name, url, note)])] for the months the front page shows."""
+    """[(month, [(day, url, text)])] for the months the front page shows."""
     window, y, m = [], *UPCOMING_FROM
     for _ in range(UPCOMING_MONTHS):
         window.append((y, m))
         m = 1 if m == 12 else m + 1
         y = y + 1 if m == 1 else y
 
+    # A line runs to the next date — except the last one before the page's own
+    # divider, which would otherwise swallow it.
+    divider = body.find("P A S T")
     found, hits = {}, date_markers(body)
     for i, mark in enumerate(hits):
         mo = next((k for k, name in enumerate(MONTH_NAMES, 1)
@@ -436,10 +500,12 @@ def upcoming_months(body):
         if (key, d) in found:         # the first line for a day wins
             continue
         end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
-        line = body[mark.end():end]
-        card = card_for("%04d-%02d-%02d" % (key[0], mo, d), line)
-        if card[0]:
-            found[(key, d)] = card
+        if mark.end() < divider < end:
+            end = divider
+        text = event_text(body[mark.end():end])
+        if text:
+            iso = "%04d-%02d-%02d" % (key[0], mo, d)
+            found[(key, d)] = (UPCOMING_LINKS.get(iso, "/upcoming/"), text)
 
     out = []
     for key in window:
@@ -466,12 +532,10 @@ def upcoming_block(pages):
             "\n".join(
                 '        <a class="up-row" href="%s">'
                 '<span class="up-num">%02d</span>'
-                '<span class="up-text">'
-                '<span class="up-what">%s</span>'
-                '<span class="up-note">%s</span></span>'
+                '<span class="up-text">%s</span>'
                 '<span class="up-star" aria-hidden="true">*</span></a>'
-                % (esc(url), d, esc(name), esc(note))
-                for d, name, url, note in rows)))
+                % (esc(url), d, esc(text))
+                for d, url, text in rows)))
 
     columns = [c for c in ([months[0]], months[1:]) if c]
     more = ('        <p class="up-more">'
@@ -487,8 +551,8 @@ def upcoming_block(pages):
                     % "\n".join(parts))
 
     return ('  <section class="up" aria-labelledby="up-title">\n'
-            '    <h2 class="up-title" id="up-title">upcoming '
-            '<span class="up-year">%d</span></h2>\n'
+            '    <h2 class="up-title" id="up-title">'
+            '<span class="up-mark">upcoming</span> %d</h2>\n'
             '    <div class="up-cols">\n%s\n    </div>\n'
             '  </section>' % (UPCOMING_FROM[0], "\n".join(cols)))
 
@@ -721,7 +785,7 @@ def build():
     ))
 
     # --- text pages ----------------------------------------------------------
-    for href, label in NAV:
+    for href, label in PAGES:
         key = href.strip("/")
         page = pages[key]
         write("%s/index.html" % key, document(
@@ -730,7 +794,7 @@ def build():
             canonical=href,
             body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
                  % (esc(page["title"]),
-                    mark_dates(lazy_iframes(strip_inline_styles(page["body"])))),
+                    page_body(href, page["body"])),
             active=href,
             body_class="text-page",
         ))
@@ -835,7 +899,7 @@ def build():
 """ % {"title": esc(TITLE.lower()), "sep": SEP})
 
     # --- sitemap & feed ------------------------------------------------------
-    urls = ["/"] + [h for h, _ in NAV] + ["/work/%s/" % p["slug"] for p in posts]
+    urls = ["/"] + [h for h, _ in PAGES] + ["/work/%s/" % p["slug"] for p in posts]
     write("sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -861,7 +925,7 @@ def build():
     write("robots.txt", "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE)
     open(os.path.join(ROOT, ".nojekyll"), "w").close()
 
-    print("built %d projects, %d pages" % (len(posts), len(NAV)))
+    print("built %d projects, %d pages" % (len(posts), len(PAGES)))
 
 
 # Every internal path is authored root-absolute, then rewritten relative to the

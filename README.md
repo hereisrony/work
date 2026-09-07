@@ -122,44 +122,47 @@ Until step 2, no `CNAME` file should exist in the repo — one would redirect th
 
 ## Upcoming, on the front page
 
-Three months as a small listing: the day set in a block of the bright accent
-with black numerals, the name beside it, and one short line under that. The
-first month stands in the left column, the rest share the right one, with the
-way through to the page under the last of them. Each row goes where its event
-goes.
+Three months as a small listing: the day set in a block of green with black
+numerals, and her own sentence beside it — the same line the upcoming page
+carries, her capitals and all. The first month stands in the left column, the
+rest share the right one, with the way through to the page under the last of
+them.
 
-The dates come from the upcoming page, so an event is written once in
-`content/pages.json`. `build.py` reads every line of the shape
-`2026_September 11_` and keeps the months it is showing.
+Her lines link several places at once; a row is one link, so the words inside
+it are not links of their own and `UPCOMING_LINKS` says where the row goes.
 
 ```python
 UPCOMING_FROM = (2026, 9)     # the first month shown
 UPCOMING_MONTHS = 3           # september, then october and november
-```
-
-Each date's name, destination and short line live together, because a row holds
-a glance and the line on the upcoming page is a sentence pointing at several
-places at once:
-
-```python
-UPCOMING_CARDS = {
-    "2026-09-11": ("adagp jury", "https://www.adagp.fr/...",
-                   "révélation art numérique, le fresnoy"),
+UPCOMING_LINKS = {
+    "2026-09-11": "https://www.adagp.fr/...",
 }
 ```
 
-Keep a line to about 33 characters and it fits whole down to a 320px phone;
-past that the row elides it and the whole of it is on the upcoming page anyway.
-A date missing from the table falls back to the first title on its line, the
-first link in it, and that line cut at `NOTE_CHARS` — so a new event still
-appears with somewhere to go, though your own three read better.
+A date with no destination sends you to the upcoming page instead, so a new
+event needs no edit here at all — the words come from `content/pages.json`
+either way, and nothing on the front page is written twice.
 
 On a phone the two columns become one and the months follow each other; every
 row keeps its number to the left rather than stacking.
 
-The months take every date they find, whether or not the upcoming page has
-moved one under `P A S T`. To show only what is still ahead, cut the body at
-that divider before parsing.
+The months take every date they find, whether or not it has happened —
+September 7 is listed, and it has. To show only what is still ahead, drop the
+dates that fall before today in `upcoming_months`.
+
+## The upcoming page
+
+Every date in one run, newest at the top, oldest at the foot. It was written in
+two halves — what was coming, and then `P A S T` counting back — and `build.py`
+now drops that divider, sorts every entry by date, and gives each one its own
+paragraph, which also tidies away the line breaks the old build left between
+them. Nothing is lost: all 35 entries, all 37 links.
+
+It is not in the menu. The front page opens on what is coming and carries
+`more upcoming` through to the rest, so a second way in from the sidebar only
+said the same thing twice. The page is still built, still in the sitemap and
+the feed, and still at `/upcoming/`. `PAGES` in `build.py` is every text page;
+`NAV` is the menu, which is `PAGES` minus that one.
 
 ## The name in the header
 
@@ -203,23 +206,29 @@ column, the 800px text measure, the three-column grid at 31.33% with a 3%
 gutter, black on white. Tile positions match the
 original to the pixel at 1440px.
 
-The accent is green screen green, in two values, because one colour cannot both
-fill and be read:
+The palette is three colours: black, white, and green screen green `#00FF33`.
+One rule holds it together — **the green is a ground, never a letter.**
 
-| | | on white | on black |
-|---|---|---|---|
-| `--accent` | `#00FF33` | 1.4:1 | 15.3:1 |
-| `--accent-ink` | `#00CC00` | 2.2:1 | 9.6:1 |
+| | contrast |
+|---|---|
+| `#00FF33` text on white | 1.4:1 — fails |
+| black text on `#00FF33` | **15.3:1** — passes AAA |
 
-`--accent` fills — the day blocks in the upcoming listing, a hovered row, the
-duotone over a tile — where it is a shape and what sits on it is black.
-`--accent-ink` writes: her name, the social icons, the current and hovered
-navigation, the project titles, the dates on the upcoming page, the loading bar,
-and every thin stroke.
+WCAG asks 4.5:1 for text and 3:1 for large text, and no bright green clears
+that on white. So nothing is written in green. Everything that used to be —
+her name, the current page in the navigation, the project titles, the section
+headings, the dates on the upcoming page, a hovered link — is now marked in
+it: a green band behind black type, `box-decoration-break: clone` so a phrase
+that wraps takes a band per line rather than one box around the block. The
+social icons are green tiles with the glyph cut out of them in black, and
+hovering her name turns the band inside out, black behind green, which is the
+same 15.3:1.
 
-Neither passes WCAG AA on white, which asks 4.5:1 for text and 3:1 for large
-text; no bright green can. `#00881B` is the darkest of that hue that does, at
-4.6:1, if reading ever matters more than the colour.
+Green still fills where a fill is what it is: the day blocks in the upcoming
+listing, a hovered row, the duotone over a tile, the play button, the typing
+caret. Text on any of them is black. Outlines are black too — a green one
+disappears on white — and the loading bar carries a hairline rule so a bright
+green line has an edge to be seen against.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
 or `press` opens. Nothing overlays the grid. A project page starts at its
