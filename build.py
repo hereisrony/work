@@ -321,8 +321,8 @@ def header(active):
     }
 
 
-def document(*, title, description, canonical, body, active, jsonld=False,
-             body_class="", extra_ld=None):
+def document(*, title, description, canonical, body, active, og_image=None,
+             jsonld=False, body_class="", extra_ld=None):
     head = [
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
@@ -347,11 +347,15 @@ def document(*, title, description, canonical, body, active, jsonld=False,
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
-    # Every link preview and every search result carries the one photograph.
-    head.append('<meta property="og:image" content="%s%s">' % (SITE, SOCIAL_IMAGE))
-    head.append('<meta property="og:image:width" content="%d">' % SOCIAL_IMAGE_W)
-    head.append('<meta property="og:image:height" content="%d">' % SOCIAL_IMAGE_H)
-    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, SOCIAL_IMAGE))
+    # A text page shares the one photograph; a project shows its own still,
+    # the same picture that stands for it on the grid.
+    head.append('<meta property="og:image" content="%s%s">'
+                % (SITE, og_image or SOCIAL_IMAGE))
+    if not og_image:
+        head.append('<meta property="og:image:width" content="%d">' % SOCIAL_IMAGE_W)
+        head.append('<meta property="og:image:height" content="%d">' % SOCIAL_IMAGE_H)
+    head.append('<meta name="twitter:image" content="%s%s">'
+                % (SITE, og_image or SOCIAL_IMAGE))
     if jsonld:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(JSONLD, ensure_ascii=False))
@@ -499,7 +503,7 @@ def build():
             "@type": "CreativeWork",
             "name": p["title"].split("\u2014")[0].strip().lower(),
             "url": "%s/work/%s/" % (SITE, p["slug"]),
-            "image": SITE + SOCIAL_IMAGE,
+            "image": "%s/assets/img/%s-960.jpg" % (SITE, p["slug"]),
             "creator": {"@type": "Person", "name": TITLE, "url": SITE},
             "description": prose(p["body"])[:300],
         }
@@ -513,6 +517,7 @@ def build():
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
+            og_image="/assets/img/%s-960.jpg" % p["slug"],
             body_class="text-page",
             extra_ld=work_ld,
         ))
