@@ -15,7 +15,6 @@
        sits behind black type — a marker rather than an ink. There is one
        green, and every pairing clears what WCAG asks. */
     --accent: #00FF33;
-    --accent-wash: #e9ffee; /* the same green at a whisper, for a resting row */
     --sidebar-w: 17%;
     --gutter: 3%;
     --ease-out: cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -266,7 +265,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
    the shadows, white in the highlights, the way a duotone works.
 
    Desaturating the photograph and screening a flat accent over it is exactly
-   that mapping: screen gives 1-(1-a)(1-b), so with #00CC00 over grey L the
+   that mapping: screen gives 1-(1-a)(1-b), so with #00FF33 over grey L the
    result runs from the accent itself at L=0 to white at L=1. No second copy of
    the image and no SVG filter — and unlike filter: url(), both grayscale() and
    opacity interpolate, so it cross-fades instead of snapping. */
@@ -330,16 +329,17 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 }
 .up-row + .up-name { margin-top: 14px; }
 
-/* The row is a pale field with the day in the one solid block of colour. It
-   is not a link — the words inside it are, the same ones that are links on the
-   upcoming page — but it lights up as the cursor crosses it. */
+/* White paper with the day in the one block of colour. Three colours on the
+   site and no fourth, so a resting row has no ground of its own — the block
+   is what marks it, and the whole row fills as the cursor crosses it. The row
+   is not a link; the words inside it are, the same ones as on the upcoming
+   page. */
 .up-row {
     position: relative;
     display: flex;
     align-items: stretch;
     min-height: 42px;
     margin-bottom: 5px;
-    background: var(--accent-wash);
     overflow: hidden;
     transition: background-color 0.3s var(--ease-out);
 }
@@ -366,30 +366,22 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .up-text {
     flex: 1 1 auto;
     min-width: 0;
-    padding: 7px 22px 7px 10px;
+    padding: 7px 12px 7px 10px;
     align-self: center;
     font-size: 12px;
     line-height: 1.35;
+    font-weight: 400;
     overflow-wrap: break-word;
 }
 
-/* the mark in the corner, from the listing she sent */
-.up-star {
-    position: absolute;
-    top: 3px;
-    right: 6px;
-    font-size: 12px;
-    line-height: 1;
-    color: var(--ink);
-    opacity: 0.3;
-}
-.up-row:hover .up-star { opacity: 0.55; }
-
-/* Her links, as on the upcoming page: bold, never underlined. A green band
-   would not read on a green row, so a hovered word turns the row's colours
-   inside out instead — green on black, the same 15.3:1 either way. */
-.up-text a {
-    font-weight: 700;
+/* Her sentence reads at one weight — the bold fell only on the words that
+   happened to carry a link, which read as emphasis she had not asked for.
+   A link answers to the cursor instead, turning the row's colours inside out:
+   green on black, the same 15.3:1 either way. */
+.up-text a,
+.up-text strong,
+.up-text b {
+    font-weight: inherit;
     color: inherit;
     transition: background-color 0.25s linear, color 0.25s linear;
 }
@@ -585,7 +577,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     .up-cols { grid-template-columns: 1fr; gap: 0; }
     .up-col + .up-col { margin-top: 14px; }
     .up-num { flex-basis: 36px; font-size: 19px; }
-    .up-text { padding-right: 18px; font-size: 13px; }
+    .up-text { padding-right: 10px; font-size: 13px; }
 
     #header {
         width: 100%;

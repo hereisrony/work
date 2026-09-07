@@ -508,8 +508,7 @@ def upcoming_block(pages):
             "\n".join(
                 '        <div class="up-row">'
                 '<span class="up-num">%02d</span>'
-                '<span class="up-text">%s</span>'
-                '<span class="up-star" aria-hidden="true">*</span></div>'
+                '<span class="up-text">%s</span></div>'
                 % (d, line)
                 for d, line in rows)))
 

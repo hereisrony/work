@@ -142,7 +142,11 @@ green with black numerals, and her own sentence beside it — the same line the
 upcoming page carries, her capitals and her links and all. The words that are
 clickable there are clickable here. The row is not itself a link; it lights up
 as the cursor crosses it, and a hovered word turns the row's colours inside
-out. The first month stands in the left column, the rest share the right one,
+out. The line reads at one weight — bold was falling on whichever words
+happened to carry a link, which looks like emphasis she never wrote, so a link
+is signalled by the cursor rather than by weight.
+
+The first month stands in the left column, the rest share the right one,
 with the way through to the page under the last of them. Then `projects`, and
 the grid.
 
@@ -243,6 +247,11 @@ listing, a hovered row, the duotone over a tile, the play button, the typing
 caret. Text on any of them is black. Outlines are black too — a green one
 disappears on white — and the loading bar carries a hairline rule so a bright
 green line has an edge to be seen against.
+
+Three colours and no fourth. There is no pale green: a listing row rests on
+white paper, marked by its day block, and fills only under the cursor. The
+greys from the original build stay for what they always did — the placeholder
+behind a loading tile, the hairline rules, the quote's attribution.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
 or `press` opens. Nothing overlays the grid. A project page starts at its
