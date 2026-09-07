@@ -18,7 +18,6 @@
     --accent-wash: #e9ffee; /* the same green at a whisper, for a resting row */
     --sidebar-w: 17%;
     --gutter: 3%;
-    --meta-gap: 20px;
     --ease-out: cubic-bezier(0.165, 0.84, 0.44, 1);
     --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -233,9 +232,12 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     column-gap: var(--gutter);
-    /* The original theme left a 20px meta slot under every tile, which made the
-       rows breathe a little wider than the columns. Kept. */
-    row-gap: calc(3cqw + var(--meta-gap));
+    /* The same gutter between the rows as between the columns. A percentage
+       row-gap would resolve against the container's height, so it is measured
+       in cqw — 3% of the grid's own width, which is what the columns use. */
+    row-gap: 3cqw;
+    /* and the same again under the last row, which had nothing */
+    padding-bottom: 3cqw;
 }
 
 .tile {
@@ -295,9 +297,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
    not the page. The first month stands alone, the rest share the column. */
 
 .up {
-    /* the measure the text pages use, so the rows keep a card's proportion
-       instead of stretching into slivers across the full width */
-    max-width: 800px;
+    /* the full width of the column, so the listing ends where the work does */
     padding-bottom: 40px;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
@@ -687,7 +687,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
     #main { margin-top: 70px; }
     #main > .wrap { padding: 0 15px; }
-    .grid { row-gap: calc(3cqw + 10px); }
+    .grid { row-gap: 3cqw; padding-bottom: 3cqw; }
     /* no hover treatment on touch — the duotone is pointer-only */
     .tile:hover img { transform: none; filter: none; }
     .tile:hover::after { opacity: 0; }

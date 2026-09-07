@@ -204,7 +204,10 @@ case, and so are the project titles — those by `text-transform`, so
 Layout, type and spacing are reproduced from the original: the fixed 17% left
 column, the 800px text measure, the three-column grid at 31.33% with a 3%
 gutter, black on white. Tile positions match the
-original to the pixel at 1440px.
+original to the pixel at 1440px. One gutter runs in both directions — 3% of
+the grid's width between the columns, the same again between the rows and under
+the last of them — and the upcoming listing above the grid ends on the same
+right edge.
 
 The palette is three colours: black, white, and green screen green `#00FF33`.
 One rule holds it together — **the green is a ground, never a letter.**
