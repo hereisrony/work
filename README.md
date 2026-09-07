@@ -120,6 +120,30 @@ from Tumblr.
 Until step 2, no `CNAME` file should exist in the repo — one would redirect the
 `github.io` preview URL to a domain that still resolves to Tumblr.
 
+## The calendar on the front page
+
+The front page opens on two months, September and October 2026, drawn from the
+dates on the upcoming page — so an event is written once, in
+`content/pages.json`, and appears in both places. `build.py` reads every line
+of the shape `2026_September 11_`, keeps the two months it is showing, and
+rules the rest of the grid through.
+
+Two things in `build.py` control it:
+
+```python
+CAL_FROM = (2026, 9)      # the first month shown; the next one follows
+CAL_LABEL = {             # the short name in the cell
+    "2026-09-11": "adagp jury",
+}
+```
+
+Move `CAL_FROM` to move the window. A date with no entry in `CAL_LABEL` falls
+back to the first title on its line, clamped to fit — enough for a new event to
+appear without an edit here, though a short name of your own reads better.
+
+Below 740px seven columns leave no room to read a name, so a day carries a
+marker and the month lists its dates underneath. The same dates, either way.
+
 ## The name in the header
 
 On the home page the header says **Rony Efrat**, in green. Open any other page
@@ -145,6 +169,10 @@ The `@font-face` URLs are relative to the stylesheet rather than the site root:
 CSS resolves `url()` against the stylesheet, so the fonts load at the domain
 root and at a Pages subpath alike. The HTML path rewriter never sees inside
 CSS.
+
+On the upcoming page the date that opens each line — `2026_September 11_` — is
+in the accent and everything after it is black. `build.py` marks them, matching
+only inside the words so a pattern never lands in a tag or a URL.
 
 Nothing on the site is underlined, anywhere. Links, including the navigation,
 take the accent on hover; the current page stays in it. Page names are lower

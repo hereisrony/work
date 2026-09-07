@@ -235,6 +235,132 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 .tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
+/* --- The calendar on the front page ----------------------------------------
+   Two months, taken from the poster: a day-name pill above a ruled grid, the
+   date in the corner of its cell, days outside the month struck through. The
+   accent carries it — the rules, the pill, the events — on the same white
+   paper as the rest of the site. */
+
+.cal {
+    padding-bottom: 44px;
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    animation: rise 0.7s var(--ease-soft) 0.05s forwards;
+}
+.cal-title {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0 0 22px;
+    color: var(--accent);
+    text-transform: lowercase;
+}
+.cal-title .cal-year { color: var(--ink); }
+
+.cal-months {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 34px;
+}
+
+.cal-name {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0 0 10px;
+    text-transform: lowercase;
+}
+
+/* the pill of day names, the one solid green shape in the block */
+.cal-dow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: var(--accent);
+    border-radius: 999px;
+    margin-bottom: 8px;
+}
+.cal-dow span {
+    font-size: 12px;
+    line-height: 1;
+    padding: 7px 0;
+    text-align: center;
+    color: var(--paper);
+    letter-spacing: 0.04em;
+}
+
+/* one hairline between cells: each draws its own top and left, the grid its
+   own bottom and right, so nothing doubles up */
+.cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-right: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    border-radius: 5px;
+    overflow: hidden;
+    /* every row the same height, whether or not it carries an event */
+    grid-auto-rows: 84px;
+}
+.cal-day {
+    position: relative;
+    padding: 4px 5px 5px;
+    border-top: 1px solid var(--accent);
+    border-left: 1px solid var(--accent);
+}
+.cal-n {
+    display: block;
+    font-size: 12px;
+    line-height: 1;
+    text-align: right;
+    color: var(--ink-soft);
+}
+.cal-day.has-event .cal-n { color: var(--ink); font-weight: 700; }
+
+/* a day with nothing on it, outside the month: ruled corner to corner */
+.cal-day.is-void {
+    background: linear-gradient(to top right, transparent calc(50% - 0.5px),
+        var(--accent) calc(50% - 0.5px), var(--accent) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px));
+}
+
+.cal-ev {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--accent);
+    text-transform: lowercase;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    transition: color 0.25s linear;
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+    animation: rise 0.6s var(--ease-soft) forwards;
+    animation-delay: calc(300ms + var(--stagger, 0ms));
+}
+.cal-ev:hover,
+.cal-ev:focus-visible { color: var(--ink); }
+
+/* the same dates as a list, for the narrow screens where a cell holds a
+   marker instead of a name */
+.cal-list { display: none; }
+
+.cal-more {
+    margin: 22px 0 0;
+    font-size: 15px;
+}
+.cal-more a {
+    font-weight: 700;
+    transition: color 0.25s linear;
+}
+.cal-more a:hover { color: var(--accent); }
+
+/* Between the phone and a wide screen the content column cannot give two
+   months seven readable columns each, so they stack and take the full width. */
+@media (max-width: 1100px) {
+    .cal-months { grid-template-columns: 1fr; gap: 30px; }
+}
+
 /* --- Text pages ------------------------------------------------------------
    Metrics taken from the original: 800px column, 30px headings at normal
    weight, 13px/1.4 body, bold un-underlined links. */
@@ -279,6 +405,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 }
 .page .page-body a:hover,
 .project .project-text a:hover { color: var(--accent); }
+
+/* 2026_September 11_ — the date is in the accent, what follows it is not */
+.page .page-body .ev-date { color: var(--accent); }
 .page .page-body iframe {
     max-width: 100%;
     width: 100%;
@@ -407,6 +536,45 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 /* --- Mobile ---------------------------------------------------------------- */
 
 @media (max-width: 740px) {
+    /* --- the calendar ---------------------------------------------------- */
+    .cal { padding-bottom: 38px; }
+    .cal-title { font-size: 20px; margin-bottom: 18px; }
+    .cal-months { grid-template-columns: 1fr; gap: 26px; }
+    .cal-days { grid-auto-rows: 46px; }
+    .cal-day { padding: 3px 4px; }
+    .cal-n { font-size: 12px; }
+    .cal-dow span { font-size: 11px; padding: 6px 0; }
+
+    /* seven columns on a phone leave no room to read a name, so the cell
+       shows that something is on and the list below says what */
+    .cal-ev {
+        position: absolute;
+        right: 4px;
+        bottom: 5px;
+        width: 9px;
+        height: 9px;
+        margin: 0;
+        overflow: hidden;
+        text-indent: -999px;
+        background: var(--accent);
+    }
+    .cal-list {
+        display: block;
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+    .cal-list li { display: flex; gap: 10px; margin-bottom: 5px; }
+    .cal-list .cal-when {
+        flex: 0 0 22px;
+        text-align: right;
+        color: var(--ink-soft);
+    }
+    .cal-list a { font-weight: 700; color: var(--accent); }
+    .cal-more { font-size: 15px; margin-top: 18px; }
+
     #header {
         width: 100%;
         height: 50px;
@@ -540,6 +708,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     }
     .tile { opacity: 1; transform: none; }
     .page h1, .page .page-body,
+    .cal, .cal-ev,
     .project .project-media, .project .project-text { opacity: 1; transform: none; }
     .loadbar { display: none; }
 }

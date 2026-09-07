@@ -8,6 +8,7 @@ browser needs ends up in the repo root and assets/. There is no other
 toolchain — the output is plain HTML you can also edit by hand.
 """
 
+import calendar as calmod
 import hashlib
 import html as htmllib
 import json
@@ -333,6 +334,151 @@ def project_body(post):
     return html
 
 
+# --- the calendar on the front page -----------------------------------------
+# Two months, drawn from the dates on the upcoming page so there is one place
+# to edit. Move the window by changing the month below.
+CAL_FROM = (2026, 9)          # September 2026; the month after it follows
+CAL_MONTHS = 2
+
+MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
+               "august", "september", "october", "november", "december")
+DAY_NAMES = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+
+# A calendar cell holds a few words, not a sentence. These are the short names;
+# a date with no entry here falls back to the first title in its line.
+CAL_LABEL = {
+    "2026-09-07": "caidp clinic",
+    "2026-09-11": "adagp jury",
+    "2026-09-14": "sciences po",
+    "2026-09-29": "agentic academy",
+    "2026-10-10": "iagora festival",
+}
+
+# 2026_September 11_ — the shape every entry on the upcoming page is written in.
+EVENT_DATE = re.compile(r"(\d{4})_([A-Z][a-z]{2,8})\.?\s(\d{1,2})_")
+
+
+def text_ranges(html):
+    """Where the words are, so a pattern never matches inside a tag."""
+    out, i = [], 0
+    for m in re.finditer(r"<[^>]*>", html):
+        if m.start() > i:
+            out.append((i, m.start()))
+        i = m.end()
+    if i < len(html):
+        out.append((i, len(html)))
+    return out
+
+
+def date_markers(html):
+    """Every date on the upcoming page, in the order it is written."""
+    spans = text_ranges(html)
+    return [m for m in EVENT_DATE.finditer(html)
+            if any(a <= m.start() < b for a, b in spans)]
+
+
+def parse_events(html):
+    """{"2026-09-11": "adagp jury"} for the dates the calendar covers.
+
+    The line following a date runs until the next one, and its first title —
+    the thing being linked to or named in bold — is the label, unless
+    CAL_LABEL gives a shorter one.
+    """
+    found, hits = {}, date_markers(html)
+    for i, m in enumerate(hits):
+        month = next((k for k, name in enumerate(MONTH_NAMES, 1)
+                      if name.startswith(m.group(2).lower()[:3])), None)
+        if month is None:
+            continue
+        iso = "%s-%02d-%02d" % (m.group(1), month, int(m.group(3)))
+        if iso in found:            # the first line for a day wins
+            continue
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(html)
+        line = html[m.end():end]
+        label = CAL_LABEL.get(iso)
+        if not label:
+            title = re.search(r"<(strong|a)\b[^>]*>(.*?)</\1>", line, re.S)
+            label = strip_tags(title.group(2)) if title else ""
+            label = htmllib.unescape(label).strip().lower()
+            if len(label) > 24:     # a cell cannot hold a sentence
+                label = label[:24].rsplit(" ", 1)[0] + "…"
+        found[iso] = label
+    return found
+
+
+def mark_dates(html):
+    """Set every date on the page in the accent, and leave the rest black."""
+    spans = text_ranges(html)
+    out, last = [], 0
+    for m in EVENT_DATE.finditer(html):
+        if not any(a <= m.start() < b for a, b in spans):
+            continue
+        out.append(html[last:m.start()])
+        out.append('<span class="ev-date">%s</span>' % m.group(0))
+        last = m.end()
+    out.append(html[last:])
+    return "".join(out)
+
+
+def calendar_block(pages):
+    """The two-month calendar that opens the front page.
+
+    Day numbers sit in the corner of their cell and the event is named beside
+    them; days outside the month are ruled through. Below 740px a cell is too
+    narrow for words, so it keeps a marker and the month lists itself instead.
+    """
+    events = parse_events(pages["upcoming"]["body"])
+
+    months = []
+    y, m = CAL_FROM
+    for _ in range(CAL_MONTHS):
+        first, span = calmod.monthrange(y, m)   # weekday of the 1st, days in it
+        cells, listed, i = [], [], 0
+
+        for _ in range(first):
+            cells.append('        <div class="cal-day is-void"></div>')
+        for d in range(1, span + 1):
+            iso = "%04d-%02d-%02d" % (y, m, d)
+            label = events.get(iso)
+            if label:
+                i += 1
+                cells.append(
+                    '        <div class="cal-day has-event" style="--stagger: %dms">\n'
+                    '          <span class="cal-n">%d</span>\n'
+                    '          <a class="cal-ev" href="/upcoming/">%s</a>\n'
+                    '        </div>' % (i * 90, d, esc(label)))
+                listed.append('        <li><span class="cal-when">%d</span> '
+                              '<a href="/upcoming/">%s</a></li>' % (d, esc(label)))
+            else:
+                cells.append('        <div class="cal-day">'
+                             '<span class="cal-n">%d</span></div>' % d)
+        while len(cells) % 7:
+            cells.append('        <div class="cal-day is-void"></div>')
+
+        months.append(
+            '    <div class="cal-month">\n'
+            '      <h3 class="cal-name">%s</h3>\n'
+            '      <div class="cal-dow" aria-hidden="true">%s</div>\n'
+            '      <div class="cal-days">\n%s\n      </div>\n'
+            '%s'
+            '    </div>' % (
+                MONTH_NAMES[m - 1],
+                "".join("<span>%s</span>" % d for d in DAY_NAMES),
+                "\n".join(cells),
+                ('      <ul class="cal-list">\n%s\n      </ul>\n' % "\n".join(listed))
+                if listed else ""))
+
+        m = 1 if m == 12 else m + 1
+        y = y + 1 if m == 1 else y
+
+    return ('  <section class="cal" aria-labelledby="cal-title">\n'
+            '    <h2 class="cal-title" id="cal-title">upcoming '
+            '<span class="cal-year">%d</span></h2>\n'
+            '    <div class="cal-months">\n%s\n    </div>\n'
+            '    <p class="cal-more"><a href="/upcoming/">every date</a></p>\n'
+            '  </section>' % (CAL_FROM[0], "\n".join(months)))
+
+
 def strip_inline_styles(html):
     """Tumblr left style attributes behind — one of them sets Helvetica on a
     heading, others set colours. They override the stylesheet, so they go."""
@@ -540,7 +686,7 @@ def build():
         title=tab_title(),
         description=SEO["/"],
         canonical="/",
-        body=grid,
+        body=calendar_block(pages) + "\n" + grid,
         active="/",
         jsonld=True,
         body_class="index-page",
@@ -556,7 +702,7 @@ def build():
             canonical=href,
             body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
                  % (esc(page["title"]),
-                    lazy_iframes(strip_inline_styles(page["body"]))),
+                    mark_dates(lazy_iframes(strip_inline_styles(page["body"])))),
             active=href,
             body_class="text-page",
         ))
