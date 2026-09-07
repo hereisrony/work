@@ -110,36 +110,46 @@
         });
     });
 
-    /* --- the line that types itself --------------------------------------- */
+    /* --- the prompt that types itself, on a loop -------------------------- */
 
-    $$('.typeline').forEach(function (line) {
-        var out = $('.typeline-out', line);
-        var text = line.dataset.type || '';
+    $$('.typebox').forEach(function (box) {
+        var out = $('.typebox-out', box);
+        var text = box.dataset.type || '';
         if (!out || !text) return;
 
-        if (reduced) { out.textContent = text; line.classList.add('done'); return; }
+        if (reduced) { out.textContent = text; return; }
 
-        var started = false;
-        var type = function () {
-            if (started) return;
-            started = true;
-            var i = 0;
-            (function step() {
+        var i = 0, phase = 'type', timer = null, visible = false;
+
+        function at(ms) { timer = window.setTimeout(step, ms); }
+
+        function step() {
+            timer = null;
+            if (!visible) return;                 // picked up again when scrolled back to
+            if (phase === 'type') {
                 out.textContent = text.slice(0, ++i);
-                if (i < text.length) {
-                    // uneven, the way typing actually is
-                    window.setTimeout(step, 28 + Math.random() * 55);
-                } else {
-                    window.setTimeout(function () { line.classList.add('done'); }, 1800);
-                }
-            }());
-        };
+                if (i >= text.length) { phase = 'hold'; at(2600); }
+                else at(30 + Math.random() * 55);  // uneven, the way typing is
+            } else if (phase === 'hold') {
+                phase = 'clear'; at(30);
+            } else if (phase === 'clear') {
+                out.textContent = text.slice(0, --i);
+                if (i <= 0) { phase = 'wait'; at(900); }
+                else at(16 + Math.random() * 12);  // deleting runs faster
+            } else {
+                phase = 'type'; at(140);
+            }
+        }
 
-        if (!('IntersectionObserver' in window)) { type(); return; }
-        var io = new IntersectionObserver(function (entries) {
-            if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); type(); }
-        }, { threshold: 0.5 });
-        io.observe(line);
+        function setVisible(v) {
+            visible = v;
+            if (v && timer === null) step();
+        }
+
+        if (!('IntersectionObserver' in window)) { setVisible(true); return; }
+        new IntersectionObserver(function (entries) {
+            setVisible(entries.some(function (e) { return e.isIntersecting; }));
+        }, { threshold: 0.25 }).observe(box);
     });
 
 })();
