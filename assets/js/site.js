@@ -92,4 +92,56 @@
         }, 1500);
     }
 
+    /* --- video: the host's player only on request ------------------------- */
+
+    $$('.embed[data-player]').forEach(function (box) {
+        var poster = $('.embed-poster', box);
+        if (!poster) return;
+        poster.addEventListener('click', function (e) {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;   // let it open the video page
+            e.preventDefault();
+            var f = document.createElement('iframe');
+            f.src = box.dataset.player;
+            f.title = 'Video';
+            f.allow = 'autoplay; fullscreen; picture-in-picture';
+            f.setAttribute('allowfullscreen', '');
+            box.innerHTML = '';
+            box.appendChild(f);
+        });
+    });
+
+    /* --- the prompt that types itself ------------------------------------- */
+
+    $$('.typebox').forEach(function (box) {
+        var out = $('.typebox-out', box);
+        var text = box.dataset.type || '';
+        if (!out || !text) return;
+
+        if (reduced) { out.textContent = text; return; }
+
+        var i = 0, started = false;
+
+        function type() {
+            out.textContent = text.slice(0, ++i);
+            // uneven, the way typing is
+            if (i < text.length) window.setTimeout(type, 30 + Math.random() * 55);
+            // and then nothing: the line stays, the caret goes on blinking
+        }
+
+        function start() {
+            if (started) return;
+            started = true;
+            type();
+        }
+
+        if (!('IntersectionObserver' in window)) { start(); return; }
+        var io = new IntersectionObserver(function (entries) {
+            if (entries.some(function (e) { return e.isIntersecting; })) {
+                io.disconnect();
+                start();
+            }
+        }, { threshold: 0.25 });
+        io.observe(box);
+    });
+
 })();

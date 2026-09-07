@@ -36,6 +36,8 @@ NAV = [
     ("/press/", "press"),
 ]
 
+SOCIAL_IMAGE = "/assets/img/tech-care-960.jpg"
+
 SOCIAL = [
     ("https://www.instagram.com/hereisrony/", "Instagram",
      'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.9 5.9 0 0 0-2.13 1.38A5.9 5.9 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13a5.9 5.9 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0z M12 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zM19.85 5.6a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z'),
@@ -52,10 +54,17 @@ JSONLD = {
     "@type": "Person",
     "name": "Rony Efrat",
     "url": SITE,
-    "jobTitle": "Filmmaker, Writer, Researcher",
-    "description": ("Multilingual writer, filmmaker, and researcher based in Paris. "
-                    "Her work explores how language and technology create an uncanny "
-                    "sense of place."),
+    "alternateName": "Rony Férat",
+    "jobTitle": "Artist and Filmmaker",
+    "nationality": {"@type": "Country", "name": "France"},
+    "image": SITE + "/assets/img/tech-care-960.jpg",
+    "homeLocation": {"@type": "Place", "name": "Paris, France"},
+    "worksFor": {"@type": "Organization", "name": "KarmaLab",
+                 "url": "https://www.karmalab.tech"},
+    "description": ("Rony Efrat is a French artist and filmmaker based in Paris. "
+                    "She makes films, site-specific and interactive work, and "
+                    "researches how language and technology shape a sense of "
+                    "place and belonging."),
     "alumniOf": {
         "@type": "CollegeOrUniversity",
         "name": "Le Fresnoy – Studio national des arts contemporains",
@@ -79,6 +88,17 @@ def esc(s):
              .replace(">", "&gt;").replace('"', "&quot;"))
 
 
+SEP = "\u22ee"          # the separator she asked for, not a dash
+ROLE = "french artist and filmmaker"
+
+
+def tab_title(name=None):
+    """Lower case, no dash, and never the subtitle: "name \u22ee rony efrat"."""
+    if not name:
+        return TITLE.lower()
+    return "%s %s %s" % (name.split(" \u2014 ")[0].strip().lower(), SEP, TITLE.lower())
+
+
 def strip_tags(s):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s)).strip()
 
@@ -88,22 +108,55 @@ def lazy_iframes(html):
     return re.sub(r"<iframe(?![^>]*loading=)", '<iframe loading="lazy"', html)
 
 
+# Each player is asked for as little chrome as the host allows: no title, no
+# byline, no avatar, no related videos.
 VIDEO_HOSTS = (
     (re.compile(r"^https?://(?:www\.)?vimeo\.com/(\d+)"),
-     "https://player.vimeo.com/video/%s"),
+     "https://player.vimeo.com/video/%s"
+     "?title=0&byline=0&portrait=0&dnt=1&autoplay=1"),
     (re.compile(r"^https?://(?:www\.)?youtube\.com/watch\?v=([\w-]+)"),
-     "https://www.youtube.com/embed/%s"),
+     "https://www.youtube-nocookie.com/embed/%s"
+     "?autoplay=1&modestbranding=1&rel=0&playsinline=1"),
     (re.compile(r"^https?://youtu\.be/([\w-]+)"),
-     "https://www.youtube.com/embed/%s"),
+     "https://www.youtube-nocookie.com/embed/%s"
+     "?autoplay=1&modestbranding=1&rel=0&playsinline=1"),
     (re.compile(r"^https?://(?:www\.)?arte\.tv/(\w\w)/videos/([\w-]+)/"),
-     "https://www.arte.tv/embeds/%s/%s"),
+     "https://www.arte.tv/embeds/%s/%s?autoplay=1"),
 )
 
+PLAY_ICON = ('<svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">'
+             '<circle cx="40" cy="40" r="40"/>'
+             '<path d="M32 24 L58 40 L32 56 Z" class="play-tri"/></svg>')
 
-def player_frame(src):
-    return ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
-            'allow="autoplay; fullscreen; picture-in-picture" '
-            'allowfullscreen></iframe></div>' % src)
+
+def player_frame(src, post=None, watch=None):
+    """A still with a play button. The host's player, with all of its lettering,
+    only arrives once someone asks for it — and nothing is requested from a
+    third party until then."""
+    if post is None:
+        return ('<div class="embed"><iframe src="%s" title="Video" loading="lazy" '
+                'allow="autoplay; fullscreen; picture-in-picture" '
+                'allowfullscreen></iframe></div>' % esc(src))
+    slug = post["slug"]
+    return ("""<div class="embed" data-player="%(src)s">
+      <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
+         aria-label="Play %(name)s">
+        <picture>
+          <source type="image/webp" srcset="%(w640)s 640w, %(w1280)s 1280w"
+                  sizes="(max-width: 740px) 100vw, 800px">
+          <img src="%(jpg)s" alt="" width="1280" height="720" loading="lazy" decoding="async">
+        </picture>
+        <span class="embed-play">%(icon)s</span>
+      </a>
+    </div>""" % {
+        "src": esc(src),
+        "watch": esc(watch or post.get("video", "")),
+        "name": esc(post["title"].split(" \u2014 ")[0].lower()),
+        "w640": asset("/assets/img/poster-%s-640.webp" % slug),
+        "w1280": asset("/assets/img/poster-%s-1280.webp" % slug),
+        "jpg": asset("/assets/img/poster-%s-1280.jpg" % slug),
+        "icon": PLAY_ICON,
+    })
 
 
 def embed_url(href):
@@ -115,7 +168,7 @@ def embed_url(href):
     return None
 
 
-def embed_videos(html, slug=""):
+def embed_videos(html, post=None):
     """Swap a project's opening 'find it here' link for the video itself.
 
     Only the first paragraph is considered, and only when it holds nothing but
@@ -127,9 +180,10 @@ def embed_videos(html, slug=""):
     if not m:
         return html
     para = m.group(1)
-    player = None
+    player = watch = None
     for href in re.findall(r'<a href="([^"]+)"', para):
-        player = player or embed_url(href)
+        if not player:
+            player, watch = embed_url(href), href
     if not player:
         return html
     # the paragraph must be just the link(s) and punctuation
@@ -138,19 +192,25 @@ def embed_videos(html, slug=""):
         text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
         if not text.startswith(("findithere", "watchithere", "watchither")):
             return html
-    return player_frame(player) + html[m.end():]
+    return player_frame(player, post, watch) + html[m.end():]
 
 
 def project_body(post):
     """The body with its video in place: either the opening link turned into a
     player, or one named by a "video" key for a project whose text never
     linked to it."""
-    html = embed_videos(post["body"], post["slug"])
+    html = embed_videos(post["body"], post)
     if 'class="embed"' not in html and post.get("video"):
         src = embed_url(post["video"])
         if src:
-            html = player_frame(src) + html
+            html = player_frame(src, post, post["video"]) + html
     return html
+
+
+def strip_inline_styles(html):
+    """Tumblr left style attributes behind — one of them sets Helvetica on a
+    heading, others set colours. They override the stylesheet, so they go."""
+    return re.sub(r'\s*style="[^"]*"', "", html)
 
 
 def blank_external(html):
@@ -212,11 +272,15 @@ def header(active):
 
 
 def document(*, title, description, canonical, body, active, og_image=None, jsonld=False,
-             body_class=""):
+             body_class="", extra_ld=None):
     head = [
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         "<title>%s</title>" % esc(title),
+        '<meta name="author" content="%s">' % esc(TITLE),
+        '<meta name="robots" content="index, follow, max-image-preview:large, '
+        'max-snippet:-1">',
+        '<meta property="og:locale" content="en_GB">',
         '<meta name="description" content="%s">' % esc(description),
         '<link rel="canonical" href="%s%s">' % (SITE, canonical),
         '<meta property="og:type" content="website">',
@@ -225,15 +289,25 @@ def document(*, title, description, canonical, body, active, og_image=None, json
         '<meta property="og:description" content="%s">' % esc(description),
         '<meta property="og:url" content="%s%s">' % (SITE, canonical),
         '<meta name="twitter:card" content="summary_large_image">',
-        '<link rel="icon" href="%s">' % asset("/assets/favicon.png"),
+        '<meta name="twitter:title" content="%s">' % esc(title),
+        '<meta name="twitter:description" content="%s">' % esc(description),
+        '<link rel="icon" href="%s" type="image/svg+xml">' % asset("/assets/favicon.svg"),
+        '<link rel="alternate icon" href="%s">' % asset("/assets/favicon.png"),
+        '<link rel="apple-touch-icon" href="%s">' % asset("/assets/apple-touch-icon.png"),
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
-    if og_image:
-        head.append('<meta property="og:image" content="%s%s">' % (SITE, og_image))
+    og_image = og_image or SOCIAL_IMAGE
+    head.append('<meta property="og:image" content="%s%s">' % (SITE, og_image))
+    head.append('<meta property="og:image:width" content="960">')
+    head.append('<meta property="og:image:height" content="960">')
+    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, og_image))
     if jsonld:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(JSONLD, ensure_ascii=False))
+    if extra_ld:
+        head.append('<script type="application/ld+json">%s</script>'
+                    % json.dumps(extra_ld, ensure_ascii=False))
 
     return """<!DOCTYPE html>
 <html lang="en">
@@ -333,8 +407,10 @@ def build():
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
             % "\n".join(tile(p) for p in posts))
     write("index.html", document(
-        title=TITLE,
-        description=TAGLINE,
+        title=tab_title(),
+        description=("Rony Efrat is a %s based in Paris. Films, site-specific and "
+                     "interactive work, and research on language, technology and "
+                     "belonging." % ROLE),
         canonical="/",
         body=grid,
         active="/",
@@ -348,11 +424,13 @@ def build():
         key = href.strip("/")
         page = pages[key]
         write("%s/index.html" % key, document(
-            title="%s — %s" % (page["title"], TITLE),
-            description=strip_tags(page["body"])[:180],
+            title=tab_title(page["title"]),
+            description="%s, %s. %s" % (TITLE, ROLE,
+                                        strip_tags(page["body"])[:150]),
             canonical=href,
             body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
-                 % (esc(page["title"]), lazy_iframes(page["body"])),
+                 % (esc(page["title"]),
+                    lazy_iframes(strip_inline_styles(page["body"]))),
             active=href,
             body_class="text-page",
         ))
@@ -368,16 +446,30 @@ def build():
   </article>""" % {
             "title": esc(p["title"]),
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
-            "body": project_body(p),
+            "body": strip_inline_styles(project_body(p)),
         }
+        work_ld = {
+            "@context": "https://schema.org",
+            "@type": "CreativeWork",
+            "name": p["title"].split("\u2014")[0].strip().lower(),
+            "url": "%s/work/%s/" % (SITE, p["slug"]),
+            "image": "%s/assets/img/%s-960.jpg" % (SITE, p["slug"]),
+            "creator": {"@type": "Person", "name": TITLE, "url": SITE},
+            "description": strip_tags(p["body"])[:300],
+        }
+        if p["subtitle"]:
+            work_ld["genre"] = p["subtitle"]
         write("work/%s/index.html" % p["slug"], document(
-            title="%s — %s" % (p["title"], TITLE),
-            description=(p["subtitle"] + ". " if p["subtitle"] else "") + strip_tags(p["body"])[:170],
+            title=tab_title(p["title"]),
+            description="%s by %s, %s. %s" % (
+                p["title"].split(" \u2014 ")[0].strip().lower(),
+                TITLE, ROLE, strip_tags(p["body"])[:130]),
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
             og_image="/assets/img/%s-960.jpg" % p["slug"],
             body_class="text-page",
+            extra_ld=work_ld,
         ))
 
     # --- legacy Tumblr permalinks -------------------------------------------
@@ -415,7 +507,7 @@ def build():
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Not found &mdash; %(title)s</title>
+  <title>not found %(sep)s %(title)s</title>
   <meta name="robots" content="noindex">
   <style>
     body { margin: 0; font: 400 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -442,7 +534,7 @@ def build():
   </script>
 </body>
 </html>
-""" % {"title": esc(TITLE)})
+""" % {"title": esc(TITLE.lower()), "sep": SEP})
 
     # --- sitemap & feed ------------------------------------------------------
     urls = ["/"] + [h for h, _ in NAV] + ["/work/%s/" % p["slug"] for p in posts]
