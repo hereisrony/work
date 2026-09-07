@@ -15,7 +15,6 @@
        sits behind black type — a marker rather than an ink. There is one
        green, and every pairing clears what WCAG asks. */
     --accent: #00FF33;
-    --accent-wash: #e9ffee; /* the same green at a whisper, for a resting row */
     --sidebar-w: 17%;
     --gutter: 3%;
     --ease-out: cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -114,7 +113,7 @@ p { margin: 0 0 14px; }
 .project h1,
 .project .project-text a:hover,
 .project .project-text a:focus-visible,
-.up-title .up-mark,
+.sec-title .mark,
 .up-more a:hover,
 .up-more a:focus-visible {
     background: var(--accent);
@@ -266,7 +265,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
    the shadows, white in the highlights, the way a duotone works.
 
    Desaturating the photograph and screening a flat accent over it is exactly
-   that mapping: screen gives 1-(1-a)(1-b), so with #00CC00 over grey L the
+   that mapping: screen gives 1-(1-a)(1-b), so with #00FF33 over grey L the
    result runs from the accent itself at L=0 to white at L=1. No second copy of
    the image and no SVG filter — and unlike filter: url(), both grayscale() and
    opacity interpolate, so it cross-fades instead of snapping. */
@@ -298,12 +297,13 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 .up {
     /* the full width of the column, so the listing ends where the work does */
-    padding-bottom: 40px;
+    padding-bottom: 30px;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
     animation: rise 0.7s var(--ease-soft) 0.05s forwards;
 }
-.up-title {
+/* upcoming, and projects: the two things the front page is */
+.sec-title {
     font-size: 18px;
     font-weight: 400;
     line-height: 1.1;
@@ -329,21 +329,22 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 }
 .up-row + .up-name { margin-top: 14px; }
 
-/* the row: a pale field with the day in the one solid block of colour */
+/* White paper with the day in the one block of colour. Three colours on the
+   site and no fourth, so a resting row has no ground of its own — the block
+   is what marks it, and the whole row fills as the cursor crosses it. The row
+   is not a link; the words inside it are, the same ones as on the upcoming
+   page. */
 .up-row {
     position: relative;
     display: flex;
     align-items: stretch;
     min-height: 42px;
     margin-bottom: 5px;
-    background: var(--accent-wash);
     overflow: hidden;
     transition: background-color 0.3s var(--ease-out);
 }
 .up-row:last-child { margin-bottom: 0; }
-.up-row:hover,
-.up-row:focus-visible { background: var(--accent); }
-.up-row:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.up-row:hover { background: var(--accent); }
 
 .up-num {
     flex: 0 0 36px;
@@ -358,33 +359,34 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     line-height: 1;
     transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
-.up-row:hover .up-num,
-.up-row:focus-visible .up-num { background: var(--paper); color: var(--ink); }
+.up-row:hover .up-num { background: var(--paper); color: var(--ink); }
 
 /* her sentence, whole and in her own capitals — the row is the one link, so
    nothing inside it is a link of its own */
 .up-text {
     flex: 1 1 auto;
     min-width: 0;
-    padding: 7px 22px 7px 10px;
+    padding: 7px 12px 7px 10px;
     align-self: center;
     font-size: 12px;
     line-height: 1.35;
+    font-weight: 400;
     overflow-wrap: break-word;
 }
 
-/* the mark in the corner, from the listing she sent */
-.up-star {
-    position: absolute;
-    top: 3px;
-    right: 6px;
-    font-size: 12px;
-    line-height: 1;
-    color: var(--ink);
-    opacity: 0.3;
+/* Bold means a link, and nothing else does: a word set in bold here is a word
+   you can click. So her <strong> is levelled unless it carries one, and a
+   hovered link turns the row's colours inside out on top of the weight —
+   green on black, the same 15.3:1 either way. */
+.up-text strong,
+.up-text b { font-weight: inherit; }
+.up-text a {
+    font-weight: 700;
+    color: inherit;
+    transition: background-color 0.25s linear, color 0.25s linear;
 }
-.up-row:hover .up-star,
-.up-row:focus-visible .up-star { opacity: 0.55; }
+.up-text a:hover,
+.up-text a:focus-visible { background: var(--ink); color: var(--accent); }
 
 /* it belongs to the second column, under the last month it lists */
 .up-more {
@@ -570,12 +572,12 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 @media (max-width: 740px) {
     /* --- upcoming ------------------------------------------------------- */
     .up { padding-bottom: 28px; }
-    .up-title { font-size: 18px; margin-bottom: 12px; }
+    .sec-title { font-size: 18px; margin-bottom: 12px; }
     /* the two columns become one, the months following each other */
     .up-cols { grid-template-columns: 1fr; gap: 0; }
     .up-col + .up-col { margin-top: 14px; }
     .up-num { flex-basis: 36px; font-size: 19px; }
-    .up-text { padding-right: 18px; font-size: 13px; }
+    .up-text { padding-right: 10px; font-size: 13px; }
 
     #header {
         width: 100%;

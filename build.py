@@ -44,18 +44,21 @@ PAGES = [
 # in the sitemap and in the feed.
 NAV = [(h, l) for h, l in PAGES if h != "/upcoming/"]
 
-# Tra il dire e il fare carries every link preview and search result.
-SOCIAL_IMAGE = "/assets/img/traildire-960.jpg"
-SOCIAL_IMAGE_W, SOCIAL_IMAGE_H = 960, 956
+# What a shared link opens with. (path, width, height) — the dimensions let a
+# platform lay the card out before the image arrives.
+#
+# Tra il dire e il fare stands for the work, so it carries every page but one.
+SOCIAL_IMAGE = ("/assets/img/traildire-960.jpg", 960, 956)
+# The front page is the site rather than any one piece, so it carries the mark
+# instead: the same ◩ as the tab icon, on the site's own white paper.
+HOME_SOCIAL_IMAGE = ("/assets/img/mark-card.png", 1200, 630)
 
 ROLE = "french filmmaker and artist"
 
 # Written by her, used as-is. Keyed by the page's path.
 SEO = {
-    "/": ("Rony Efrat is a French filmmaker, artist, researcher and educator "
-          "working across film, language, technology and systems. Her films, "
-          "installations and research explore how we construct memory, truth and "
-          "belonging through the tools we make."),
+    "/": ("Rony Efrat is a French multimedia artist, researcher and educator, "
+          "working across film, language, technology and systems."),
     "/about/": ("Rony Efrat is a filmmaker, artist, researcher and educator whose "
                 "practice moves between cinema, language, archives, technology and "
                 "public systems. Her work has been presented by ARTE, France "
@@ -165,7 +168,7 @@ JSONLD = {
     "alternateName": "Rony Férat",
     "jobTitle": "Filmmaker, Artist, Researcher and Educator",
     "nationality": {"@type": "Country", "name": "France"},
-    "image": SITE + SOCIAL_IMAGE,
+    "image": SITE + SOCIAL_IMAGE[0],
     "homeLocation": {"@type": "Place", "name": "Paris, France"},
     "worksFor": {"@type": "Organization", "name": "KarmaLab",
                  "url": "https://www.karmalab.tech"},
@@ -423,20 +426,6 @@ def project_body(post):
 UPCOMING_FROM = (2026, 9)     # the first month shown
 UPCOMING_MONTHS = 3           # september, then october and november
 
-# Where each date sends you. The words are hers, taken whole from the upcoming
-# page — her sentence, her capitals — so nothing on the front page is written
-# twice. Her lines link several places at once; a row is one link, and this
-# says which. A date missing from here sends you to the upcoming page.
-UPCOMING_LINKS = {
-    "2026-09-07": "https://www.caidp.org/",
-    "2026-09-11": "https://www.adagp.fr/fr/soutien-la-creation-artistique"
-                  "/aides-directes-aux-artistes/les-revelations",
-    "2026-09-14": "https://www.linkedin.com/company/ai-safety-hub-sciencespo/",
-    "2026-09-29": "https://uni-r.org/",
-    "2026-10-10": "https://iagora.fr/",
-    "2026-11-14": "https://iagora.fr/",
-}
-
 MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december")
 
@@ -463,23 +452,8 @@ def date_markers(html):
             if any(a <= m.start() < b for a, b in spans)]
 
 
-def event_text(line):
-    """One line of the upcoming page as running words.
-
-    Her sentence and her capitals, with the markup taken out: the row is a
-    single link, so the words inside it are no longer links of their own.
-    """
-    text = htmllib.unescape(strip_tags(line))
-    text = re.sub(r"\s+", " ", text)
-    # strip_tags leaves a space where a tag was, which can land in front of a
-    # comma: "UniR's Agentic Academy , an AI literacy day"
-    text = re.sub(r"\s+([,.;:!?)\u2019'])", r"\1", text)
-    text = re.sub(r"([(\u2018])\s+", r"\1", text)
-    return text.strip(" \u00a0,;:")
-
-
 def upcoming_months(body):
-    """[(month, [(day, url, text)])] for the months the front page shows."""
+    """[(month, [(day, html)])] for the months the front page shows."""
     window, y, m = [], *UPCOMING_FROM
     for _ in range(UPCOMING_MONTHS):
         window.append((y, m))
@@ -502,25 +476,27 @@ def upcoming_months(body):
         end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
         if mark.end() < divider < end:
             end = divider
-        text = event_text(body[mark.end():end])
-        if text:
-            iso = "%04d-%02d-%02d" % (key[0], mo, d)
-            found[(key, d)] = (UPCOMING_LINKS.get(iso, "/upcoming/"), text)
+        line = tidy_entry(body[mark.end():end])
+        if line:
+            found[(key, d)] = line
 
     out = []
     for key in window:
         days = sorted(d for (k, d) in found if k == key)
         if days:
-            out.append((key[1], [(d,) + found[(key, d)] for d in days]))
+            out.append((key[1], [(d, found[(key, d)]) for d in days]))
     return out
 
 
 def upcoming_block(pages):
     """The upcoming rubric that opens the front page.
 
-    The listing she sent, at the site's scale: the day in a block of accent,
-    the name beside it, her line under that, each row going where the event
-    does. The first month stands on its own; the rest share the second column.
+    The listing she sent, at this site's scale and in its colours: the day in
+    a block of accent and her own sentence beside it, links and all — the words
+    that are clickable on the upcoming page are clickable here too. The row is
+    not itself a link; it lights up as the cursor crosses it. The first month
+    stands alone, the rest share the second column, with the way through to the
+    page under the last of them.
     """
     months = upcoming_months(pages["upcoming"]["body"])
     if not months:
@@ -530,12 +506,11 @@ def upcoming_block(pages):
         return ('        <h3 class="up-name">%s</h3>\n%s' % (
             MONTH_NAMES[month - 1],
             "\n".join(
-                '        <a class="up-row" href="%s">'
+                '        <div class="up-row">'
                 '<span class="up-num">%02d</span>'
-                '<span class="up-text">%s</span>'
-                '<span class="up-star" aria-hidden="true">*</span></a>'
-                % (esc(url), d, esc(text))
-                for d, url, text in rows)))
+                '<span class="up-text">%s</span></div>'
+                % (d, line)
+                for d, line in rows)))
 
     columns = [c for c in ([months[0]], months[1:]) if c]
     more = ('        <p class="up-more">'
@@ -551,10 +526,10 @@ def upcoming_block(pages):
                     % "\n".join(parts))
 
     return ('  <section class="up" aria-labelledby="up-title">\n'
-            '    <h2 class="up-title" id="up-title">'
-            '<span class="up-mark">upcoming</span> %d</h2>\n'
+            '    <h2 class="sec-title" id="up-title">'
+            '<span class="mark">upcoming</span></h2>\n'
             '    <div class="up-cols">\n%s\n    </div>\n'
-            '  </section>' % (UPCOMING_FROM[0], "\n".join(cols)))
+            '  </section>' % "\n".join(cols))
 
 
 def mark_dates(html):
@@ -661,15 +636,14 @@ def document(*, title, description, canonical, body, active, og_image=None,
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
-    # A text page shares the one photograph; a project shows its own still,
-    # the same picture that stands for it on the grid.
-    head.append('<meta property="og:image" content="%s%s">'
-                % (SITE, og_image or SOCIAL_IMAGE))
-    if not og_image:
-        head.append('<meta property="og:image:width" content="%d">' % SOCIAL_IMAGE_W)
-        head.append('<meta property="og:image:height" content="%d">' % SOCIAL_IMAGE_H)
-    head.append('<meta name="twitter:image" content="%s%s">'
-                % (SITE, og_image or SOCIAL_IMAGE))
+    # A text page shares the one photograph, the front page the mark, and a
+    # project its own still — the picture that stands for it on the grid.
+    path, w, h = og_image or SOCIAL_IMAGE
+    head.append('<meta property="og:image" content="%s%s">' % (SITE, path))
+    if w and h:
+        head.append('<meta property="og:image:width" content="%d">' % w)
+        head.append('<meta property="og:image:height" content="%d">' % h)
+    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, path))
     if jsonld:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(JSONLD, ensure_ascii=False))
@@ -774,11 +748,14 @@ def build():
     # --- index ---------------------------------------------------------------
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
             % "\n".join(tile(p) for p in posts))
+    projects = ('  <h2 class="sec-title">'
+                '<span class="mark">projects</span></h2>')
     write("index.html", document(
         title=tab_title(),
         description=SEO["/"],
         canonical="/",
-        body=upcoming_block(pages) + "\n" + grid,
+        og_image=HOME_SOCIAL_IMAGE,
+        body="\n".join([upcoming_block(pages), projects, grid]),
         active="/",
         jsonld=True,
         body_class="index-page",
@@ -829,7 +806,7 @@ def build():
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
-            og_image="/assets/img/%s-960.jpg" % p["slug"],
+            og_image=("/assets/img/%s-960.jpg" % p["slug"], None, None),
             body_class="text-page",
             extra_ld=work_ld,
         ))

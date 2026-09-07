@@ -15,14 +15,29 @@ post/<id>/<slug>/       redirects for the old Tumblr permalinks
 assets/css/site.css     all styling
 assets/js/site.js       grid reveal, mobile drawer
 assets/js/name.js       generated from content/questions.json
-assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback
+assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback,
+                        and mark-card.png, the card a shared link opens with
 assets/fonts/           Inconsolata, self-hosted (two variable subsets)
 content/posts.json      the 18 projects: title, subtitle, date, body HTML,
                         and an optional "video" to embed
 content/pages.json      the six text pages
 content/questions.json  the questions the header asks about her name
 build.py                regenerates the HTML from content/
+tools/make-icons.py     redraws the mark: favicons and the social card
 ```
+
+## The mark
+
+◩, in the accent, drawn from a single set of proportions in
+`tools/make-icons.py`: the favicon, the icon a phone keeps on its home screen,
+and `mark-card.png`, the 1200×630 card a shared link to the front page opens
+with. That script needs Pillow, which `build.py` deliberately does not — the
+build stays stdlib-only, so the icons are drawn once and committed. Run it if
+the accent changes, or the mark does.
+
+Every other page shares one photograph, *Tra il dire e il fare*, except a
+project, which previews with its own still. The front page is the site rather
+than any one piece, so it carries the mark instead.
 
 ## Editing
 
@@ -122,26 +137,26 @@ Until step 2, no `CNAME` file should exist in the repo — one would redirect th
 
 ## Upcoming, on the front page
 
-Three months as a small listing: the day set in a block of green with black
-numerals, and her own sentence beside it — the same line the upcoming page
-carries, her capitals and all. The first month stands in the left column, the
-rest share the right one, with the way through to the page under the last of
-them.
+Under `upcoming`, three months as a small listing: the day set in a block of
+green with black numerals, and her own sentence beside it — the same line the
+upcoming page carries, her capitals and her links and all. The words that are
+clickable there are clickable here. The row is not itself a link; it lights up
+as the cursor crosses it, and a hovered word turns the row's colours inside
+out. In a row, bold means a link and nothing else does: a word set in bold is
+a word you can click. `<strong>` in her own writing is levelled here unless it
+carries one, so the weight never promises something that is not there.
 
-Her lines link several places at once; a row is one link, so the words inside
-it are not links of their own and `UPCOMING_LINKS` says where the row goes.
+The first month stands in the left column, the rest share the right one,
+with the way through to the page under the last of them. Then `projects`, and
+the grid.
 
 ```python
 UPCOMING_FROM = (2026, 9)     # the first month shown
 UPCOMING_MONTHS = 3           # september, then october and november
-UPCOMING_LINKS = {
-    "2026-09-11": "https://www.adagp.fr/...",
-}
 ```
 
-A date with no destination sends you to the upcoming page instead, so a new
-event needs no edit here at all — the words come from `content/pages.json`
-either way, and nothing on the front page is written twice.
+Nothing else to keep in step: an event is written once in `content/pages.json`,
+links included, and appears in both places.
 
 On a phone the two columns become one and the months follow each other; every
 row keeps its number to the left rather than stacking.
@@ -232,6 +247,11 @@ listing, a hovered row, the duotone over a tile, the play button, the typing
 caret. Text on any of them is black. Outlines are black too — a green one
 disappears on white — and the loading bar carries a hairline rule so a bright
 green line has an edge to be seen against.
+
+Three colours and no fourth. There is no pale green: a listing row rests on
+white paper, marked by its day block, and fills only under the cursor. The
+greys from the original build stay for what they always did — the placeholder
+behind a loading tile, the hairline rules, the quote's attribution.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
 or `press` opens. Nothing overlays the grid. A project page starts at its
