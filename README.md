@@ -142,9 +142,9 @@ green with black numerals, and her own sentence beside it — the same line the
 upcoming page carries, her capitals and her links and all. The words that are
 clickable there are clickable here. The row is not itself a link; it lights up
 as the cursor crosses it, and a hovered word turns the row's colours inside
-out. The line reads at one weight — bold was falling on whichever words
-happened to carry a link, which looks like emphasis she never wrote, so a link
-is signalled by the cursor rather than by weight.
+out. In a row, bold means a link and nothing else does: a word set in bold is
+a word you can click. `<strong>` in her own writing is levelled here unless it
+carries one, so the weight never promises something that is not there.
 
 The first month stands in the left column, the rest share the right one,
 with the way through to the page under the last of them. Then `projects`, and

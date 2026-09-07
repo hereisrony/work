@@ -374,14 +374,14 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     overflow-wrap: break-word;
 }
 
-/* Her sentence reads at one weight — the bold fell only on the words that
-   happened to carry a link, which read as emphasis she had not asked for.
-   A link answers to the cursor instead, turning the row's colours inside out:
+/* Bold means a link, and nothing else does: a word set in bold here is a word
+   you can click. So her <strong> is levelled unless it carries one, and a
+   hovered link turns the row's colours inside out on top of the weight —
    green on black, the same 15.3:1 either way. */
-.up-text a,
 .up-text strong,
-.up-text b {
-    font-weight: inherit;
+.up-text b { font-weight: inherit; }
+.up-text a {
+    font-weight: 700;
     color: inherit;
     transition: background-color 0.25s linear, color 0.25s linear;
 }
