@@ -9,6 +9,7 @@ toolchain — the output is plain HTML you can also edit by hand.
 """
 
 import hashlib
+import html as htmllib
 import json
 import os
 import re
@@ -36,7 +37,46 @@ NAV = [
     ("/press/", "press"),
 ]
 
-SOCIAL_IMAGE = "/assets/img/tech-care-960.jpg"
+# Tra il dire e il fare carries every link preview and search result.
+SOCIAL_IMAGE = "/assets/img/traildire-960.jpg"
+SOCIAL_IMAGE_W, SOCIAL_IMAGE_H = 960, 956
+
+ROLE = "french filmmaker and artist"
+
+# Written by her, used as-is. Keyed by the page's path.
+SEO = {
+    "/": ("Rony Efrat is a French filmmaker, artist, researcher and educator "
+          "working across film, language, technology and systems. Her films, "
+          "installations and research explore how we construct memory, truth and "
+          "belonging through the tools we make."),
+    "/about/": ("Rony Efrat is a filmmaker, artist, researcher and educator whose "
+                "practice moves between cinema, language, archives, technology and "
+                "public systems. Her work has been presented by ARTE, France "
+                "T\u00e9l\u00e9visions, Le Fresnoy, ADAGP and the Venice "
+                "Architecture Biennale."),
+    "/upcoming/": ("Upcoming screenings, talks, conferences, exhibitions and public "
+                   "events with Rony Efrat. Current appearances include Sciences Po, "
+                   "ADAGP, festivals and institutions in France and internationally."),
+    "/filmography/": ("Films by filmmaker and writer-director Rony Efrat, including "
+                      "Failing Forward, Une vie en France and Exceptional Talent. Her "
+                      "filmography spans fiction, documentary, hybrid cinema, "
+                      "interactive work and writing for ARTE, France "
+                      "T\u00e9l\u00e9visions and independent productions."),
+    "/academia/": ("Research and teaching by Rony Efrat across systems theory, "
+                   "sociolinguistics, technology, migration and belonging. She "
+                   "teaches at Sciences Po and has worked across academic research, "
+                   "public policy and higher education in France and "
+                   "internationally."),
+    "/ai/": ("Rony Efrat\u2019s work with generative systems examines synthetic "
+             "images and the ways technology reorganizes perception, representation "
+             "and authority. She develops experimental production pipelines while "
+             "using technical practice as a way to understand and critique the "
+             "systems themselves."),
+    "/press/": ("Interviews and critical writing on Rony Efrat\u2019s films, "
+                "exhibitions, research and work with technology. Selected coverage "
+                "includes Arte, Forbes, Esprit, Fisheye, Hyperallergic and "
+                "Lib\u00e9ration."),
+}
 
 SOCIAL = [
     ("https://www.instagram.com/hereisrony/", "Instagram",
@@ -55,16 +95,13 @@ JSONLD = {
     "name": "Rony Efrat",
     "url": SITE,
     "alternateName": "Rony Férat",
-    "jobTitle": "Artist and Filmmaker",
+    "jobTitle": "Filmmaker, Artist, Researcher and Educator",
     "nationality": {"@type": "Country", "name": "France"},
-    "image": SITE + "/assets/img/tech-care-960.jpg",
+    "image": SITE + SOCIAL_IMAGE,
     "homeLocation": {"@type": "Place", "name": "Paris, France"},
     "worksFor": {"@type": "Organization", "name": "KarmaLab",
                  "url": "https://www.karmalab.tech"},
-    "description": ("Rony Efrat is a French artist and filmmaker based in Paris. "
-                    "She makes films, site-specific and interactive work, and "
-                    "researches how language and technology shape a sense of "
-                    "place and belonging."),
+    "description": SEO["/"],
     "alumniOf": {
         "@type": "CollegeOrUniversity",
         "name": "Le Fresnoy – Studio national des arts contemporains",
@@ -89,7 +126,6 @@ def esc(s):
 
 
 SEP = "\u22ee"          # the separator she asked for, not a dash
-ROLE = "french artist and filmmaker"
 
 
 def tab_title(name=None):
@@ -101,6 +137,20 @@ def tab_title(name=None):
 
 def strip_tags(s):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s)).strip()
+
+
+# A body usually opens with nothing but a link — "find it here." — which tells
+# a search engine nothing, so descriptions skip it and start at the writing.
+_OPENING_LINK = re.compile(
+    r"^(?:\s|<p>|</p>|<br\s*/?>|<a\b[^>]*>.*?</a>|[.\u2026,;:]\s*)+", re.S)
+
+
+def prose(s):
+    """The running text of a body, as a reader would say it aloud."""
+    text = strip_tags(_OPENING_LINK.sub("", s))
+    # Bodies carry HTML entities (&oelig;, &Ugrave;); a description wants the
+    # letters themselves, and esc() re-escapes what needs it on the way out.
+    return re.sub(r"\s+", " ", htmllib.unescape(text)).strip()
 
 
 def lazy_iframes(html):
@@ -271,7 +321,7 @@ def header(active):
     }
 
 
-def document(*, title, description, canonical, body, active, og_image=None, jsonld=False,
+def document(*, title, description, canonical, body, active, jsonld=False,
              body_class="", extra_ld=None):
     head = [
         '<meta charset="utf-8">',
@@ -297,11 +347,11 @@ def document(*, title, description, canonical, body, active, og_image=None, json
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
-    og_image = og_image or SOCIAL_IMAGE
-    head.append('<meta property="og:image" content="%s%s">' % (SITE, og_image))
-    head.append('<meta property="og:image:width" content="960">')
-    head.append('<meta property="og:image:height" content="960">')
-    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, og_image))
+    # Every link preview and every search result carries the one photograph.
+    head.append('<meta property="og:image" content="%s%s">' % (SITE, SOCIAL_IMAGE))
+    head.append('<meta property="og:image:width" content="%d">' % SOCIAL_IMAGE_W)
+    head.append('<meta property="og:image:height" content="%d">' % SOCIAL_IMAGE_H)
+    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, SOCIAL_IMAGE))
     if jsonld:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(JSONLD, ensure_ascii=False))
@@ -408,13 +458,10 @@ def build():
             % "\n".join(tile(p) for p in posts))
     write("index.html", document(
         title=tab_title(),
-        description=("Rony Efrat is a %s based in Paris. Films, site-specific and "
-                     "interactive work, and research on language, technology and "
-                     "belonging." % ROLE),
+        description=SEO["/"],
         canonical="/",
         body=grid,
         active="/",
-        og_image="/assets/img/%s-960.jpg" % posts[0]["slug"],
         jsonld=True,
         body_class="index-page",
     ))
@@ -425,8 +472,7 @@ def build():
         page = pages[key]
         write("%s/index.html" % key, document(
             title=tab_title(page["title"]),
-            description="%s, %s. %s" % (TITLE, ROLE,
-                                        strip_tags(page["body"])[:150]),
+            description=SEO[href],
             canonical=href,
             body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
                  % (esc(page["title"]),
@@ -453,9 +499,9 @@ def build():
             "@type": "CreativeWork",
             "name": p["title"].split("\u2014")[0].strip().lower(),
             "url": "%s/work/%s/" % (SITE, p["slug"]),
-            "image": "%s/assets/img/%s-960.jpg" % (SITE, p["slug"]),
+            "image": SITE + SOCIAL_IMAGE,
             "creator": {"@type": "Person", "name": TITLE, "url": SITE},
-            "description": strip_tags(p["body"])[:300],
+            "description": prose(p["body"])[:300],
         }
         if p["subtitle"]:
             work_ld["genre"] = p["subtitle"]
@@ -463,11 +509,10 @@ def build():
             title=tab_title(p["title"]),
             description="%s by %s, %s. %s" % (
                 p["title"].split(" \u2014 ")[0].strip().lower(),
-                TITLE, ROLE, strip_tags(p["body"])[:130]),
+                TITLE, ROLE, prose(p["body"])[:130]),
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
-            og_image="/assets/img/%s-960.jpg" % p["slug"],
             body_class="text-page",
             extra_ld=work_ld,
         ))
@@ -552,7 +597,7 @@ def build():
         "      <description>%s</description>\n"
         "    </item>\n" % (
             esc(p["title"]), SITE, p["slug"], SITE, p["slug"],
-            esc(strip_tags(p["body"])[:300]))
+            esc(prose(p["body"])[:300]))
         for p in posts)
     write("feed.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
