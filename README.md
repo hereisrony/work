@@ -120,29 +120,22 @@ from Tumblr.
 Until step 2, no `CNAME` file should exist in the repo — one would redirect the
 `github.io` preview URL to a domain that still resolves to Tumblr.
 
-## The calendar on the front page
+## Upcoming, on the front page
 
-The front page opens on two months, September and October 2026, drawn from the
-dates on the upcoming page — so an event is written once, in
-`content/pages.json`, and appears in both places. `build.py` reads every line
-of the shape `2026_September 11_`, keeps the two months it is showing, and
-rules the rest of the grid through.
+The front page opens on a short list of what is coming — September and October
+2026 — taken from the upcoming page, so an event is written once in
+`content/pages.json` and appears in both places. `build.py` reads every line of
+the shape `2026_September 11_`, stops at the page's own `P A S T` divider so
+nothing that has happened turns up under "upcoming", and keeps the two months
+it is showing. Her words, links and all, with the date in the accent.
 
-Two things in `build.py` control it:
+One line controls the window:
 
 ```python
-CAL_FROM = (2026, 9)      # the first month shown; the next one follows
-CAL_LABEL = {             # the short name in the cell
-    "2026-09-11": "adagp jury",
-}
+UPCOMING_FROM = (2026, 9)     # the first month shown; the next one follows
 ```
 
-Move `CAL_FROM` to move the window. A date with no entry in `CAL_LABEL` falls
-back to the first title on its line, clamped to fit — enough for a new event to
-appear without an edit here, though a short name of your own reads better.
-
-Below 740px seven columns leave no room to read a name, so a day carries a
-marker and the month lists its dates underneath. The same dates, either way.
+`more upcoming` goes to the page itself, where the rest is.
 
 ## The name in the header
 
