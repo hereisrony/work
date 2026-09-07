@@ -120,6 +120,50 @@ from Tumblr.
 Until step 2, no `CNAME` file should exist in the repo — one would redirect the
 `github.io` preview URL to a domain that still resolves to Tumblr.
 
+## Upcoming, on the front page
+
+Three months as a small listing: the day set in a block of green with black
+numerals, and her own sentence beside it — the same line the upcoming page
+carries, her capitals and all. The first month stands in the left column, the
+rest share the right one, with the way through to the page under the last of
+them.
+
+Her lines link several places at once; a row is one link, so the words inside
+it are not links of their own and `UPCOMING_LINKS` says where the row goes.
+
+```python
+UPCOMING_FROM = (2026, 9)     # the first month shown
+UPCOMING_MONTHS = 3           # september, then october and november
+UPCOMING_LINKS = {
+    "2026-09-11": "https://www.adagp.fr/...",
+}
+```
+
+A date with no destination sends you to the upcoming page instead, so a new
+event needs no edit here at all — the words come from `content/pages.json`
+either way, and nothing on the front page is written twice.
+
+On a phone the two columns become one and the months follow each other; every
+row keeps its number to the left rather than stacking.
+
+The months take every date they find, whether or not it has happened —
+September 7 is listed, and it has. To show only what is still ahead, drop the
+dates that fall before today in `upcoming_months`.
+
+## The upcoming page
+
+Every date in one run, newest at the top, oldest at the foot. It was written in
+two halves — what was coming, and then `P A S T` counting back — and `build.py`
+now drops that divider, sorts every entry by date, and gives each one its own
+paragraph, which also tidies away the line breaks the old build left between
+them. Nothing is lost: all 35 entries, all 37 links.
+
+It is not in the menu. The front page opens on what is coming and carries
+`more upcoming` through to the rest, so a second way in from the sidebar only
+said the same thing twice. The page is still built, still in the sitemap and
+the feed, and still at `/upcoming/`. `PAGES` in `build.py` is every text page;
+`NAV` is the menu, which is `PAGES` minus that one.
+
 ## The name in the header
 
 On the home page the header says **Rony Efrat**, in green. Open any other page
@@ -146,6 +190,10 @@ CSS resolves `url()` against the stylesheet, so the fonts load at the domain
 root and at a Pages subpath alike. The HTML path rewriter never sees inside
 CSS.
 
+On the upcoming page the date that opens each line — `2026_September 11_` — is
+in the accent and everything after it is black. `build.py` marks them, matching
+only inside the words so a pattern never lands in a tag or a URL.
+
 Nothing on the site is underlined, anywhere. Links, including the navigation,
 take the accent on hover; the current page stays in it. Page names are lower
 case, and so are the project titles — those by `text-transform`, so
@@ -156,10 +204,34 @@ case, and so are the project titles — those by `text-transform`, so
 Layout, type and spacing are reproduced from the original: the fixed 17% left
 column, the 800px text measure, the three-column grid at 31.33% with a 3%
 gutter, black on white. Tile positions match the
-original to the pixel at 1440px. The one accent is green screen green
-`#00CC00` — it carries the name, the social icons, the current and hovered
-navigation, the project titles, the hover treatment on a tile and the loading
-bar.
+original to the pixel at 1440px. One gutter runs in both directions — 3% of
+the grid's width between the columns, the same again between the rows and under
+the last of them — and the upcoming listing above the grid ends on the same
+right edge.
+
+The palette is three colours: black, white, and green screen green `#00FF33`.
+One rule holds it together — **the green is a ground, never a letter.**
+
+| | contrast |
+|---|---|
+| `#00FF33` text on white | 1.4:1 — fails |
+| black text on `#00FF33` | **15.3:1** — passes AAA |
+
+WCAG asks 4.5:1 for text and 3:1 for large text, and no bright green clears
+that on white. So nothing is written in green. Everything that used to be —
+her name, the current page in the navigation, the project titles, the section
+headings, the dates on the upcoming page, a hovered link — is now marked in
+it: a green band behind black type, `box-decoration-break: clone` so a phrase
+that wraps takes a band per line rather than one box around the block. The
+social icons are green tiles with the glyph cut out of them in black, and
+hovering her name turns the band inside out, black behind green, which is the
+same 15.3:1.
+
+Green still fills where a fill is what it is: the day blocks in the upcoming
+listing, a hovered row, the duotone over a tile, the play button, the typing
+caret. Text on any of them is black. Outlines are black too — a green one
+disappears on white — and the loading bar carries a hairline rule so a bright
+green line has an edge to be seen against.
 
 Every project opens as its own page at `/work/<slug>/`, the same way `about`
 or `press` opens. Nothing overlays the grid. A project page starts at its

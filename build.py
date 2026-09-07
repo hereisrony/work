@@ -9,6 +9,7 @@ toolchain — the output is plain HTML you can also edit by hand.
 """
 
 import hashlib
+import html as htmllib
 import json
 import os
 import re
@@ -27,7 +28,8 @@ QUOTE = ('<figure class="header-description">'
          '<figcaption>%s</figcaption>'
          '</figure>' % (TAGLINE, QUOTE_BY))
 
-NAV = [
+# Every text page, in the order they were written.
+PAGES = [
     ("/upcoming/", "upcoming"),
     ("/about/", "about"),
     ("/filmography/", "filmography"),
@@ -36,7 +38,113 @@ NAV = [
     ("/press/", "press"),
 ]
 
-SOCIAL_IMAGE = "/assets/img/tech-care-960.jpg"
+# The menu is those pages minus upcoming: the front page already opens on what
+# is coming and carries "more upcoming" through to the rest, so a second way in
+# from the sidebar only says the same thing twice. The page stays where it is,
+# in the sitemap and in the feed.
+NAV = [(h, l) for h, l in PAGES if h != "/upcoming/"]
+
+# Tra il dire e il fare carries every link preview and search result.
+SOCIAL_IMAGE = "/assets/img/traildire-960.jpg"
+SOCIAL_IMAGE_W, SOCIAL_IMAGE_H = 960, 956
+
+ROLE = "french filmmaker and artist"
+
+# Written by her, used as-is. Keyed by the page's path.
+SEO = {
+    "/": ("Rony Efrat is a French filmmaker, artist, researcher and educator "
+          "working across film, language, technology and systems. Her films, "
+          "installations and research explore how we construct memory, truth and "
+          "belonging through the tools we make."),
+    "/about/": ("Rony Efrat is a filmmaker, artist, researcher and educator whose "
+                "practice moves between cinema, language, archives, technology and "
+                "public systems. Her work has been presented by ARTE, France "
+                "T\u00e9l\u00e9visions, Le Fresnoy, ADAGP and the Venice "
+                "Architecture Biennale."),
+    "/upcoming/": ("Upcoming screenings, talks, conferences, exhibitions and public "
+                   "events with Rony Efrat. Current appearances include Sciences Po, "
+                   "ADAGP, festivals and institutions in France and internationally."),
+    "/filmography/": ("Films by filmmaker and writer-director Rony Efrat, including "
+                      "Failing Forward, Une vie en France and Exceptional Talent. Her "
+                      "filmography spans fiction, documentary, hybrid cinema, "
+                      "interactive work and writing for ARTE, France "
+                      "T\u00e9l\u00e9visions and independent productions."),
+    "/academia/": ("Research and teaching by Rony Efrat across systems theory, "
+                   "sociolinguistics, technology, migration and belonging. She "
+                   "teaches at Sciences Po and has worked across academic research, "
+                   "public policy and higher education in France and "
+                   "internationally."),
+    "/ai/": ("Rony Efrat\u2019s work with generative systems examines synthetic "
+             "images and the ways technology reorganizes perception, representation "
+             "and authority. She develops experimental production pipelines while "
+             "using technical practice as a way to understand and critique the "
+             "systems themselves."),
+    "/press/": ("Interviews and critical writing on Rony Efrat\u2019s films, "
+                "exhibitions, research and work with technology. Selected coverage "
+                "includes Arte, Forbes, Esprit, Fisheye, Hyperallergic and "
+                "Lib\u00e9ration."),
+}
+
+# And hers for each project, keyed by slug. Every project has one; the
+# assembled fallback below is only there so a new project is never left
+# without a description.
+WORK_SEO = {
+    "une-vie-en-france":
+        "A one-minute biographical series for France Télévisions about "
+        "figures whose lives reshaped France through migration.",
+    "failing-forward":
+        "A short fiction film exploring the shifting border between "
+        "language, family archives and artificial intelligence.",
+    "exemplaires":
+        "A short fiction film set in Paris in 2017, where three migrant "
+        "women face the arbitrary cancellation of their residence permits.",
+    "tech-care":
+        "A talk on technology, memory and storytelling for researchers, "
+        "policymakers, artists and communities.",
+    "strike-against-the-archive":
+        "A multi-screen installation on family memory, national narratives "
+        "and technology, built from interviews with Rony Efrat’s parents.",
+    "from-accents-to-ai":
+        "A talk at Concordia University on language standardization through "
+        "technology.",
+    "coupdecoeur":
+        "A site-specific video tour for the Historical Library of Paris, "
+        "created for the European Heritage Days.",
+    "multilingual":
+        "A workshop on creative translation in theatre and performance "
+        "through multilingual, collaborative practice.",
+    "escalesliees":
+        "IGLOÙ’s 2018 edition brought together artists from different "
+        "backgrounds between Venice Architecture Biennale and Parc de La "
+        "Villette.",
+    "toutdonnees":
+        "IGLOÙ’s second annual event transformed DOC in Paris into a "
+        "weekend of digital art and multisensory experiences.",
+    "premiersejour":
+        "The first edition of IGLOÙ gathered artists and writers for a "
+        "site-specific festival of performance and installation.",
+    "sonicmuseum":
+        "A series of immersive audio guides for the Louvre Museum combining "
+        "sound, experimental audio and localization.",
+    "clefsdame":
+        "An interactive Exquisite Corpse performance where personal "
+        "memories are transformed through homophonic translation.",
+    "coincidence":
+        "A long-distance storytelling project by Ariel Abrahams and Rony "
+        "Efrat, created before the collaborators met in person.",
+    "falsefriends":
+        "A bilingual performance about faux amis, words that sound alike "
+        "across languages but carry different meanings.",
+    "failure":
+        "A performance and text on failure, desire and repetition told "
+        "through fragmented language and the recurring figure of the wolf.",
+    "traildire":
+        "A trilingual performance, three attempts to reach a memory "
+        "suspended between video, sound and water.",
+    "homecheck":
+        "An interactive performance using digital tools to stage a virtual "
+        "home visit and explore distance, presence and mediation.",
+}
 
 SOCIAL = [
     ("https://www.instagram.com/hereisrony/", "Instagram",
@@ -55,16 +163,13 @@ JSONLD = {
     "name": "Rony Efrat",
     "url": SITE,
     "alternateName": "Rony Férat",
-    "jobTitle": "Artist and Filmmaker",
+    "jobTitle": "Filmmaker, Artist, Researcher and Educator",
     "nationality": {"@type": "Country", "name": "France"},
-    "image": SITE + "/assets/img/tech-care-960.jpg",
+    "image": SITE + SOCIAL_IMAGE,
     "homeLocation": {"@type": "Place", "name": "Paris, France"},
     "worksFor": {"@type": "Organization", "name": "KarmaLab",
                  "url": "https://www.karmalab.tech"},
-    "description": ("Rony Efrat is a French artist and filmmaker based in Paris. "
-                    "She makes films, site-specific and interactive work, and "
-                    "researches how language and technology shape a sense of "
-                    "place and belonging."),
+    "description": SEO["/"],
     "alumniOf": {
         "@type": "CollegeOrUniversity",
         "name": "Le Fresnoy – Studio national des arts contemporains",
@@ -89,7 +194,6 @@ def esc(s):
 
 
 SEP = "\u22ee"          # the separator she asked for, not a dash
-ROLE = "french artist and filmmaker"
 
 
 def tab_title(name=None):
@@ -101,6 +205,111 @@ def tab_title(name=None):
 
 def strip_tags(s):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s)).strip()
+
+
+# A body usually opens with nothing but a link — "find it here." — which tells
+# a search engine nothing, so descriptions skip it and start at the writing.
+_OPENING_LINK = re.compile(
+    r"^(?:\s|<p>|</p>|<br\s*/?>|<a\b[^>]*>.*?</a>|[.\u2026,;:]\s*)+", re.S)
+
+
+def prose(s):
+    """The running text of a body, as a reader would say it aloud."""
+    text = strip_tags(_OPENING_LINK.sub("", s))
+    # Bodies carry HTML entities (&oelig;, &Ugrave;); a description wants the
+    # letters themselves, and esc() re-escapes what needs it on the way out.
+    return re.sub(r"\s+", " ", htmllib.unescape(text)).strip()
+
+
+def work_seo(p):
+    """What a project says about itself to a search engine.
+
+    Hers, where she wrote one — which is everywhere today. A project added
+    later falls back to its own opening line, named and placed, so it is never
+    left with nothing.
+    """
+    written = WORK_SEO.get(p["slug"])
+    if written:
+        return written
+    return "%s by %s, %s. %s" % (
+        p["title"].split(" \u2014 ")[0].strip().lower(),
+        TITLE, ROLE, prose(p["body"])[:130])
+
+
+def page_body(href, body):
+    """A text page's body, ready to write."""
+    html = tidy_headings(lazy_iframes(strip_inline_styles(body)))
+    if href == "/upcoming/":
+        html = one_list(html)
+    return mark_dates(html)
+
+
+def tidy_headings(html):
+    """Headings the old build left behind.
+
+    One on the press page holds nothing but a non-breaking space inside a link
+    to an emoji page — it rendered as air, and now that a heading carries a
+    green band it renders as a green swatch. Another opens with a line break
+    before its word, which puts an empty line inside the band. Neither is
+    content, so both go.
+    """
+    def fix(m):
+        inner = m.group(2)
+        if not strip_tags(htmllib.unescape(inner)).strip():
+            return ""                       # a heading with nothing in it
+        inner = re.sub(r"^(?:\s|<br\s*/?>)+", "", inner)
+        inner = re.sub(r"(?:\s|<br\s*/?>)+$", "", inner)
+        return "<%s>%s</%s>" % (m.group(1), inner, m.group(1))
+
+    return re.sub(r"<(h[1-6])(?:\s[^>]*)?>(.*?)</\1>", fix, html, flags=re.S)
+
+
+def one_list(body):
+    """The upcoming page as a single run of dates, newest first.
+
+    It was written in two halves — what is coming, in the order it arrives,
+    and then P A S T counting back. One list reads the same whether an event
+    has happened or not, so the divider goes and everything sorts by date, the
+    newest at the top. Each entry comes out in its own paragraph, which also
+    tidies the line breaks the old build left between them.
+    """
+    hits = date_markers(body)
+    if not hits:
+        return body
+    divider = body.find("P A S T")
+
+    entries = []
+    for i, mark in enumerate(hits):
+        month = next((k for k, name in enumerate(MONTH_NAMES, 1)
+                      if name.startswith(mark.group(2).lower()[:3])), 0)
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
+        if mark.end() < divider < end:
+            end = divider              # the divider is not part of the entry
+        entries.append(((int(mark.group(1)), month, int(mark.group(3))),
+                        mark.group(0), tidy_entry(body[mark.end():end])))
+
+    entries.sort(key=lambda e: e[0], reverse=True)
+    return "".join("<p>%s%s</p>" % (marker, text)
+                   for _, marker, text in entries if text)
+
+
+def tidy_entry(html):
+    """One entry with the paragraph scaffolding taken off.
+
+    Entries were separated by line breaks, sometimes inside the anchor that
+    ended them, and Tumblr left empty tags behind. None of that survives being
+    put in a paragraph of its own.
+    """
+    html = re.sub(r"</?p>", " ", html)
+    for _ in range(4):                 # each pass can uncover the next
+        html = re.sub(r"(?:\s|&nbsp;|<br\s*/?>)+$", "", html.strip())
+        html = re.sub(r"(?:\s|&nbsp;|<br\s*/?>)+(?=(?:</[a-z]+>)+$)", "", html)
+        html = re.sub(r"<a\b[^>]*>\s*</a>$", "", html)
+        html = re.sub(r"<(strong|i|em|b)>\s*</\1>$", "", html)
+        # an opening tag with nothing after it — the last entry before the old
+        # divider ended on the <strong> that used to open it
+        html = re.sub(r"<(?:a|strong|em|i|b|span|u|small)\b[^>]*>\s*$", "", html)
+    return re.sub(r"\s+", " ", html).strip()
 
 
 def lazy_iframes(html):
@@ -207,6 +416,161 @@ def project_body(post):
     return html
 
 
+# --- what is coming, on the front page --------------------------------------
+# A short list above the work, taken from the upcoming page so an event is
+# written once. Only the two months below, and only what has not happened yet —
+# the page's own P A S T divider says where that stops.
+UPCOMING_FROM = (2026, 9)     # the first month shown
+UPCOMING_MONTHS = 3           # september, then october and november
+
+# Where each date sends you. The words are hers, taken whole from the upcoming
+# page — her sentence, her capitals — so nothing on the front page is written
+# twice. Her lines link several places at once; a row is one link, and this
+# says which. A date missing from here sends you to the upcoming page.
+UPCOMING_LINKS = {
+    "2026-09-07": "https://www.caidp.org/",
+    "2026-09-11": "https://www.adagp.fr/fr/soutien-la-creation-artistique"
+                  "/aides-directes-aux-artistes/les-revelations",
+    "2026-09-14": "https://www.linkedin.com/company/ai-safety-hub-sciencespo/",
+    "2026-09-29": "https://uni-r.org/",
+    "2026-10-10": "https://iagora.fr/",
+    "2026-11-14": "https://iagora.fr/",
+}
+
+MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
+               "august", "september", "october", "november", "december")
+
+# 2026_September 11_ — the shape every entry on the upcoming page is written in.
+EVENT_DATE = re.compile(r"(\d{4})_([A-Z][a-z]{2,8})\.?\s(\d{1,2})_")
+
+
+def text_ranges(html):
+    """Where the words are, so a pattern never matches inside a tag."""
+    out, i = [], 0
+    for m in re.finditer(r"<[^>]*>", html):
+        if m.start() > i:
+            out.append((i, m.start()))
+        i = m.end()
+    if i < len(html):
+        out.append((i, len(html)))
+    return out
+
+
+def date_markers(html):
+    """Every date on the upcoming page, in the order it is written."""
+    spans = text_ranges(html)
+    return [m for m in EVENT_DATE.finditer(html)
+            if any(a <= m.start() < b for a, b in spans)]
+
+
+def event_text(line):
+    """One line of the upcoming page as running words.
+
+    Her sentence and her capitals, with the markup taken out: the row is a
+    single link, so the words inside it are no longer links of their own.
+    """
+    text = htmllib.unescape(strip_tags(line))
+    text = re.sub(r"\s+", " ", text)
+    # strip_tags leaves a space where a tag was, which can land in front of a
+    # comma: "UniR's Agentic Academy , an AI literacy day"
+    text = re.sub(r"\s+([,.;:!?)\u2019'])", r"\1", text)
+    text = re.sub(r"([(\u2018])\s+", r"\1", text)
+    return text.strip(" \u00a0,;:")
+
+
+def upcoming_months(body):
+    """[(month, [(day, url, text)])] for the months the front page shows."""
+    window, y, m = [], *UPCOMING_FROM
+    for _ in range(UPCOMING_MONTHS):
+        window.append((y, m))
+        m = 1 if m == 12 else m + 1
+        y = y + 1 if m == 1 else y
+
+    # A line runs to the next date — except the last one before the page's own
+    # divider, which would otherwise swallow it.
+    divider = body.find("P A S T")
+    found, hits = {}, date_markers(body)
+    for i, mark in enumerate(hits):
+        mo = next((k for k, name in enumerate(MONTH_NAMES, 1)
+                   if name.startswith(mark.group(2).lower()[:3])), None)
+        key = (int(mark.group(1)), mo)
+        if mo is None or key not in window:
+            continue
+        d = int(mark.group(3))
+        if (key, d) in found:         # the first line for a day wins
+            continue
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
+        if mark.end() < divider < end:
+            end = divider
+        text = event_text(body[mark.end():end])
+        if text:
+            iso = "%04d-%02d-%02d" % (key[0], mo, d)
+            found[(key, d)] = (UPCOMING_LINKS.get(iso, "/upcoming/"), text)
+
+    out = []
+    for key in window:
+        days = sorted(d for (k, d) in found if k == key)
+        if days:
+            out.append((key[1], [(d,) + found[(key, d)] for d in days]))
+    return out
+
+
+def upcoming_block(pages):
+    """The upcoming rubric that opens the front page.
+
+    The listing she sent, at the site's scale: the day in a block of accent,
+    the name beside it, her line under that, each row going where the event
+    does. The first month stands on its own; the rest share the second column.
+    """
+    months = upcoming_months(pages["upcoming"]["body"])
+    if not months:
+        return ""
+
+    def month_html(month, rows):
+        return ('        <h3 class="up-name">%s</h3>\n%s' % (
+            MONTH_NAMES[month - 1],
+            "\n".join(
+                '        <a class="up-row" href="%s">'
+                '<span class="up-num">%02d</span>'
+                '<span class="up-text">%s</span>'
+                '<span class="up-star" aria-hidden="true">*</span></a>'
+                % (esc(url), d, esc(text))
+                for d, url, text in rows)))
+
+    columns = [c for c in ([months[0]], months[1:]) if c]
+    more = ('        <p class="up-more">'
+            '<a href="/upcoming/">more upcoming</a></p>')
+
+    cols = []
+    for i, col in enumerate(columns):
+        parts = [month_html(mo, rows) for mo, rows in col]
+        # the way through sits under the last month it lists, on the right
+        if i == len(columns) - 1:
+            parts.append(more)
+        cols.append('      <div class="up-col">\n%s\n      </div>'
+                    % "\n".join(parts))
+
+    return ('  <section class="up" aria-labelledby="up-title">\n'
+            '    <h2 class="up-title" id="up-title">'
+            '<span class="up-mark">upcoming</span> %d</h2>\n'
+            '    <div class="up-cols">\n%s\n    </div>\n'
+            '  </section>' % (UPCOMING_FROM[0], "\n".join(cols)))
+
+
+def mark_dates(html):
+    """Set every date on the page in the accent, and leave the rest black."""
+    spans = text_ranges(html)
+    out, last = [], 0
+    for m in EVENT_DATE.finditer(html):
+        if not any(a <= m.start() < b for a, b in spans):
+            continue
+        out.append(html[last:m.start()])
+        out.append('<span class="ev-date">%s</span>' % m.group(0))
+        last = m.end()
+    out.append(html[last:])
+    return "".join(out)
+
+
 def strip_inline_styles(html):
     """Tumblr left style attributes behind — one of them sets Helvetica on a
     heading, others set colours. They override the stylesheet, so they go."""
@@ -271,8 +635,8 @@ def header(active):
     }
 
 
-def document(*, title, description, canonical, body, active, og_image=None, jsonld=False,
-             body_class="", extra_ld=None):
+def document(*, title, description, canonical, body, active, og_image=None,
+             jsonld=False, body_class="", extra_ld=None):
     head = [
         '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
@@ -297,11 +661,15 @@ def document(*, title, description, canonical, body, active, og_image=None, json
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
-    og_image = og_image or SOCIAL_IMAGE
-    head.append('<meta property="og:image" content="%s%s">' % (SITE, og_image))
-    head.append('<meta property="og:image:width" content="960">')
-    head.append('<meta property="og:image:height" content="960">')
-    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, og_image))
+    # A text page shares the one photograph; a project shows its own still,
+    # the same picture that stands for it on the grid.
+    head.append('<meta property="og:image" content="%s%s">'
+                % (SITE, og_image or SOCIAL_IMAGE))
+    if not og_image:
+        head.append('<meta property="og:image:width" content="%d">' % SOCIAL_IMAGE_W)
+        head.append('<meta property="og:image:height" content="%d">' % SOCIAL_IMAGE_H)
+    head.append('<meta name="twitter:image" content="%s%s">'
+                % (SITE, og_image or SOCIAL_IMAGE))
     if jsonld:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(JSONLD, ensure_ascii=False))
@@ -408,29 +776,25 @@ def build():
             % "\n".join(tile(p) for p in posts))
     write("index.html", document(
         title=tab_title(),
-        description=("Rony Efrat is a %s based in Paris. Films, site-specific and "
-                     "interactive work, and research on language, technology and "
-                     "belonging." % ROLE),
+        description=SEO["/"],
         canonical="/",
-        body=grid,
+        body=upcoming_block(pages) + "\n" + grid,
         active="/",
-        og_image="/assets/img/%s-960.jpg" % posts[0]["slug"],
         jsonld=True,
         body_class="index-page",
     ))
 
     # --- text pages ----------------------------------------------------------
-    for href, label in NAV:
+    for href, label in PAGES:
         key = href.strip("/")
         page = pages[key]
         write("%s/index.html" % key, document(
             title=tab_title(page["title"]),
-            description="%s, %s. %s" % (TITLE, ROLE,
-                                        strip_tags(page["body"])[:150]),
+            description=SEO[href],
             canonical=href,
             body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
                  % (esc(page["title"]),
-                    lazy_iframes(strip_inline_styles(page["body"]))),
+                    page_body(href, page["body"])),
             active=href,
             body_class="text-page",
         ))
@@ -455,15 +819,13 @@ def build():
             "url": "%s/work/%s/" % (SITE, p["slug"]),
             "image": "%s/assets/img/%s-960.jpg" % (SITE, p["slug"]),
             "creator": {"@type": "Person", "name": TITLE, "url": SITE},
-            "description": strip_tags(p["body"])[:300],
+            "description": work_seo(p),
         }
         if p["subtitle"]:
             work_ld["genre"] = p["subtitle"]
         write("work/%s/index.html" % p["slug"], document(
             title=tab_title(p["title"]),
-            description="%s by %s, %s. %s" % (
-                p["title"].split(" \u2014 ")[0].strip().lower(),
-                TITLE, ROLE, strip_tags(p["body"])[:130]),
+            description=work_seo(p),
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
@@ -537,7 +899,7 @@ def build():
 """ % {"title": esc(TITLE.lower()), "sep": SEP})
 
     # --- sitemap & feed ------------------------------------------------------
-    urls = ["/"] + [h for h, _ in NAV] + ["/work/%s/" % p["slug"] for p in posts]
+    urls = ["/"] + [h for h, _ in PAGES] + ["/work/%s/" % p["slug"] for p in posts]
     write("sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -552,7 +914,7 @@ def build():
         "      <description>%s</description>\n"
         "    </item>\n" % (
             esc(p["title"]), SITE, p["slug"], SITE, p["slug"],
-            esc(strip_tags(p["body"])[:300]))
+            esc(work_seo(p)))
         for p in posts)
     write("feed.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -563,7 +925,7 @@ def build():
     write("robots.txt", "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE)
     open(os.path.join(ROOT, ".nojekyll"), "w").close()
 
-    print("built %d projects, %d pages" % (len(posts), len(NAV)))
+    print("built %d projects, %d pages" % (len(posts), len(PAGES)))
 
 
 # Every internal path is authored root-absolute, then rewritten relative to the
