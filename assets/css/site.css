@@ -236,12 +236,11 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* --- Upcoming, on the front page --------------------------------------------
-   A short list above the work: the date in the accent, her own line beside it,
-   and a way through to the rest. Set on the text measure the pages use, so it
-   reads as writing rather than as a widget. */
+   A month, then its dates: the day in the margin and a few words beside it,
+   the way a listing reads. Short enough that the work still begins near the
+   top, and the same shape at every width. */
 
 .up {
-    max-width: 800px;
     padding-bottom: 44px;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
@@ -251,34 +250,52 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     font-size: 22px;
     font-weight: 400;
     line-height: 1.1;
-    margin: 0 0 16px;
+    margin: 0 0 18px;
     color: var(--accent);
     text-transform: lowercase;
 }
 .up-title .up-year { color: var(--ink); }
 
-.up-list {
+.up-name {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0 0 9px;
+    text-transform: lowercase;
+}
+.up-name + .up-days { margin-bottom: 20px; }
+.up-days:last-child { margin-bottom: 0; }
+
+.up-days {
     margin: 0;
     padding: 0;
     list-style: none;
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.4;
 }
-.up-list li { margin-bottom: 10px; }
-.up-list li:last-child { margin-bottom: 0; }
+.up-days li {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 5px;
+}
+.up-days li:last-child { margin-bottom: 0; }
 
-/* the date reads the way it does on the upcoming page itself */
-.up-when {
-    color: var(--accent);
-    white-space: nowrap;
+/* the day sits in a column of its own so the names line up under each other */
+.up-day {
+    flex: 0 0 22px;
+    text-align: right;
+    color: var(--ink-soft);
 }
-.up-what a,
-.up-what strong { font-weight: 700; }
-.up-what a { transition: color 0.25s linear; }
-.up-what a:hover { color: var(--accent); }
+.up-what {
+    font-weight: 700;
+    color: var(--accent);
+    transition: color 0.25s linear;
+}
+.up-what:hover,
+.up-what:focus-visible { color: var(--ink); }
 
 .up-more {
-    margin: 18px 0 0;
+    margin: 20px 0 0;
     font-size: 15px;
 }
 .up-more a {
@@ -463,9 +480,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 @media (max-width: 740px) {
     /* --- upcoming ------------------------------------------------------- */
-    .up { padding-bottom: 34px; }
-    .up-title { font-size: 20px; margin-bottom: 14px; }
-    .up-list li { margin-bottom: 12px; }
+    .up { padding-bottom: 32px; }
+    .up-title { font-size: 20px; margin-bottom: 15px; }
 
     #header {
         width: 100%;

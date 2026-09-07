@@ -122,18 +122,28 @@ Until step 2, no `CNAME` file should exist in the repo — one would redirect th
 
 ## Upcoming, on the front page
 
-The front page opens on a short list of what is coming — September and October
-2026 — taken from the upcoming page, so an event is written once in
-`content/pages.json` and appears in both places. `build.py` reads every line of
-the shape `2026_September 11_`, stops at the page's own `P A S T` divider so
-nothing that has happened turns up under "upcoming", and keeps the two months
-it is showing. Her words, links and all, with the date in the accent.
+The front page opens on a short listing — September and October 2026, a month
+and then its dates — taken from the upcoming page, so an event is written once
+in `content/pages.json` and appears in both places. `build.py` reads every line
+of the shape `2026_September 11_` and keeps the two months it is showing.
 
-One line controls the window:
+Two things control it:
 
 ```python
-UPCOMING_FROM = (2026, 9)     # the first month shown; the next one follows
+UPCOMING_FROM = (2026, 9)      # the first month shown; the next one follows
+UPCOMING_LABEL = {             # the few words that name a date
+    "2026-09-11": "adagp jury",
+}
 ```
+
+Move `UPCOMING_FROM` to move the window. A date with no entry in
+`UPCOMING_LABEL` falls back to the first title on its line, clamped to fit — so
+a new event appears without an edit here, though a short name of your own reads
+better.
+
+The window takes every date in those months, whether or not the upcoming page
+has moved it under `P A S T`. To list only what is still ahead, cut the body at
+that divider before parsing.
 
 `more upcoming` goes to the page itself, where the rest is.
 

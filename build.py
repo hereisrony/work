@@ -340,6 +340,16 @@ def project_body(post):
 UPCOMING_FROM = (2026, 9)     # September 2026; the month after it follows
 UPCOMING_MONTHS = 2
 
+# A row holds a few words. These are the short names; a date with no entry here
+# falls back to the first title on its line on the upcoming page.
+UPCOMING_LABEL = {
+    "2026-09-07": "caidp clinic",
+    "2026-09-11": "adagp jury",
+    "2026-09-14": "sciences po",
+    "2026-09-29": "agentic academy",
+    "2026-10-10": "iagora festival",
+}
+
 MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december")
 
@@ -366,70 +376,73 @@ def date_markers(html):
             if any(a <= m.start() < b for a, b in spans)]
 
 
-def tidy_entry(html):
-    """One line of the upcoming page, with the paragraph scaffolding off.
-
-    Entries are separated by line breaks and the odd empty anchor Tumblr left
-    behind; none of that belongs in a list item.
-    """
-    html = re.sub(r"</?p>", " ", html)
-    for _ in range(4):        # each pass can uncover the next
-        html = re.sub(r"(?:\s|&nbsp;|<br\s*/?>)+$", "", html.strip())
-        # a break can also sit just inside the tags that close the line,
-        # as in <a href="...">Le Fresnoy<br><br></a>
-        html = re.sub(r"(?:\s|&nbsp;|<br\s*/?>)+(?=(?:</[a-z]+>)+$)", "", html)
-        html = re.sub(r"<a\b[^>]*>\s*</a>$", "", html)
-        html = re.sub(r"<(strong|i|em|b)>\s*</\1>$", "", html)
-    return re.sub(r"\s+", " ", html).strip()
+def short_label(iso, line):
+    """The few words that name a date, hers where she gave them."""
+    label = UPCOMING_LABEL.get(iso)
+    if label:
+        return label
+    title = re.search(r"<(strong|a)\b[^>]*>(.*?)</\1>", line, re.S)
+    label = htmllib.unescape(strip_tags(title.group(2))).strip().lower() if title else ""
+    if len(label) > 24:           # a row cannot hold a sentence
+        label = label[:24].rsplit(" ", 1)[0] + "\u2026"
+    return label
 
 
-def upcoming_entries(body):
-    """[(month, day, entry html)] for the months the front page shows."""
-    cut = body.find("P A S T")          # everything after it has happened
-    ahead = body[:cut] if cut > 0 else body
-
-    window = set()
-    y, m = UPCOMING_FROM
+def upcoming_by_month(body):
+    """[(month, [(day, label)])] for the months the front page shows."""
+    window, y, m = [], *UPCOMING_FROM
     for _ in range(UPCOMING_MONTHS):
-        window.add((y, m))
+        window.append((y, m))
         m = 1 if m == 12 else m + 1
         y = y + 1 if m == 1 else y
 
-    out, hits = [], date_markers(ahead)
+    days, hits = {}, date_markers(body)
     for i, mark in enumerate(hits):
         month = next((k for k, name in enumerate(MONTH_NAMES, 1)
                       if name.startswith(mark.group(2).lower()[:3])), None)
         if month is None or (int(mark.group(1)), month) not in window:
             continue
-        end = hits[i + 1].start() if i + 1 < len(hits) else len(ahead)
-        entry = tidy_entry(ahead[mark.end():end])
-        if entry:
-            out.append((month, int(mark.group(3)), entry))
-    return out
+        d = int(mark.group(3))
+        iso = "%s-%02d-%02d" % (mark.group(1), month, d)
+        if (month, d) in days:    # the first line for a day wins
+            continue
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(body)
+        label = short_label(iso, body[mark.end():end])
+        if label:
+            days[(month, d)] = label
+
+    return [(mo, sorted((d, days[(m2, d)]) for (m2, d) in days if m2 == mo))
+            for _, mo in window
+            if any(m2 == mo for (m2, _) in days)]
 
 
 def upcoming_block(pages):
     """The upcoming rubric that opens the front page.
 
-    Her own words for each date — the same lines the upcoming page carries,
-    links and all — with the date in the accent, and a way through to the rest.
+    A month, then its dates: the day in the margin and a few words beside it,
+    the way a listing reads. Compact enough that the work still starts near the
+    top, and the same shape at every width.
     """
-    entries = upcoming_entries(pages["upcoming"]["body"])
-    if not entries:
+    months = upcoming_by_month(pages["upcoming"]["body"])
+    if not months:
         return ""
 
-    items = "\n".join(
-        '      <li>'
-        '<span class="up-when">%s %d_</span>'
-        '<span class="up-what">%s</span></li>' % (MONTH_NAMES[mo - 1], d, entry)
-        for mo, d, entry in entries)
+    blocks = []
+    for mo, dates in months:
+        rows = "\n".join(
+            '        <li><span class="up-day">%d</span>'
+            '<a class="up-what" href="/upcoming/">%s</a></li>' % (d, esc(label))
+            for d, label in dates)
+        blocks.append('      <h3 class="up-name">%s</h3>\n'
+                      '      <ul class="up-days">\n%s\n      </ul>'
+                      % (MONTH_NAMES[mo - 1], rows))
 
     return ('  <section class="up" aria-labelledby="up-title">\n'
             '    <h2 class="up-title" id="up-title">upcoming '
             '<span class="up-year">%d</span></h2>\n'
-            '    <ul class="up-list">\n%s\n    </ul>\n'
+            '    <div class="up-body">\n%s\n    </div>\n'
             '    <p class="up-more"><a href="/upcoming/">more upcoming</a></p>\n'
-            '  </section>' % (UPCOMING_FROM[0], items))
+            '  </section>' % (UPCOMING_FROM[0], "\n".join(blocks)))
 
 
 def mark_dates(html):
