@@ -114,7 +114,7 @@ p { margin: 0 0 14px; }
 .project h1,
 .project .project-text a:hover,
 .project .project-text a:focus-visible,
-.up-title .up-mark,
+.sec-title .mark,
 .up-more a:hover,
 .up-more a:focus-visible {
     background: var(--accent);
@@ -298,12 +298,13 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 .up {
     /* the full width of the column, so the listing ends where the work does */
-    padding-bottom: 40px;
+    padding-bottom: 30px;
     opacity: 0;
     transform: translate3d(0, 18px, 0);
     animation: rise 0.7s var(--ease-soft) 0.05s forwards;
 }
-.up-title {
+/* upcoming, and projects: the two things the front page is */
+.sec-title {
     font-size: 18px;
     font-weight: 400;
     line-height: 1.1;
@@ -329,7 +330,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 }
 .up-row + .up-name { margin-top: 14px; }
 
-/* the row: a pale field with the day in the one solid block of colour */
+/* The row is a pale field with the day in the one solid block of colour. It
+   is not a link — the words inside it are, the same ones that are links on the
+   upcoming page — but it lights up as the cursor crosses it. */
 .up-row {
     position: relative;
     display: flex;
@@ -341,9 +344,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     transition: background-color 0.3s var(--ease-out);
 }
 .up-row:last-child { margin-bottom: 0; }
-.up-row:hover,
-.up-row:focus-visible { background: var(--accent); }
-.up-row:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.up-row:hover { background: var(--accent); }
 
 .up-num {
     flex: 0 0 36px;
@@ -358,8 +359,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     line-height: 1;
     transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
-.up-row:hover .up-num,
-.up-row:focus-visible .up-num { background: var(--paper); color: var(--ink); }
+.up-row:hover .up-num { background: var(--paper); color: var(--ink); }
 
 /* her sentence, whole and in her own capitals — the row is the one link, so
    nothing inside it is a link of its own */
@@ -383,8 +383,18 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     color: var(--ink);
     opacity: 0.3;
 }
-.up-row:hover .up-star,
-.up-row:focus-visible .up-star { opacity: 0.55; }
+.up-row:hover .up-star { opacity: 0.55; }
+
+/* Her links, as on the upcoming page: bold, never underlined. A green band
+   would not read on a green row, so a hovered word turns the row's colours
+   inside out instead — green on black, the same 15.3:1 either way. */
+.up-text a {
+    font-weight: 700;
+    color: inherit;
+    transition: background-color 0.25s linear, color 0.25s linear;
+}
+.up-text a:hover,
+.up-text a:focus-visible { background: var(--ink); color: var(--accent); }
 
 /* it belongs to the second column, under the last month it lists */
 .up-more {
@@ -570,7 +580,7 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 @media (max-width: 740px) {
     /* --- upcoming ------------------------------------------------------- */
     .up { padding-bottom: 28px; }
-    .up-title { font-size: 18px; margin-bottom: 12px; }
+    .sec-title { font-size: 18px; margin-bottom: 12px; }
     /* the two columns become one, the months following each other */
     .up-cols { grid-template-columns: 1fr; gap: 0; }
     .up-col + .up-col { margin-top: 14px; }
