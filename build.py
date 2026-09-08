@@ -432,6 +432,9 @@ MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
 # 2026_September 11_ — the shape every entry on the upcoming page is written in.
 EVENT_DATE = re.compile(r"(\d{4})_([A-Z][a-z]{2,8})\.?\s(\d{1,2})_")
 
+# Entries kept on the upcoming page but left off the front page's short list.
+HOME_SKIP = re.compile(r"caidp\.org|uni-r\.org", re.I)
+
 
 def text_ranges(html):
     """Where the words are, so a pattern never matches inside a tag."""
@@ -477,7 +480,7 @@ def upcoming_months(body):
         if mark.end() < divider < end:
             end = divider
         line = tidy_entry(body[mark.end():end])
-        if line:
+        if line and not HOME_SKIP.search(line):
             found[(key, d)] = line
 
     out = []
