@@ -21,7 +21,7 @@
   <link rel="alternate icon" href="../assets/favicon.png?v=dedb7ed0d4">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png?v=75b878d765">
   <link rel="stylesheet" href="../assets/css/site.css?v=ff54b9ddc3">
-  <link rel="stylesheet" href="../assets/css/endof.css?v=1">
+  <link rel="stylesheet" href="../assets/css/endof.css?v=2">
   <meta property="og:image" content="https://www.ronyefrat.work/assets/img/traildire-960.jpg">
   <meta property="og:image:width" content="960">
   <meta property="og:image:height" content="956">
@@ -29,7 +29,12 @@
 </head>
 <body class="text-page">
 <div class="loadbar" aria-hidden="true"></div>
-<div class="scroll-progress" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="rail" aria-hidden="true">
+  <i style="top:0"></i><i style="top:34px"></i><i style="top:68px"></i><i style="top:102px"></i>
+  <i style="top:136px"></i><i style="top:170px"></i><i style="top:204px"></i><i style="top:238px"></i>
+</div>
+<div id="tc" aria-hidden="true"><span class="rec"></span><b id="tc-clock">00:00:00:00</b></div>
 <header id="header">
   <div class="wrap">
     <div class="logo"><a href="../" aria-label="Rony Efrat &mdash; home"><span class="logo-text">Rony Efrat</span></a></div>
@@ -51,148 +56,220 @@
   <div class="wrap endof-wrap">
   <article class="endof">
 
-    <section class="endof-hero">
-      <p class="endof-kicker">a feature-length essay film</p>
-      <h1 class="endof-title">The end of<br><span class="redact">foreign</span></h1>
-      <p class="endof-byline">Rony Efrat</p>
-      <p class="endof-question">When did foreignness become a technical problem?</p>
-      <a class="endof-scroll" href="#chap-01">scroll <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 4 L6 8 L10 4"/></svg></a>
-    </section>
-
-    <section class="chap" id="chap-01">
-      <h2>I think I have been making this film for a while.</h2>
-      <div class="reel-grid">
-        <article>
-          <p class="reel-year">2021</p>
-          <h3>Exceptional Talent</h3>
-          <div class="reel"><iframe src="https://player.vimeo.com/video/556810771?h=7704d2c333&amp;dnt=1&amp;title=0&amp;byline=0&amp;portrait=0" title="Exceptional Talent" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
-          <p class="reel-line">A life translated into criteria.</p>
-        </article>
-        <article>
-          <p class="reel-year">2024</p>
-          <h3>Failing Forward</h3>
-          <div class="reel"><iframe src="https://www.arte.tv/embeds/fr/129320-000-A" title="Failing Forward" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
-          <p class="reel-line">A memory rebuilt with machines.</p>
-          <p class="reel-credit">ADAGP Révélation Art numérique · ARTE</p>
-        </article>
-        <article>
-          <p class="reel-year">2025</p>
-          <h3>Strike Against the Archive</h3>
-          <div class="reel"><iframe src="https://www.youtube-nocookie.com/embed/aSkSxT8axKw" title="Strike Against the Archive" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
-          <p class="reel-line">The archive comes back speaking in voices it never had.</p>
-          <p class="reel-credit">Solo exhibition, ADAGP</p>
-        </article>
+    <section class="hero">
+      <p class="eyebrow">a feature-length essay film</p>
+      <h1 id="hero-h1">The end of<br><span class="cycle-wrap"><span class="cycle" id="cycle-word">foreign</span><span class="strike" aria-hidden="true"></span></span></h1>
+      <p class="byline">Rony Efrat</p>
+      <p class="question">When did foreignness become a technical problem?</p>
+      <div class="leader-count">
+        <span class="frames" id="leader-frames"><i>3</i><i>2</i><i>1</i></span>
+        scroll
+        <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M2 4 L6 8 L10 4"/></svg>
       </div>
     </section>
 
-    <section class="chap">
-      <h2>The end of foreign</h2>
-      <div class="prose">
-        <p>A few months ago, I watched a young Silicon Valley founder, the son of immigrants, announce that his AI company would soon harmonize film and television into standard American English.</p>
-        <p>He remembered growing up between languages. He remembered watching foreign films with his parents and wishing he could share them with his friends.</p>
-        <p>Now, finally, technology could fix this.</p>
-        <p>The actor would keep her face.<br>Her performance would remain.<br>Even her voice could remain.<br>But the foreignness would leave.</p>
-        <p>He said his product would be<br>
-          <button type="button" class="swap redact">“the end of foreign.”<span class="redact-alt">“the end of difference.”</span></button>
-        </p>
-        <p>He smiled.</p>
-        <p>Everyone seemed relieved.</p>
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <p class="kicker">a reel of what came before</p>
+        <h2>I think I have been making this film for a while.</h2>
+        <div class="reels">
+          <article class="reel-card" data-tilt>
+            <p class="reel-year">2021</p>
+            <h3 class="reel-title">exceptional talent</h3>
+            <div class="gate" data-src="https://player.vimeo.com/video/556810771?h=7704d2c333&amp;dnt=1&amp;title=0&amp;byline=0&amp;portrait=0&amp;autoplay=1">
+              <button type="button" class="gate-trigger" aria-label="Play Exceptional Talent">
+                <span class="gate-scan" aria-hidden="true"></span>
+                <span class="gate-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2 1 L15 8 L2 15 Z"/></svg></span>
+                <span class="gate-watch">vimeo</span>
+              </button>
+            </div>
+            <p class="reel-line">A life translated into criteria.</p>
+          </article>
+          <article class="reel-card" data-tilt>
+            <p class="reel-year">2024</p>
+            <h3 class="reel-title">failing forward</h3>
+            <div class="gate" data-src="https://www.arte.tv/embeds/fr/129320-000-A">
+              <button type="button" class="gate-trigger" aria-label="Play Failing Forward">
+                <span class="gate-scan" aria-hidden="true"></span>
+                <span class="gate-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2 1 L15 8 L2 15 Z"/></svg></span>
+                <span class="gate-watch">arte.tv</span>
+              </button>
+            </div>
+            <p class="reel-line">A memory rebuilt with machines.</p>
+            <p class="reel-credit">ADAGP Révélation Art numérique · ARTE</p>
+          </article>
+          <article class="reel-card" data-tilt>
+            <p class="reel-year">2025</p>
+            <h3 class="reel-title">strike against the archive</h3>
+            <div class="gate" data-src="https://www.youtube-nocookie.com/embed/aSkSxT8axKw?autoplay=1">
+              <button type="button" class="gate-trigger" aria-label="Play Strike Against the Archive">
+                <span class="gate-scan" aria-hidden="true"></span>
+                <span class="gate-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2 1 L15 8 L2 15 Z"/></svg></span>
+                <span class="gate-watch">youtube</span>
+              </button>
+            </div>
+            <p class="reel-line">The archive comes back speaking in voices it never had.</p>
+            <p class="reel-credit">Solo exhibition, ADAGP</p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="chap endof-statement">
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <h2>The end of foreign</h2>
+        <div class="prose" style="margin-top:20px">
+          <p>A few months ago, I watched a young Silicon Valley founder, the son of immigrants, announce that his AI company would soon harmonize film and television into standard American English.</p>
+          <p>He remembered growing up between languages. He remembered watching foreign films with his parents and wishing he could share them with his friends.</p>
+          <p>Now, finally, technology could fix this.</p>
+        </div>
+        <div class="inventory" id="inventory">
+          <div>
+            <p class="inv-head">keeps</p>
+            <ul class="inv-list">
+              <li class="inv-row"><span class="box"></span><span class="txt">face</span></li>
+              <li class="inv-row"><span class="box"></span><span class="txt">performance</span></li>
+              <li class="inv-row"><span class="box"></span><span class="txt">voice</span></li>
+            </ul>
+          </div>
+          <div>
+            <p class="inv-head">drops</p>
+            <ul class="inv-list">
+              <li class="inv-row inv-row--drop" id="inv-drop"><span class="box"></span><span class="txt">uncanniness</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="prose">
+          <p>He said his product would be</p>
+        </div>
+        <p class="decode-line"><span id="decode-main">— — — —— —— —— ——</span></p>
+        <div class="prose">
+          <p>He smiled.</p>
+          <p>Everyone seemed relieved.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="leader-scene rise" data-reveal>
       <h2>Erasure has excellent manners.</h2>
       <p>It often arrives offering convenience.</p>
-    </section>
+    </div>
 
-    <section class="chap">
-      <h2>Iron Mountain</h2>
-      <div class="reel reel--solo"><iframe src="https://www.youtube-nocookie.com/embed/6aY05YDX3ss?start=1201" title="Heart of a Dog, from 20:01" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
-      <div class="prose">
-        <p>In <em>Heart of a Dog</em>, Laurie Anderson tells the story of Iron Mountain, where records were used to create identities for Jewish refugees who arrived in America after the Second World War without papers.</p>
-        <p>She calls them:</p>
-      </div>
-      <p class="pull-quote">“instant Americans.”</p>
-      <p class="endof-aside">The machinery has become considerably more elegant nowadays.</p>
-      <div class="compare">
-        <div class="compare-col compare-col--paper">
-          <h3>Paper</h3>
-          <ul>
-            <li>A new name</li>
-            <li>A new biography</li>
-            <li>A new administrative past</li>
-          </ul>
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <h2>Iron Mountain</h2>
+        <div class="gate" data-src="https://www.youtube-nocookie.com/embed/6aY05YDX3ss?start=1201&amp;autoplay=1" style="margin-top:18px;max-width:640px">
+          <button type="button" class="gate-trigger" aria-label="Play Heart of a Dog, from 20:01">
+            <span class="gate-scan" aria-hidden="true"></span>
+            <span class="gate-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2 1 L15 8 L2 15 Z"/></svg></span>
+            <span class="gate-watch">heart of a dog, 20:01 · youtube</span>
+          </button>
         </div>
-        <div class="compare-arrow" aria-hidden="true">→</div>
-        <div class="compare-col compare-col--machine">
-          <h3>Machine</h3>
-          <ul>
-            <li>Bleach an accent</li>
-            <li>Retime a mouth to a language</li>
-            <li>Counterfeit a voice</li>
-          </ul>
+        <div class="prose" style="margin-top:26px">
+          <p>In <em>Heart of a Dog</em>, Laurie Anderson tells the story of Iron Mountain, where records were used to create identities for Jewish refugees who arrived in America after the Second World War without papers.</p>
+          <p>She says they became:</p>
+        </div>
+        <p class="pull">“instant Americans.”</p>
+        <p class="aside">The machinery has become considerably more elegant nowadays.</p>
+      </div>
+    </section>
+
+    <div class="transform-wrap" id="tf-wrap">
+      <div class="transform-pin">
+        <div class="tf-scan" id="tf-scan"></div>
+        <div class="tf-label">
+          <span class="tag" id="tf-tag-paper">paper</span>
+          →
+          <span class="tag" id="tf-tag-machine">machine</span>
+        </div>
+        <div class="tf-rows">
+          <p class="tf-row" data-paper="A new name" data-machine="Bleach an accent" id="tf-row-0"><span class="cursor">_</span></p>
+          <p class="tf-row" data-paper="A new biography" data-machine="Retime a mouth to a language" id="tf-row-1"><span class="cursor">_</span></p>
+          <p class="tf-row" data-paper="A new administrative past" data-machine="Counterfeit a voice" id="tf-row-2"><span class="cursor">_</span></p>
+        </div>
+        <div class="tf-progress"><i id="tf-progress-bar"></i></div>
+      </div>
+    </div>
+
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <h2>When I was eight, I learned Spanish because of a telenovela.</h2>
+        <div class="prose" style="margin-top:20px; max-width:46ch">
+          <p>I wanted to understand someone very far away.</p>
+          <p style="font-weight:700">So I moved toward her.</p>
         </div>
       </div>
     </section>
 
-    <section class="chap">
-      <h2>When I was eight, I learned Spanish because of a telenovela.</h2>
-      <p>I wanted to understand someone very far away.</p>
-      <p class="endof-beat">So I moved toward her.</p>
-    </section>
-
-    <section class="chap">
-      <h2>Now she can move toward me.</h2>
-      <div class="reel reel--solo"><iframe src="https://www.youtube-nocookie.com/embed/ufQP6DGOEcw" title="Now she can move toward me" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>
-    </section>
-
-    <section class="chap">
-      <h2>The end of foreign</h2>
-      <div class="prose">
-        <p>A feature essay moving through migration, cinema, archives, classrooms, interfaces and the small humiliations of being translated.</p>
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <h2>Now she can move toward me.</h2>
+        <div class="gate" data-src="https://www.youtube-nocookie.com/embed/ufQP6DGOEcw?autoplay=1" style="margin-top:18px;max-width:640px">
+          <button type="button" class="gate-trigger" aria-label="Play video">
+            <span class="gate-scan" aria-hidden="true"></span>
+            <span class="gate-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2 1 L15 8 L2 15 Z"/></svg></span>
+            <span class="gate-watch">youtube</span>
+          </button>
+        </div>
       </div>
-      <ul class="meets-list">
-        <li>Historical assimilation <span class="meets">meets</span> synthetic media.</li>
-        <li>Personal memory <span class="meets">meets</span> the machinery built to make everybody legible.</li>
-        <li>A child who learned languages to reach other worlds <span class="meets">meets</span> an adult living at the precise moment when those worlds can be brought to her already translated.</li>
-      </ul>
     </section>
 
-    <section class="chap">
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <h2>The end of foreign</h2>
+        <div class="prose" style="margin-top:20px">
+          <p>A feature essay moving through migration, cinema, archives, classrooms, interfaces and the small humiliations of being translated.</p>
+        </div>
+        <div class="subtitles" id="subtitles">
+          <p class="subtitle-card">Historical assimilation <span class="meets">meets</span> synthetic media.</p>
+          <p class="subtitle-card">Personal memory <span class="meets">meets</span> the machinery built to make everybody legible.</p>
+          <p class="subtitle-card">A child who learned languages to reach other worlds <span class="meets">meets</span> an adult living at the precise moment when those worlds can be brought to her already translated.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="leader-scene rise" data-reveal>
       <h2>Miramar</h2>
-      <div class="filmstrip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-      <div class="prose">
-        <p>Cinema is full of decisions pretending to be technical.</p>
-        <ul class="stack-list">
-          <li>What gets preserved.</li>
-          <li>What gets compressed.</li>
-          <li>What should sound natural.</li>
-          <li>What natural means.</li>
-        </ul>
-        <p>I want to develop this film in a place where pipelines are understood deeply enough to be questioned from inside.</p>
+      <div class="filmstrip-wrap" aria-hidden="true">
+        <div class="filmstrip">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <p style="color:var(--leader-ink); font-size:15.5px; max-width:34em; margin-top:20px">Cinema is full of decisions pretending to be technical.</p>
+      <p style="color:var(--leader-ink); font-size:15.5px; max-width:34em">I want to develop this film in a place where pipelines are understood deeply enough to be questioned from inside.</p>
+    </div>
+
+    <section class="scene wipe" data-reveal>
+      <div class="wipe-cover" aria-hidden="true"></div>
+      <div class="wipe-body">
+        <p class="kicker">production schedule</p>
+        <h2>Six weeks</h2>
+        <div class="callsheet" id="callsheet">
+          <div class="cs-row"><p class="cs-week">week 1</p><p class="cs-task">A feature structure with teeth.</p></div>
+          <div class="cs-row"><p class="cs-week">weeks 2–3</p><p class="cs-task">New sequences around voice, translation, archive and performance.</p></div>
+          <div class="cs-row"><p class="cs-week">weeks 3–4</p><p class="cs-task">A working language for moving between live action, historical material and synthetic images.</p></div>
+          <div class="cs-row"><p class="cs-week">week 5</p><p class="cs-task">Conversations with people who know how worlds are built.</p></div>
+          <div class="cs-row"><p class="cs-week">week 6</p><p class="cs-task">Workshops where unfinished ideas are allowed to misbehave.</p></div>
+        </div>
       </div>
     </section>
 
-    <section class="chap">
-      <h2>Six weeks</h2>
-      <ol class="plan-list">
-        <li>A feature structure with teeth.</li>
-        <li>New sequences around voice, translation, archive and performance.</li>
-        <li>A working language for moving between live action, historical material and synthetic images.</li>
-        <li>Conversations with people who know how worlds are built.</li>
-        <li>Workshops where unfinished ideas are allowed to misbehave.</li>
-      </ol>
-    </section>
-
-    <section class="endof-close">
-      <h2 class="endof-title-small">The end of foreign</h2>
-      <p class="endof-question">What survives once foreignness becomes optional?</p>
+    <section class="scene close-scene rise" data-reveal>
+      <h2>The end of foreign</h2>
+      <p class="type-line" id="type-line"><span class="cursor blink" id="type-cursor">&nbsp;</span></p>
     </section>
 
   </article>
   </div>
 </main>
 <script src="../assets/js/site.js?v=29902fdadc" defer></script>
-<script src="../assets/js/endof.js?v=1" defer></script>
+<script src="../assets/js/endof.js?v=2" defer></script>
 </body>
 </html>
