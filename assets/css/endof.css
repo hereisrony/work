@@ -1,0 +1,306 @@
+/* ---------------------------------------------------------------------------
+   /endof/ — "The End of Foreign"
+   An unlisted project-presentation page, presented as a reel. Reuses the
+   site's own tokens (ink/paper/accent/rule/ease) so it never drifts from the
+   rest of ronyefrat.work; adds only what this one page needs: a cut-to-black
+   "leader" tone for a couple of scene breaks, and a running timecode.
+   Loaded after site.css, on this page only.
+   --------------------------------------------------------------------------- */
+
+:root{
+    --leader:#04140b;      /* cut-to-black, with a whisper of the accent */
+    --leader-ink:#eafbee;
+    --leader-soft:#7fae90;
+}
+
+.endof-wrap{ max-width:860px; }
+.endof{ padding-bottom:40px; }
+
+/* --- the sprocket rail -------------------------------------------------
+   A hairline strip of film perforation at the very edge of the page,
+   sitting in the sidebar's own left padding. It drifts, slowly, forever —
+   the one piece of pure ambient motion that says "this is footage." */
+
+.rail{
+    position:fixed; left:0; top:0; bottom:0; width:14px;
+    z-index:150;
+    background:
+        repeating-linear-gradient(var(--paper) 0 10px, var(--rule) 10px 12px),
+        var(--paper);
+    background-size:100% 34px, auto;
+    border-right:1px solid var(--rule);
+    overflow:hidden;
+}
+.rail i{
+    position:absolute; left:3px; width:8px; height:8px; border-radius:1px;
+    background:var(--paper); border:1px solid var(--rule);
+    animation:rail-drift 3.4s linear infinite;
+}
+@keyframes rail-drift{ from{transform:translateY(-34px)} to{transform:translateY(0)} }
+
+/* --- timecode HUD --------------------------------------------------------
+   Fixed, running from the moment the page opens. This is the page's only
+   counter: it counts footage, not sections. */
+
+#tc{
+    position:fixed; top:24px; right:clamp(16px,3vw,40px); z-index:20;
+    display:flex; align-items:center; gap:9px;
+    font-size:12px; letter-spacing:.04em;
+    font-variant-numeric:tabular-nums;
+    color:var(--ink-soft);
+    background:rgba(255,255,255,.88);
+    padding:5px 10px;
+}
+#tc .rec{width:6px;height:6px;border-radius:50%;background:#ff2d2d;animation:pulse 1.1s ease-in-out infinite}
+#tc b{color:var(--ink); font-weight:700}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* film grain, everywhere, very quiet */
+.grain{
+    position:fixed; inset:0; z-index:15; pointer-events:none;
+    opacity:.035; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    animation:grain 1s steps(2) infinite;
+}
+@keyframes grain{0%{transform:translate(0,0)}100%{transform:translate(-2%,1%)}}
+
+/* --- hero ------------------------------------------------------------------ */
+
+.hero{padding:16px 0 74px; position:relative}
+.eyebrow{
+    display:flex; align-items:center; gap:10px;
+    font-size:12.5px; text-transform:lowercase; color:var(--ink-soft);
+    margin-bottom:30px;
+}
+.eyebrow::before{content:"";width:24px;height:1px;background:var(--ink-soft)}
+
+.hero h1{
+    font-size:clamp(42px,7.6vw,96px);
+    line-height:.96; letter-spacing:-.01em; text-transform:uppercase;
+    font-weight:700;
+}
+.cycle-wrap{position:relative; display:inline-block; min-width:9ch}
+.cycle{display:inline-block; position:relative}
+.cycle .strike{
+    position:absolute; left:-2%; right:-2%; top:54%; height:.1em;
+    background:var(--accent); transform-origin:0 50%;
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path .55s var(--ease-out);
+}
+.hero h1.struck .strike{clip-path:inset(0 0 0 0)}
+
+.byline{font-weight:700; font-size:15px; margin:30px 0 44px; text-transform:lowercase}
+.question{font-size:clamp(19px,2.6vw,25px); font-weight:400; line-height:1.35; max-width:17em; margin-bottom:54px}
+
+.leader-count{
+    display:flex; align-items:center; gap:16px; font-size:12.5px;
+    text-transform:lowercase; color:var(--ink-soft);
+}
+.leader-count .frames{display:flex; gap:6px}
+.leader-count .frames i{
+    width:16px; height:16px; border:1px solid var(--rule);
+    display:flex; align-items:center; justify-content:center;
+    font-style:normal; font-weight:700; font-size:10px; color:var(--ink-soft);
+}
+.leader-count .frames i.hit{background:var(--accent); color:var(--ink); border-color:var(--accent)}
+.leader-count svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* --- scenes / reveal --------------------------------------------------------
+   Each scene wipes into place — a hard-edged clip reveal, like a cut, not a
+   soft fade. No divider rules between them: the space alone separates them. */
+
+.scene{padding:70px 0; position:relative}
+.scene h2{font-size:clamp(22px,3vw,30px); font-weight:700; text-transform:uppercase; letter-spacing:-.005em; margin-bottom:10px}
+.scene .kicker{font-size:12px; text-transform:lowercase; color:var(--ink-soft); margin-bottom:16px}
+
+.wipe{position:relative; overflow:clip}
+.wipe > .wipe-cover{
+    position:absolute; inset:0; background:var(--accent); z-index:2;
+    transform-origin:0 50%; transform:scaleX(0);
+}
+.wipe.in > .wipe-cover{ animation:wipe-across .65s var(--ease-out) forwards; }
+.wipe > .wipe-body{opacity:0}
+.wipe.in > .wipe-body{ animation:wipe-reveal 0s .32s forwards; }
+@keyframes wipe-across{0%{transform:scaleX(0);transform-origin:0 50%}45%{transform:scaleX(1);transform-origin:0 50%}55%{transform:scaleX(1);transform-origin:100% 50%}100%{transform:scaleX(0);transform-origin:100% 50%}}
+@keyframes wipe-reveal{to{opacity:1}}
+
+.rise{opacity:0; transform:translate3d(0,16px,0); transition:opacity .6s var(--ease-out), transform .6s var(--ease-out)}
+.rise.in{opacity:1; transform:none}
+
+/* --- reels (prior films) ---------------------------------------------------- */
+
+.reels{display:grid; grid-template-columns:repeat(3,1fr); gap:30px 24px; margin-top:8px}
+.reel-card{perspective:900px}
+.reel-year{font-size:11.5px; color:var(--ink-soft); margin-bottom:2px}
+.reel-title{font-size:15px; font-weight:700; text-transform:lowercase; margin-bottom:10px}
+.gate{
+    position:relative; aspect-ratio:16/9; background:#0a0d0a; overflow:hidden;
+    display:block;
+    transform:rotateX(0) rotateY(0); transition:transform .3s var(--ease-out);
+    box-shadow:0 0 0 1px var(--rule);
+}
+.gate::after{ /* vignette, so every gate reads as a lit gate, not a flat swatch */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(120% 100% at 50% 42%, transparent 35%, #000c 100%);
+}
+.gate .gate-scan{
+    position:absolute; left:0; right:0; height:38%; top:-40%;
+    background:linear-gradient(180deg, transparent, #ffffff14, transparent);
+    animation:gate-sweep 5s ease-in-out infinite;
+}
+@keyframes gate-sweep{ 0%{top:-40%} 50%{top:100%} 100%{top:100%} }
+.gate .gate-play{
+    position:absolute; left:50%; top:50%; width:52px; height:52px;
+    margin:-26px 0 0 -26px; border-radius:50%;
+    background:var(--accent); display:flex; align-items:center; justify-content:center;
+    transition:transform .3s var(--ease-out);
+}
+.gate .gate-play svg{width:16px; height:16px; fill:var(--ink); margin-left:2px}
+.gate-trigger:hover .gate-play, .gate-trigger:focus-visible .gate-play{ transform:scale(1.12) }
+.gate .gate-watch{
+    position:absolute; left:10px; bottom:9px; font-size:10.5px; letter-spacing:.02em;
+    color:var(--leader-ink); opacity:.75; text-transform:lowercase;
+}
+.gate-trigger{
+    position:absolute; inset:0; width:100%; height:100%;
+    cursor:pointer; background:none; border:0; padding:0; display:block;
+}
+.gate iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.reel-line{font-size:13px; margin-top:10px}
+.reel-credit{font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin-top:3px}
+
+/* --- the inventory: what she keeps, what she loses -------------------------- */
+
+.inventory{display:flex; gap:56px; flex-wrap:wrap; margin:22px 0 26px}
+.inv-head{font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin-bottom:12px}
+.inv-list{display:flex; flex-direction:column; gap:9px}
+.inv-row{display:flex; align-items:center; gap:10px; font-size:15.5px}
+.inv-row .box{
+    flex:0 0 auto; width:16px; height:16px; border:1px solid var(--ink-soft);
+    position:relative; transition:background .2s,border-color .2s;
+}
+.inv-row.checked .box{background:var(--accent); border-color:var(--ink)}
+.inv-row.checked .box::after{content:"✓"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--ink)}
+.inv-row .txt{transition:opacity .3s, color .3s}
+.inv-row--drop .box{border-style:dashed}
+.inv-row--drop.dropped .box{background:var(--ink); border-color:var(--ink); border-style:solid}
+.inv-row--drop.dropped .box::after{content:"×"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--accent)}
+.inv-row--drop.dropped .txt{text-decoration:line-through; color:var(--ink-soft)}
+
+/* --- essay prose ------------------------------------------------------------ */
+
+.prose{max-width:62ch}
+.prose p{margin-bottom:18px}
+.prose p:last-child{margin-bottom:0}
+.prose em{font-style:italic}
+
+.decode-line{
+    font-size:clamp(24px,3.6vw,34px); font-weight:700; line-height:1.15;
+    margin:8px 0 4px;
+}
+
+/* --- leader scenes (cut to black) ------------------------------------------- */
+
+.leader-scene{
+    background:var(--leader); color:var(--leader-ink);
+    padding:64px clamp(20px,4vw,56px); margin:70px 0 0;
+}
+.leader-scene h2{font-size:clamp(26px,4.2vw,44px); font-weight:700; text-transform:uppercase}
+.leader-scene p{color:var(--leader-soft); font-size:15.5px; max-width:30em; margin-top:14px}
+
+/* --- pull quote / iron mountain ---------------------------------------------- */
+
+.pull{font-size:clamp(26px,4.4vw,42px); font-weight:700; line-height:1.05; margin:18px 0 10px}
+.aside{font-size:13.5px; color:var(--ink-soft); max-width:30em; margin-bottom:10px}
+
+/* --- the transformation set-piece: paper becomes machine --------------------- */
+
+.transform-wrap{ height:300vh; position:relative; }
+.transform-pin{
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column;
+    justify-content:center; overflow:hidden;
+}
+.tf-scan{
+    position:absolute; left:0; right:0; height:2px; background:var(--accent);
+    box-shadow:0 0 16px 2px var(--accent); opacity:.85; top:0;
+}
+.tf-label{
+    font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft);
+    margin-bottom:26px; display:flex; gap:10px; align-items:center;
+}
+.tf-label .tag{padding:1px 7px; border:1px solid var(--rule)}
+.tf-label .tag.on{background:var(--ink); color:var(--accent); border-color:var(--ink)}
+.tf-rows{display:flex; flex-direction:column; gap:30px}
+.tf-row{font-size:clamp(19px,3vw,27px); font-weight:700; min-height:1.3em}
+.tf-row .cursor{display:inline-block; width:.5em; height:.9em; background:var(--accent); vertical-align:-.12em; opacity:0}
+.tf-row.active .cursor{animation:tf-blink 1s steps(1) infinite}
+@keyframes tf-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.tf-progress{position:absolute; left:0; bottom:0; height:2px; background:var(--rule); width:100%}
+.tf-progress i{display:block; height:100%; background:var(--ink); width:0%}
+
+/* --- subtitle cards (the "meets" beats) --------------------------------------- */
+
+.subtitles{display:flex; flex-direction:column; gap:14px; margin-top:26px}
+.subtitle-card{
+    align-self:flex-start; max-width:44em;
+    background:var(--ink); color:var(--paper);
+    padding:12px 16px; font-size:15.5px; line-height:1.4;
+    opacity:0; transform:translate3d(0,14px,0);
+    transition:opacity .5s var(--ease-out), transform .5s var(--ease-out);
+}
+.subtitle-card.in{opacity:1; transform:none}
+.subtitle-card .meets{color:var(--accent); font-weight:700}
+
+/* --- Miramar: real filmstrip marquee ------------------------------------------ */
+
+.filmstrip-wrap{overflow:hidden; margin:26px 0 6px; -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent); mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.filmstrip{display:flex; gap:4px; width:max-content; animation:strip-scroll 22s linear infinite}
+.filmstrip span{
+    flex:0 0 auto; width:120px; aspect-ratio:3/2; position:relative;
+    background:linear-gradient(150deg,#0c1a10,#1a1f1a);
+}
+.filmstrip span:nth-child(4n+2){background:linear-gradient(150deg,#132914,#1a1f1a)}
+.filmstrip span::before,.filmstrip span::after{content:"";position:absolute;left:5px;right:5px;height:4px;background:var(--leader-ink);opacity:.28}
+.filmstrip span::before{top:5px} .filmstrip span::after{bottom:5px}
+@keyframes strip-scroll{to{transform:translateX(-50%)}}
+
+/* --- six weeks: a call sheet, not a numbered list ------------------------------ */
+
+.callsheet{position:relative; margin-top:22px; padding-left:26px}
+.callsheet::before{content:"";position:absolute; left:0; top:6px; bottom:6px; width:1px; background:var(--rule)}
+.cs-row{position:relative; padding:0 0 26px 20px}
+.cs-row:last-child{padding-bottom:0}
+.cs-row::before{
+    content:""; position:absolute; left:-4px; top:5px; width:9px; height:9px;
+    border-radius:50%; background:var(--paper); border:1px solid var(--ink-soft);
+    transition:background .3s,border-color .3s;
+}
+.cs-row.passed::before{background:var(--accent); border-color:var(--ink)}
+.cs-week{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:4px}
+.cs-task{font-size:15.5px; max-width:40em}
+
+/* --- close --------------------------------------------------------------------- */
+
+.close-scene{ padding-bottom:80px; }
+.close-scene h2{font-size:clamp(30px,5vw,52px); font-weight:700; text-transform:uppercase; margin-bottom:22px}
+.type-line{font-size:clamp(19px,2.8vw,25px); min-height:1.6em}
+.type-line .cursor{display:inline-block; width:.5em; height:1em; background:var(--accent); vertical-align:-.14em}
+.type-line .cursor.blink{animation:tf-blink 1s steps(1) infinite}
+
+/* --- mobile ---------------------------------------------------------------------- */
+
+@media (max-width:740px){
+    .rail{display:none}
+    #tc{display:none}
+    .reels{grid-template-columns:1fr}
+    .leader-scene{margin:70px -15px 0}
+    .hero{padding-top:6px}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .grain{display:none}
+    .rise{opacity:1; transform:none}
+    .wipe > .wipe-cover{display:none}
+    .wipe > .wipe-body{opacity:1}
+}
