@@ -17,7 +17,7 @@
     --leader-ink:#eafbee;
     --leader-soft:#7fae90;
     --ease:cubic-bezier(.165,.84,.44,1);
-    --measure:800px;
+    --measure:1600px;
     --pad:clamp(20px,6vw,72px);
 }
 
@@ -119,7 +119,7 @@ button{font:inherit;color:inherit}
 .eyebrow::before{content:"";width:24px;height:1px;background:var(--ink-soft)}
 
 .hero h1{
-    font-size:clamp(42px,7.6vw,96px);
+    font-size:clamp(44px,8vw,128px);
     line-height:.96; letter-spacing:-.01em; text-transform:uppercase;
     font-weight:700;
 }
@@ -174,45 +174,16 @@ button{font:inherit;color:inherit}
 
 /* --- reels (prior films) ------------------------------------------------------- */
 
-.reels{display:grid; grid-template-columns:repeat(3,1fr); gap:30px 24px; margin-top:8px}
-.reel-card{perspective:900px}
-.reel-year{font-size:11.5px; color:var(--ink-soft); margin-bottom:2px}
-.reel-title{font-size:15px; font-weight:700; text-transform:lowercase; margin-bottom:10px}
-.gate{
-    position:relative; aspect-ratio:16/9; background:#0a0d0a; overflow:hidden;
-    display:block;
-    transform:rotateX(0) rotateY(0); transition:transform .3s var(--ease);
+.reels{display:grid; grid-template-columns:repeat(3,1fr); gap:40px 32px; margin-top:12px}
+.reel-year{font-size:12.5px; color:var(--ink-soft); margin-bottom:3px}
+.reel-title{font-size:17px; font-weight:700; text-transform:lowercase; margin-bottom:12px}
+.reel-embed{
+    position:relative; width:100%; aspect-ratio:16/9; background:#000; overflow:hidden;
     box-shadow:0 0 0 1px var(--rule);
 }
-.gate::after{ /* vignette, so every gate reads as a lit gate, not a flat swatch */
-    content:""; position:absolute; inset:0; pointer-events:none;
-    background:radial-gradient(120% 100% at 50% 42%, transparent 35%, #000c 100%);
-}
-.gate .gate-scan{
-    position:absolute; left:0; right:0; height:38%; top:-40%;
-    background:linear-gradient(180deg, transparent, #ffffff14, transparent);
-    animation:gate-sweep 5s ease-in-out infinite;
-}
-@keyframes gate-sweep{ 0%{top:-40%} 50%{top:100%} 100%{top:100%} }
-.gate .gate-play{
-    position:absolute; left:50%; top:50%; width:52px; height:52px;
-    margin:-26px 0 0 -26px; border-radius:50%;
-    background:var(--accent); display:flex; align-items:center; justify-content:center;
-    transition:transform .3s var(--ease);
-}
-.gate .gate-play svg{width:16px; height:16px; fill:var(--ink); margin-left:2px}
-.gate-trigger:hover .gate-play, .gate-trigger:focus-visible .gate-play{ transform:scale(1.12) }
-.gate .gate-watch{
-    position:absolute; left:10px; bottom:9px; font-size:10.5px; letter-spacing:.02em;
-    color:var(--leader-ink); opacity:.75; text-transform:lowercase;
-}
-.gate-trigger{
-    position:absolute; inset:0; width:100%; height:100%;
-    cursor:pointer; background:none; border:0; padding:0; display:block;
-}
-.gate iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
-.reel-line{font-size:13px; margin-top:10px}
-.reel-credit{font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin-top:3px}
+.reel-embed iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.reel-line{font-size:14.5px; margin-top:14px}
+.reel-credit{font-size:11.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin-top:4px}
 
 /* --- the inventory: what she keeps, what she loses ------------------------------ */
 

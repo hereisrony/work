@@ -124,22 +124,6 @@
         }
     }
 
-    /* ---- gates: click to embed, in place ---- */
-    $$('.gate[data-src]').forEach(function (gate) {
-        var trigger = gate.querySelector('.gate-trigger');
-        if (!trigger) return;
-        trigger.addEventListener('click', function () {
-            var f = document.createElement('iframe');
-            f.src = gate.dataset.src;
-            f.title = trigger.getAttribute('aria-label') || 'Video';
-            f.allow = 'autoplay; fullscreen; picture-in-picture';
-            f.setAttribute('allowfullscreen', '');
-            f.loading = 'lazy';
-            gate.innerHTML = '';
-            gate.appendChild(f);
-        });
-    });
-
     /* ---- the transformation set-piece: paper becomes machine, scroll-scrubbed ---- */
     var tfWrap = $('#tf-wrap');
     if (tfWrap) {
@@ -208,19 +192,6 @@
             entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('passed'); });
         }, { rootMargin: '0px 0px -40% 0px', threshold: 0 });
         csRows.forEach(function (r) { io4.observe(r); });
-    }
-
-    /* ---- reel tilt ---- */
-    if (!reduced && window.matchMedia('(hover:hover)').matches) {
-        $$('[data-tilt]').forEach(function (card) {
-            var gate = card.querySelector('.gate');
-            card.addEventListener('mousemove', function (e) {
-                var r = card.getBoundingClientRect();
-                var px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
-                gate.style.transform = 'rotateY(' + (px * 8) + 'deg) rotateX(' + (-py * 8) + 'deg)';
-            });
-            card.addEventListener('mouseleave', function () { gate.style.transform = 'rotateY(0) rotateX(0)'; });
-        });
     }
 
     /* ---- closing type-out ---- */
