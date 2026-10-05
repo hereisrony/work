@@ -174,16 +174,6 @@
         onTfScroll();
     }
 
-    /* ---- subtitle cards ---- */
-    var subs = $$('.subtitle-card');
-    if (reduced || !('IntersectionObserver' in window)) subs.forEach(function (s) { s.classList.add('in'); });
-    else {
-        var io3 = new IntersectionObserver(function (entries) {
-            entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io3.unobserve(e.target); } });
-        }, { threshold: .4 });
-        subs.forEach(function (s, i) { s.style.transitionDelay = (i * 90) + 'ms'; io3.observe(s); });
-    }
-
     /* ---- closing type-out ---- */
     var typeEl = $('#type-line'), typeCursor = $('#type-cursor');
     if (typeEl && typeCursor) {
