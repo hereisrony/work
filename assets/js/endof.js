@@ -184,16 +184,6 @@
         subs.forEach(function (s, i) { s.style.transitionDelay = (i * 90) + 'ms'; io3.observe(s); });
     }
 
-    /* ---- call sheet: fill in as you pass it ---- */
-    var csRows = $$('.cs-row');
-    if (reduced || !('IntersectionObserver' in window)) csRows.forEach(function (r) { r.classList.add('passed'); });
-    else {
-        var io4 = new IntersectionObserver(function (entries) {
-            entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('passed'); });
-        }, { rootMargin: '0px 0px -40% 0px', threshold: 0 });
-        csRows.forEach(function (r) { io4.observe(r); });
-    }
-
     /* ---- closing type-out ---- */
     var typeEl = $('#type-line'), typeCursor = $('#type-cursor');
     if (typeEl && typeCursor) {

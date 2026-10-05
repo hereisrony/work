@@ -266,34 +266,6 @@ button{font:inherit;color:inherit}
 .subtitle-card.in{opacity:1; transform:none}
 .subtitle-card .meets{color:var(--accent); font-weight:700}
 
-/* --- Miramar: real filmstrip marquee ------------------------------------------------ */
-
-.filmstrip-wrap{overflow:hidden; margin:26px 0 6px; -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent); mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.filmstrip{display:flex; gap:4px; width:max-content; animation:strip-scroll 22s linear infinite}
-.filmstrip span{
-    flex:0 0 auto; width:120px; aspect-ratio:3/2; position:relative;
-    background:linear-gradient(150deg,#0c1a10,#1a1f1a);
-}
-.filmstrip span:nth-child(4n+2){background:linear-gradient(150deg,#132914,#1a1f1a)}
-.filmstrip span::before,.filmstrip span::after{content:"";position:absolute;left:5px;right:5px;height:4px;background:var(--leader-ink);opacity:.28}
-.filmstrip span::before{top:5px} .filmstrip span::after{bottom:5px}
-@keyframes strip-scroll{to{transform:translateX(-50%)}}
-
-/* --- six weeks: a call sheet, not a numbered list --------------------------------------- */
-
-.callsheet{position:relative; margin-top:22px; padding-left:26px}
-.callsheet::before{content:"";position:absolute; left:0; top:6px; bottom:6px; width:1px; background:var(--rule)}
-.cs-row{position:relative; padding:0 0 26px 20px}
-.cs-row:last-child{padding-bottom:0}
-.cs-row::before{
-    content:""; position:absolute; left:-4px; top:5px; width:9px; height:9px;
-    border-radius:50%; background:var(--paper); border:1px solid var(--ink-soft);
-    transition:background .3s,border-color .3s;
-}
-.cs-row.passed::before{background:var(--accent); border-color:var(--ink)}
-.cs-week{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-bottom:4px}
-.cs-task{font-size:15.5px; max-width:40em}
-
 /* --- close ---------------------------------------------------------------------------- */
 
 .close-scene{ padding-bottom:20px; }
