@@ -768,12 +768,13 @@ def build():
     for href, label in PAGES:
         key = href.strip("/")
         page = pages[key]
+        article_class = "page page-upcoming" if href == "/upcoming/" else "page"
         write("%s/index.html" % key, document(
             title=tab_title(page["title"]),
             description=SEO[href],
             canonical=href,
-            body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
-                 % (esc(page["title"]),
+            body='  <article class="%s">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
+                 % (article_class, esc(page["title"]),
                     page_body(href, page["body"])),
             active=href,
             body_class="text-page",
