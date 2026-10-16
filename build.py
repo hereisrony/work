@@ -581,7 +581,7 @@ def icons(extra_class=""):
 
 
 # The blog lives on its own domain, so it opens in a new tab and sits apart
-# from the pages above: first in the list, set in the soft ink.
+# from the pages above: first in the list, white on a black band.
 BLOG = "https://rony.blog"
 
 
