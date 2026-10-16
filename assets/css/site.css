@@ -179,6 +179,9 @@ p { margin: 0 0 14px; }
     margin-left: -0.16em;
     transition: background-color 0.25s linear, color 0.25s linear;
 }
+.nav-blog { color: var(--ink-soft); }
+.nav-blog:hover,
+.nav-blog:focus-visible { color: var(--ink); }
 
 .social { margin-bottom: 30px; }
 .social ul { display: flex; align-items: center; gap: 12px; }

@@ -580,8 +580,13 @@ def icons(extra_class=""):
             % (extra_class, "".join(lis)))
 
 
+# The blog lives on its own domain, so it opens in a new tab and sits apart
+# from the pages above: first in the list, set in the soft ink.
+BLOG = "https://rony.blog"
+
+
 def nav_list(active):
-    lis = []
+    lis = ['<li><a class="nav-link nav-blog" href="%s" target="_blank" rel="noopener">blog</a></li>' % BLOG]
     for href, label in NAV:
         cur = ' aria-current="page"' if href == active else ""
         lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, esc(label)))
