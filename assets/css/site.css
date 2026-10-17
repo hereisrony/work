@@ -574,6 +574,15 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 /* The still is 16:9 like the others; Instagram's player is a vertical frame
    (header, caption, counts), so the box reshapes once it takes over. */
+/* A link out (the host will not be framed): the play mark sits in the corner,
+   clear of the lettering the still already carries. */
+.embed-link .embed-play {
+    left: auto; top: auto;
+    right: 18px; bottom: 18px;
+    width: 56px; height: 56px;
+    margin: 0;
+}
+
 .embed-ig.is-playing { max-width: 400px; aspect-ratio: 400 / 720; }
 
 /* The prompt she would have typed at a model — a text box that types itself,
