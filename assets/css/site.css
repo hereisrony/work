@@ -530,6 +530,11 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .embed-poster:focus-visible .embed-play { transform: scale(1.09); }
 .embed-poster:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
+/* An Instagram reel is square here, and its frame (header, caption, counts)
+   adds height; the box is sized for the still, then the player takes over. */
+.embed-reel { max-width: 400px; aspect-ratio: 1 / 1; }
+.embed-reel.is-playing { aspect-ratio: 400 / 720; }
+
 /* The prompt she would have typed at a model — a text box that types itself,
    then clears and starts again. */
 .typebox {
