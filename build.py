@@ -93,7 +93,7 @@ UI = {
         "upcoming": "à venir",
         "more_upcoming": "tout l’agenda",
         "filters": {"film": "film", "exhibition": "exposition", "talk": "conférence",
-                    "site-specific": "in situ", "performance": "performance",
+                    "site-specific": "in-situ", "performance": "performance",
                     "music": "musique"},
         "words": "mots",
         "filter_aria": "filtrer les projets",
@@ -218,7 +218,7 @@ SEO_FR = {
     "/": ("Rony Efrat est une artiste multimédia, chercheuse et enseignante "
           "française, qui travaille entre cinéma, langage, technologie et "
           "systèmes."),
-    "/about/": ("Rony Efrat est cinéaste, artiste, chercheuse et enseignante. Sa "
+    "/about/": ("Rony Efrat est réalisatrice, artiste, chercheuse et enseignante. Sa "
                 "pratique circule entre cinéma, langage, archives, technologie et "
                 "systèmes publics. Son travail a été présenté par ARTE, France "
                 "Télévisions, Le Fresnoy, l’ADAGP et la Biennale d’architecture "
@@ -227,7 +227,7 @@ SEO_FR = {
                    "événements publics à venir avec Rony Efrat, notamment à "
                    "Sciences Po, à l’ADAGP, dans des festivals et des "
                    "institutions en France et à l’international."),
-    "/filmography/": ("Les films de la cinéaste et scénariste Rony Efrat, dont "
+    "/filmography/": ("Les films de l’autrice-réalisatrice Rony Efrat, dont "
                       "Failing Forward, Une vie en France et Exemplaires : "
                       "fiction, documentaire, cinéma hybride, œuvres "
                       "interactives et écriture pour ARTE, France Télévisions "
@@ -275,7 +275,7 @@ WORK_SEO_FR = {
         "Une conférence à l’Université Concordia sur la standardisation de la "
         "langue par la technologie.",
     "coupdecoeur":
-        "Une visite vidéo in situ pour la Bibliothèque historique de la Ville "
+        "Une visite vidéo in-situ pour la Bibliothèque historique de la Ville "
         "de Paris, créée pour les Journées européennes du patrimoine.",
     "multilingual":
         "Un atelier de traduction créative pour le théâtre et la performance, "
@@ -288,7 +288,7 @@ WORK_SEO_FR = {
         "un week-end d’art numérique et d’expériences multisensorielles.",
     "premiersejour":
         "La première édition d’IGLOÙ a réuni artistes et auteurs pour un "
-        "festival in situ de performances et d’installations.",
+        "festival in-situ de performances et d’installations.",
     "sonicmuseum":
         "Une série d’audioguides immersifs pour le musée du Louvre mêlant son, "
         "création sonore expérimentale et localisation.",
