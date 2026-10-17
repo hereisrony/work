@@ -62,9 +62,21 @@ Each tile on the front page is cut into its own pentagon: a `pentagon` key
 in the entry, five `x y` points in percent of the square (`"55 0, 100 25,
 100 100, 0 100, 0 22"`), placed so the corners it cuts off hold no lettering
 or faces. Leave it out and the tile gets a regular pentagon.
+`name` is the project's title as it should be capitalised (`"Tu ne reverras
+plus mes yeux"`), used in the data search engines read; the on-screen title
+stays as `title` has it.
 
 You can also just edit the generated HTML directly — but `build.py` will
 overwrite it next time it runs, so put lasting changes in `content/`.
+
+## Search
+
+Every page carries its description, canonical address and its twin in the
+other language (`hreflang`), plus schema.org data: who she is (front page and
+about), the site, a breadcrumb, and for a project what kind of work it is
+(film, series, music video…) and its year, read off the category and
+subtitle. `sitemap.xml` lists each page with its twin and each project with
+its picture. There is a feed per language: `feed.xml` and `feed-fr.xml`.
 
 ## Two languages
 
