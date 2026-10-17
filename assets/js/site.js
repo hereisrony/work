@@ -96,7 +96,7 @@
 
     var filterBar = $('.filters');
     if (filterBar) {
-        var buttons = $$('.filter', filterBar);
+        var buttons = $$('button.filter', filterBar);
         var apply = function (kind) {
             buttons.forEach(function (b) {
                 b.setAttribute('aria-pressed', String(b.dataset.filter === kind));
