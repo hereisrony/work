@@ -1211,6 +1211,9 @@ def build():
     var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
     el.textContent = q;
     el.parentNode.parentNode.classList.add('is-question');
+    // a question is too wide to share a line with the language switch
+    var brand = el.closest('.brand');
+    if (brand) brand.classList.add('has-question');
 }());
 """ % {"questions": json.dumps(questions, ensure_ascii=False, indent=8)})
 

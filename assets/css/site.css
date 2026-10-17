@@ -163,6 +163,9 @@ p { margin: 0 0 14px; }
     padding-top: 0.25em;     /* sits on the name's first line */
     white-space: nowrap;
 }
+/* a question is wider than the sidebar can share: the switch goes above it */
+.brand.has-question { flex-direction: column; gap: 8px; }
+.brand.has-question .lang { order: -1; padding-top: 0; }
 .lang-sep { margin: 0 2px; color: var(--ink-soft); font-weight: 400; }
 .lang-link {
     padding: 0 0.16em;
@@ -574,15 +577,6 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 
 /* The still is 16:9 like the others; Instagram's player is a vertical frame
    (header, caption, counts), so the box reshapes once it takes over. */
-/* A link out (the host will not be framed): the play mark sits in the corner,
-   clear of the lettering the still already carries. */
-.embed-link .embed-play {
-    left: auto; top: auto;
-    right: 18px; bottom: 18px;
-    width: 56px; height: 56px;
-    margin: 0;
-}
-
 .embed-ig.is-playing { max-width: 400px; aspect-ratio: 400 / 720; }
 
 /* The prompt she would have typed at a model — a text box that types itself,
@@ -660,6 +654,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     .brand { flex: 1; min-width: 0; align-items: center; margin: 0; }
     .logo { margin: 0; line-height: 30px; }
     .lang { padding-top: 0; font-size: 12px; }
+    .brand.has-question { flex-direction: row; gap: 10px; }
+    .brand.has-question .lang { order: 0; }
     /* a question is longer than a name: shrink it and hold it to two lines
        so the bar keeps its height */
     .logo.is-question {
