@@ -23,6 +23,9 @@ content/posts.json      the 18 projects: title, subtitle, date, body HTML,
                         and an optional "video" to embed
 content/pages.json      the six text pages
 content/questions.json  the questions the header asks about her name
+content/fr/              the same in French: posts.json and pages.json keyed
+                        by slug and by page, and questions.json
+fr/                     the French site, page for page (generated)
 build.py                regenerates the HTML from content/
 tools/make-icons.py     cuts the mark down: favicons and the social card
 ```
@@ -58,6 +61,24 @@ then run `build.py`. Order in the file is the order on the page.
 
 You can also just edit the generated HTML directly — but `build.py` will
 overwrite it next time it runs, so put lasting changes in `content/`.
+
+## Two languages
+
+English is at the root, French under `/fr/`, page for page. The `en / fr`
+switch beside the name moves to the same page in the other language. A first
+visit lands in the reader's language (French if the browser asks for French
+first, English otherwise); choosing with the switch is remembered from then on.
+
+French text lives in `content/fr/`. `posts.json` holds each project's
+`subtitle` and `body` by slug; `pages.json` each page's `title` and `body`.
+Anything missing there falls back to the English. Titles of projects are not
+translated. Interface words (menu, filters, months, the quote) and the French
+search descriptions are in `build.py` (`UI`, `SEO_FR`, `WORK_SEO_FR`).
+
+When you add or change a project, add its French in `content/fr/posts.json`
+too, then run `build.py`. Dates on the upcoming page stay written the English
+way (`2026_September 11_`) in both files; the French page shows French months.
+Internal links in the French text point at `/fr/...`.
 
 ## Preview locally
 

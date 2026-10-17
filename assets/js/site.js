@@ -92,6 +92,15 @@
         }, 1500);
     }
 
+    /* --- en / fr: the choice is remembered, and a filter carries over ----- */
+
+    $$('.lang-link').forEach(function (a) {
+        a.addEventListener('click', function () {
+            try { localStorage.setItem('lang', a.getAttribute('hreflang')); } catch (e) {}
+            if (location.hash) a.href = a.href.split('#')[0] + location.hash;
+        });
+    });
+
     /* --- filters on the front page ---------------------------------------- */
 
     var filterBar = $('.filters');

@@ -23,10 +23,11 @@ QUOTE_BY = "Laurie Anderson"
 
 # The line has always been Laurie Anderson's; the sidebar now says so. No
 # quotation marks, no dash — the attribution is set apart by weight and space.
-QUOTE = ('<figure class="header-description">'
-         '<blockquote><p>%s</p></blockquote>'
-         '<figcaption>%s</figcaption>'
-         '</figure>' % (TAGLINE, QUOTE_BY))
+def quote(lang="en"):
+    return ('<figure class="header-description">'
+            '<blockquote><p>%s</p></blockquote>'
+            '<figcaption>%s</figcaption>'
+            '</figure>' % (UI[lang]["tagline"], QUOTE_BY))
 
 # Every text page, in the order they were written.
 PAGES = [
@@ -54,6 +55,62 @@ SOCIAL_IMAGE = ("/assets/img/traildire-960.jpg", 960, 956)
 HOME_SOCIAL_IMAGE = ("/assets/img/mark-card.png", 1200, 630)
 
 ROLE = "french filmmaker and artist"
+
+# The site in two languages. English sits at the root, French under /fr/, page
+# for page; a switch beside the name moves between them, and a first visit
+# lands in the reader's own language (see LANG_JS).
+LANGS = ("en", "fr")
+
+
+def lp(lang, path):
+    """A root-absolute path in the given language."""
+    return path if lang == "en" else "/fr" + path
+
+
+UI = {
+    "en": {
+        "nav": {"/about/": "about", "/filmography/": "filmography",
+                "/academia/": "academia", "/ai/": "ai", "/press/": "press"},
+        "upcoming": "upcoming",
+        "more_upcoming": "more upcoming",
+        "filters": {"film": "film", "exhibition": "exhibition", "talk": "talk",
+                    "site-specific": "site-specific", "performance": "performance",
+                    "music": "music"},
+        "words": "words",
+        "filter_aria": "filter the work",
+        "play": "Play",
+        "home": "home",
+        "menu": "Menu",
+        "main": "Main",
+        "elsewhere": "Elsewhere",
+        "language": "Language",
+        "tagline": TAGLINE,
+        "og_locale": "en_GB",
+    },
+    "fr": {
+        "nav": {"/about/": "à propos", "/filmography/": "filmographie",
+                "/academia/": "recherche", "/ai/": "ia", "/press/": "presse"},
+        "upcoming": "à venir",
+        "more_upcoming": "tout l’agenda",
+        "filters": {"film": "film", "exhibition": "exposition", "talk": "conférence",
+                    "site-specific": "in situ", "performance": "performance",
+                    "music": "musique"},
+        "words": "mots",
+        "filter_aria": "filtrer les projets",
+        "play": "Lire",
+        "home": "accueil",
+        "menu": "Menu",
+        "main": "Principal",
+        "elsewhere": "Ailleurs",
+        "language": "Langue",
+        "tagline": "la technologie est le feu de camp autour duquel nous "
+                   "racontons nos histoires.",
+        "og_locale": "fr_FR",
+    },
+}
+
+MONTHS_FR = ("janvier", "février", "mars", "avril", "mai", "juin", "juillet",
+             "août", "septembre", "octobre", "novembre", "décembre")
 
 # Written by her, used as-is. Keyed by the page's path.
 SEO = {
@@ -156,6 +213,105 @@ WORK_SEO = {
         "home visit and explore distance, presence and mediation.",
 }
 
+# The same, in French.
+SEO_FR = {
+    "/": ("Rony Efrat est une artiste multimédia, chercheuse et enseignante "
+          "française, qui travaille entre cinéma, langage, technologie et "
+          "systèmes."),
+    "/about/": ("Rony Efrat est cinéaste, artiste, chercheuse et enseignante. Sa "
+                "pratique circule entre cinéma, langage, archives, technologie et "
+                "systèmes publics. Son travail a été présenté par ARTE, France "
+                "Télévisions, Le Fresnoy, l’ADAGP et la Biennale d’architecture "
+                "de Venise."),
+    "/upcoming/": ("Projections, conférences, rencontres, expositions et "
+                   "événements publics à venir avec Rony Efrat, notamment à "
+                   "Sciences Po, à l’ADAGP, dans des festivals et des "
+                   "institutions en France et à l’international."),
+    "/filmography/": ("Les films de la cinéaste et scénariste Rony Efrat, dont "
+                      "Failing Forward, Une vie en France et Exemplaires : "
+                      "fiction, documentaire, cinéma hybride, œuvres "
+                      "interactives et écriture pour ARTE, France Télévisions "
+                      "et des productions indépendantes."),
+    "/academia/": ("Recherche et enseignement de Rony Efrat entre théorie des "
+                   "systèmes, sociolinguistique, technologie, migration et "
+                   "appartenance. Elle enseigne à Sciences Po et a travaillé "
+                   "dans la recherche, les politiques publiques et "
+                   "l’enseignement supérieur en France et à l’international."),
+    "/ai/": ("Le travail de Rony Efrat avec les systèmes génératifs interroge les "
+             "images de synthèse et la façon dont la technologie réorganise la "
+             "perception, la représentation et l’autorité. Elle développe des "
+             "chaînes de production expérimentales pour comprendre et critiquer "
+             "ces systèmes de l’intérieur."),
+    "/press/": ("Entretiens et textes critiques sur les films, expositions, "
+                "recherches et travaux technologiques de Rony Efrat, dans ARTE, "
+                "Forbes, Esprit, Fisheye, Hyperallergic et Libération."),
+}
+
+WORK_SEO_FR = {
+    "une-vie-en-france":
+        "Une série biographique d’une minute pour France Télévisions sur des "
+        "figures dont la vie a transformé la France par la migration.",
+    "failing-forward":
+        "Un court métrage de fiction sur la frontière mouvante entre langage, "
+        "archives familiales et intelligence artificielle.",
+    "exemplaires":
+        "Un court métrage de fiction à Paris en 2017 : trois femmes immigrées "
+        "face à l’annulation arbitraire de leur titre de séjour.",
+    "tech-care":
+        "Une conférence sur la technologie, la mémoire et le récit, pour "
+        "chercheurs, décideurs, artistes et communautés.",
+    "strike-against-the-archive":
+        "Une installation multi-écrans sur la mémoire familiale, les récits "
+        "nationaux et la technologie, à partir d’entretiens avec les parents "
+        "de Rony Efrat.",
+    "mesyeux":
+        "Un clip pour Garden City Movement qui anime dix ans de portraits en "
+        "moyen format grâce aux débuts de la vidéo générative.",
+    "women-in-ai":
+        "Une comédie musicale IA réalisée en 36 heures pour un concours de "
+        "vidéo générative, point de départ d’un documentaire sur l’IA, la "
+        "représentation et le consentement.",
+    "from-accents-to-ai":
+        "Une conférence à l’Université Concordia sur la standardisation de la "
+        "langue par la technologie.",
+    "coupdecoeur":
+        "Une visite vidéo in situ pour la Bibliothèque historique de la Ville "
+        "de Paris, créée pour les Journées européennes du patrimoine.",
+    "multilingual":
+        "Un atelier de traduction créative pour le théâtre et la performance, "
+        "par une pratique collaborative et multilingue.",
+    "escalesliees":
+        "L’édition 2018 d’IGLOÙ a réuni des artistes d’horizons différents "
+        "entre la Biennale d’architecture de Venise et le Parc de la Villette.",
+    "toutdonnees":
+        "Le deuxième événement annuel d’IGLOÙ a transformé le DOC, à Paris, en "
+        "un week-end d’art numérique et d’expériences multisensorielles.",
+    "premiersejour":
+        "La première édition d’IGLOÙ a réuni artistes et auteurs pour un "
+        "festival in situ de performances et d’installations.",
+    "sonicmuseum":
+        "Une série d’audioguides immersifs pour le musée du Louvre mêlant son, "
+        "création sonore expérimentale et localisation.",
+    "clefsdame":
+        "Un cadavre exquis interactif où des souvenirs personnels se "
+        "transforment par la traduction homophonique.",
+    "coincidence":
+        "Un projet de récit à distance d’Ariel Abrahams et Rony Efrat, créé "
+        "avant que les deux artistes ne se rencontrent.",
+    "falsefriends":
+        "Une performance bilingue sur les faux amis, ces mots qui se "
+        "ressemblent d’une langue à l’autre sans vouloir dire la même chose.",
+    "failure":
+        "Une performance et un texte sur l’échec, le désir et la répétition, "
+        "en langage fragmenté et avec la figure récurrente du loup.",
+    "traildire":
+        "Une performance trilingue : trois tentatives d’atteindre un souvenir "
+        "suspendu entre vidéo, son et eau.",
+    "homecheck":
+        "Une performance interactive qui met en scène une visite à domicile "
+        "virtuelle pour explorer la distance, la présence et la médiation.",
+}
+
 SOCIAL = [
     ("https://www.instagram.com/hereisrony/", "Instagram",
      'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.9 5.9 0 0 0-2.13 1.38A5.9 5.9 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13a5.9 5.9 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0z M12 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zM19.85 5.6a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z'),
@@ -231,14 +387,14 @@ def prose(s):
     return re.sub(r"\s+", " ", htmllib.unescape(text)).strip()
 
 
-def work_seo(p):
+def work_seo(p, lang="en"):
     """What a project says about itself to a search engine.
 
     Hers, where she wrote one — which is everywhere today. A project added
     later falls back to its own opening line, named and placed, so it is never
     left with nothing.
     """
-    written = WORK_SEO.get(p["slug"])
+    written = (WORK_SEO_FR if lang == "fr" else WORK_SEO).get(p["slug"])
     if written:
         return written
     return "%s by %s, %s. %s" % (
@@ -246,15 +402,29 @@ def work_seo(p):
         TITLE, ROLE, prose(p["body"])[:130])
 
 
-def page_body(href, body):
+def page_body(href, body, lang="en"):
     """A text page's body, ready to write."""
     html = tidy_headings(lazy_iframes(strip_inline_styles(body)))
     if href == "/upcoming/":
         html = one_list(html)
-    return page_players(mark_dates(html))
+    return page_players(local_dates(mark_dates(html), lang), lang)
 
 
-def page_players(html):
+def local_dates(html, lang):
+    """The dates are written 2026_September 11_ in both languages, which is
+    what the parser reads; a French page shows them with French months."""
+    if lang != "fr":
+        return html
+
+    def fr(m):
+        k = next((i for i, n in enumerate(MONTH_NAMES)
+                  if n.startswith(m.group(2).lower()[:3])), None)
+        return m.group(0) if k is None else "%s_%s %s_" % (
+            m.group(1), MONTHS_FR[k], m.group(3))
+    return re.sub(r'(?<=<span class="ev-date">)' + EVENT_DATE.pattern, fr, html)
+
+
+def page_players(html, lang="en"):
     """A player on a text page, from a marker <!--reel:slug|Name|link-->.
 
     The still is poster-<slug>-640/1280 in assets/img, the same as a
@@ -264,7 +434,8 @@ def page_players(html):
         src = embed_url(link)
         if not src:
             return ""
-        return player_frame(src, {"slug": slug, "title": name, "video": link}, link)
+        return player_frame(src, {"slug": slug, "title": name, "video": link,
+                                  "_lang": lang}, link)
     return re.sub(r"<!--reel:(.*?)-->", swap, html)
 
 
@@ -377,7 +548,7 @@ def player_frame(src, post=None, watch=None):
     cls = "embed embed-ig" if "instagram.com" in src else "embed"
     return ("""<div class="%(cls)s" data-player="%(src)s">
       <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
-         aria-label="Play %(name)s">
+         aria-label="%(play)s %(name)s">
         <picture>
           <source type="image/webp" srcset="%(w640)s 640w, %(w1280)s 1280w"
                   sizes="(max-width: 740px) 100vw, 800px">
@@ -394,6 +565,7 @@ def player_frame(src, post=None, watch=None):
         "jpg": asset("/assets/img/poster-%s-1280.jpg" % slug),
         "icon": PLAY_ICON,
         "cls": cls,
+        "play": UI[post.get("_lang", "en")]["play"],
     })
 
 
@@ -430,9 +602,11 @@ def embed_videos(html, post=None):
         return html
     # the paragraph must be just the link(s) and punctuation
     if re.sub(r"<[^>]+>|[\s.,;:]", "", para) not in ("findithere", "watchithere",
-                                                     "watchither", "seeithere"):
+                                                     "watchither", "seeithere",
+                                                     "àvoirici"):
         text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
-        if not text.startswith(("findithere", "watchithere", "watchither")):
+        if not text.startswith(("findithere", "watchithere", "watchither",
+                                "àvoirici")):
             return html
     return player_frame(player, post, watch) + html[m.end():]
 
@@ -521,7 +695,7 @@ def upcoming_months(body):
     return out
 
 
-def upcoming_block(pages):
+def upcoming_block(pages, lang="en"):
     """The upcoming rubric that opens the front page.
 
     The listing she sent, at this site's scale and in its colours: the day in
@@ -537,7 +711,7 @@ def upcoming_block(pages):
 
     def month_html(month, rows):
         return ('        <h3 class="up-name">%s</h3>\n%s' % (
-            MONTH_NAMES[month - 1],
+            (MONTHS_FR if lang == "fr" else MONTH_NAMES)[month - 1],
             "\n".join(
                 '        <div class="up-row">'
                 '<span class="up-num">%02d</span>'
@@ -547,7 +721,8 @@ def upcoming_block(pages):
 
     columns = [c for c in ([months[0]], months[1:]) if c]
     more = ('        <p class="up-more">'
-            '<a href="/upcoming/">more upcoming</a></p>')
+            '<a href="%s">%s</a></p>' % (lp(lang, "/upcoming/"),
+                                         esc(UI[lang]["more_upcoming"])))
 
     cols = []
     for i, col in enumerate(columns):
@@ -560,9 +735,9 @@ def upcoming_block(pages):
 
     return ('  <section class="up" aria-labelledby="up-title">\n'
             '    <h2 class="sec-title" id="up-title">'
-            '<span class="mark">upcoming</span></h2>\n'
+            '<span class="mark">%s</span></h2>\n'
             '    <div class="up-cols">\n%s\n    </div>\n'
-            '  </section>' % "\n".join(cols))
+            '  </section>' % (esc(UI[lang]["upcoming"]), "\n".join(cols)))
 
 
 def mark_dates(html):
@@ -597,7 +772,7 @@ def blank_external(html):
     return re.sub(r'<a ([^>]*href="https?://[^"]*"[^>]*)>', fix, html)
 
 
-def icons(extra_class=""):
+def icons(extra_class="", lang="en"):
     lis = []
     for href, label, path in SOCIAL:
         rel = ' target="_blank" rel="noopener"' if href.startswith("http") else ""
@@ -606,8 +781,8 @@ def icons(extra_class=""):
             '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
             '<path d="%s"/></svg></a></li>' % (href, rel, label, path)
         )
-    return ('<nav class="social%s" aria-label="Elsewhere"><ul>%s</ul></nav>'
-            % (extra_class, "".join(lis)))
+    return ('<nav class="social%s" aria-label="%s"><ul>%s</ul></nav>'
+            % (extra_class, UI[lang]["elsewhere"], "".join(lis)))
 
 
 # The blog lives on its own domain, so it opens in a new tab and sits apart:
@@ -615,23 +790,38 @@ def icons(extra_class=""):
 BLOG = "https://rony.blog"
 
 
-def nav_list(active):
+def nav_list(active, lang="en"):
     lis = []
-    for href, label in NAV:
+    for href, _ in NAV:
         cur = ' aria-current="page"' if href == active else ""
-        lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, esc(label)))
-    return '<nav class="navigation" aria-label="Main"><ul>%s</ul></nav>' % "".join(lis)
+        lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>'
+                   % (lp(lang, href), cur, esc(UI[lang]["nav"][href])))
+    return ('<nav class="navigation" aria-label="%s"><ul>%s</ul></nav>'
+            % (UI[lang]["main"], "".join(lis)))
 
 
-def header(active):
+def lang_switch(path, lang):
+    """en / fr beside the name: the same page in the other language."""
+    def one(l):
+        cur = ' aria-current="true"' if l == lang else ""
+        return ('<a class="lang-link" href="%s" hreflang="%s" lang="%s"%s>%s</a>'
+                % (lp(l, path), l, l, cur, l))
+    return ('<nav class="lang" aria-label="%s">%s<span class="lang-sep">/</span>%s</nav>'
+            % (UI[lang]["language"], one("en"), one("fr")))
+
+
+def header(active, lang="en", path="/"):
     return """<header id="header">
   <div class="wrap">
-    <div class="logo"><a href="/" aria-label="%(title)s &mdash; home"><span class="logo-text">%(title)s</span></a></div>
+    <div class="brand">
+      <div class="logo"><a href="%(home)s" aria-label="%(title)s &mdash; %(home_word)s"><span class="logo-text">%(title)s</span></a></div>
+      %(switch)s
+    </div>
     <script src="%(name_js)s"></script>
     %(nav)s
     %(social)s
     %(quote)s
-    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="drawer">
+    <button class="nav-toggle" type="button" aria-label="%(menu)s" aria-expanded="false" aria-controls="drawer">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -642,24 +832,46 @@ def header(active):
   %(quote)s
 </aside>""" % {
         "title": TITLE,
-        "quote": QUOTE,
-        "nav": nav_list(active), "social": icons(),
+        "quote": quote(lang),
+        "nav": nav_list(active, lang), "social": icons(lang=lang),
+        "home": lp(lang, "/"), "home_word": UI[lang]["home"],
+        "menu": UI[lang]["menu"],
+        "switch": lang_switch(path, lang),
         "name_js": asset("/assets/js/name.js"),
     }
 
 
+# A first visit lands in the reader's language: French for a browser that asks
+# for French first, English otherwise. Choosing with the switch is remembered
+# and wins from then on. Crawlers are left where they are, so each language is
+# indexed at its own address.
+LANG_JS = ("<script>(function(){var d=document.documentElement,a=d.getAttribute('data-alt'),s;"
+           "if(!a||/bot|crawl|spider|slurp|preview|lighthouse/i.test(navigator.userAgent))return;"
+           "try{s=localStorage.getItem('lang')}catch(e){}"
+           "var n=((navigator.languages&&navigator.languages[0])||navigator.language||'').toLowerCase();"
+           "var w=s==='fr'||s==='en'?s:(n.indexOf('fr')===0?'fr':'en');"
+           "if(w!==d.lang)location.replace(a+location.hash)}())</script>")
+
+
 def document(*, title, description, canonical, body, active, og_image=None,
-             jsonld=False, body_class="", extra_ld=None):
+             jsonld=False, body_class="", extra_ld=None, lang="en"):
+    """canonical is the page's path in English; the French one follows."""
+    path, canonical = canonical, lp(lang, canonical)
+    other = "fr" if lang == "en" else "en"
     head = [
         '<meta charset="utf-8">',
+        LANG_JS,
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         "<title>%s</title>" % esc(title),
         '<meta name="author" content="%s">' % esc(TITLE),
         '<meta name="robots" content="index, follow, max-image-preview:large, '
         'max-snippet:-1">',
-        '<meta property="og:locale" content="en_GB">',
+        '<meta property="og:locale" content="%s">' % UI[lang]["og_locale"],
         '<meta name="description" content="%s">' % esc(description),
         '<link rel="canonical" href="%s%s">' % (SITE, canonical),
+        '<link rel="alternate" hreflang="en" href="%s%s">' % (SITE, path),
+        '<link rel="alternate" hreflang="fr" href="%s%s">' % (SITE, lp("fr", path)),
+        '<link rel="alternate" hreflang="x-default" href="%s%s">' % (SITE, path),
         '<meta property="og:type" content="website">',
         '<meta property="og:site_name" content="%s">' % esc(TITLE),
         '<meta property="og:title" content="%s">' % esc(title),
@@ -675,21 +887,22 @@ def document(*, title, description, canonical, body, active, og_image=None,
     ]
     # A text page shares the one photograph, the front page the mark, and a
     # project its own still — the picture that stands for it on the grid.
-    path, w, h = og_image or SOCIAL_IMAGE
-    head.append('<meta property="og:image" content="%s%s">' % (SITE, path))
+    img, w, h = og_image or SOCIAL_IMAGE
+    head.append('<meta property="og:image" content="%s%s">' % (SITE, img))
     if w and h:
         head.append('<meta property="og:image:width" content="%d">' % w)
         head.append('<meta property="og:image:height" content="%d">' % h)
-    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, path))
+    head.append('<meta name="twitter:image" content="%s%s">' % (SITE, img))
     if jsonld:
+        ld = dict(JSONLD, description=(SEO_FR if lang == "fr" else SEO)["/"])
         head.append('<script type="application/ld+json">%s</script>'
-                    % json.dumps(JSONLD, ensure_ascii=False))
+                    % json.dumps(ld, ensure_ascii=False))
     if extra_ld:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(extra_ld, ensure_ascii=False))
 
     return """<!DOCTYPE html>
-<html lang="en">
+<html lang="%(lang)s" data-alt="%(alt)s">
 <head>
 %(head)s
 </head>
@@ -707,7 +920,9 @@ def document(*, title, description, canonical, body, active, og_image=None,
 """ % {
         "head": "\n".join("  " + h for h in head),
         "cls": (' class="%s"' % body_class) if body_class else "",
-        "header": header(active),
+        "header": header(active, lang, path),
+        "lang": lang,
+        "alt": lp(other, path),
         "body": body,
         "site_js": asset("/assets/js/site.js"),
     }
@@ -739,16 +954,16 @@ def srcset(post, ext):
 FILTER_ORDER = ("film", "exhibition", "talk", "site-specific", "performance", "music")
 
 
-def tile(post):
+def tile(post, lang="en"):
     """A grid tile. A plain link — project pages open like any other page."""
     alt = "%s — %s" % (post["title"], post["subtitle"]) if post["subtitle"] else post["title"]
-    return """    <a class="tile" href="/work/%(slug)s/" data-category="%(category)s" aria-label="%(aria)s">
+    return """    <a class="tile" href="%(href)s" data-category="%(category)s" aria-label="%(aria)s">
       <picture>
         <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 31vw, 26vw">
         <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
       </picture>
     </a>""" % {
-        "slug": post["slug"],
+        "href": lp(lang, "/work/%s/" % post["slug"]),
         "category": post.get("category", ""),
         "webp": srcset(post, "webp"),
         "alt": esc(alt),
@@ -759,69 +974,52 @@ def tile(post):
     }
 
 
-def build():
-    posts = json.load(open(os.path.join(ROOT, "content/posts.json"), encoding="utf-8"))
-    pages = json.load(open(os.path.join(ROOT, "content/pages.json"), encoding="utf-8"))
-
-    # --- the name question ---------------------------------------------------
-    # The header carries her name on the home page. Open anything else and it
-    # slips into one of the questions people actually ask about that name; the
-    # link still goes home, where the name is itself again.
-    questions = json.load(open(os.path.join(ROOT, "content/questions.json"),
-                               encoding="utf-8"))
-    write("assets/js/name.js", """/* Generated by build.py from content/questions.json — do not edit. */
-(function () {
-    'use strict';
-    var QUESTIONS = %(questions)s;
-
-    var el = document.querySelector('.logo-text');
-    if (!el) return;
-
-    // The home page is where the name stays put.
-    if (document.body && document.body.classList.contains('index-page')) return;
-
-    var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
-    el.textContent = q;
-    el.parentNode.parentNode.classList.add('is-question');
-}());
-""" % {"questions": json.dumps(questions, ensure_ascii=False, indent=8)})
-
+def build_lang(lang, posts, pages):
+    """The front page, the text pages and every project, in one language."""
     # --- index ---------------------------------------------------------------
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
-            % "\n".join(tile(p) for p in posts))
+            % "\n".join(tile(p, lang) for p in posts))
     # The front page starts with everything; these narrow it. Without script
     # the buttons would do nothing, so they stay hidden until it runs.
     kinds = [k for k in FILTER_ORDER if any(p.get("category") == k for p in posts)]
-    projects = ('  <h2 class="sec-title filters" role="group" aria-label="filter the work">\n'
+    words = UI[lang]
+    projects = ('  <h2 class="sec-title filters" role="group" aria-label="%s">\n'
+                % words["filter_aria"]
                 + "\n".join('    <button type="button" class="filter" data-filter="%s" '
-                             'aria-pressed="false" hidden>%s</button>' % (esc(k), esc(k))
+                             'aria-pressed="false" hidden>%s</button>'
+                             % (esc(k), esc(words["filters"][k]))
                              for k in kinds)
-                + '\n    <a class="filter" href="%s" target="_blank" rel="noopener">words</a>' % BLOG
+                + '\n    <a class="filter" href="%s" target="_blank" rel="noopener">%s</a>'
+                % (BLOG, esc(words["words"]))
                 + '\n  </h2>')
-    write("index.html", document(
+    seo = SEO_FR if lang == "fr" else SEO
+    root = "" if lang == "en" else "fr/"
+    write(root + "index.html", document(
         title=tab_title(),
-        description=SEO["/"],
+        description=seo["/"],
         canonical="/",
         og_image=HOME_SOCIAL_IMAGE,
-        body="\n".join([upcoming_block(pages), projects, grid]),
+        body="\n".join([upcoming_block(pages, lang), projects, grid]),
         active="/",
         jsonld=True,
         body_class="index-page",
+        lang=lang,
     ))
 
     # --- text pages ----------------------------------------------------------
     for href, label in PAGES:
         key = href.strip("/")
         page = pages[key]
-        write("%s/index.html" % key, document(
+        write("%s%s/index.html" % (root, key), document(
             title=tab_title(page["title"]),
-            description=SEO[href],
+            description=seo[href],
             canonical=href,
             body='  <article class="page">\n    <h1>%s</h1>\n    <div class="page-body">%s</div>\n  </article>'
                  % (esc(page["title"]),
-                    page_body(href, page["body"])),
+                    page_body(href, page["body"], lang)),
             active=href,
             body_class="text-page",
+            lang=lang,
         ))
 
     # --- project permalinks --------------------------------------------------
@@ -841,23 +1039,72 @@ def build():
             "@context": "https://schema.org",
             "@type": "CreativeWork",
             "name": p["title"].split("\u2014")[0].strip().lower(),
-            "url": "%s/work/%s/" % (SITE, p["slug"]),
+            "url": "%s%s" % (SITE, lp(lang, "/work/%s/" % p["slug"])),
             "image": "%s/assets/img/%s-960.jpg" % (SITE, p["slug"]),
             "creator": {"@type": "Person", "name": TITLE, "url": SITE},
-            "description": work_seo(p),
+            "description": work_seo(p, lang),
+            "inLanguage": lang,
         }
         if p["subtitle"]:
             work_ld["genre"] = p["subtitle"]
-        write("work/%s/index.html" % p["slug"], document(
+        write("%swork/%s/index.html" % (root, p["slug"]), document(
             title=tab_title(p["title"]),
-            description=work_seo(p),
+            description=work_seo(p, lang),
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
             og_image=("/assets/img/%s-960.jpg" % p["slug"], None, None),
             body_class="text-page",
             extra_ld=work_ld,
+            lang=lang,
         ))
+
+
+
+def build():
+    posts = json.load(open(os.path.join(ROOT, "content/posts.json"), encoding="utf-8"))
+    pages = json.load(open(os.path.join(ROOT, "content/pages.json"), encoding="utf-8"))
+
+    # The French text, keyed by slug and by page, laid over the English. A
+    # project or page not yet translated keeps its English words.
+    def load(path):
+        full = os.path.join(ROOT, path)
+        return json.load(open(full, encoding="utf-8")) if os.path.exists(full) else {}
+    posts_fr, pages_fr = load("content/fr/posts.json"), load("content/fr/pages.json")
+    in_lang = {
+        "en": (posts, pages),
+        "fr": ([dict(p, **posts_fr.get(p["slug"], {}), _lang="fr") for p in posts],
+               {k: dict(v, **pages_fr.get(k, {})) for k, v in pages.items()}),
+    }
+
+    # --- the name question ---------------------------------------------------
+    # The header carries her name on the home page. Open anything else and it
+    # slips into one of the questions people actually ask about that name; the
+    # link still goes home, where the name is itself again.
+    questions = {"en": json.load(open(os.path.join(ROOT, "content/questions.json"),
+                                      encoding="utf-8"))}
+    questions["fr"] = load("content/fr/questions.json") or questions["en"]
+    write("assets/js/name.js", """/* Generated by build.py from content/questions.json and
+   content/fr/questions.json — do not edit. */
+(function () {
+    'use strict';
+    var ALL = %(questions)s;
+    var QUESTIONS = ALL[document.documentElement.lang] || ALL.en;
+
+    var el = document.querySelector('.logo-text');
+    if (!el) return;
+
+    // The home page is where the name stays put.
+    if (document.body && document.body.classList.contains('index-page')) return;
+
+    var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+    el.textContent = q;
+    el.parentNode.parentNode.classList.add('is-question');
+}());
+""" % {"questions": json.dumps(questions, ensure_ascii=False, indent=8)})
+
+    for lang in LANGS:
+        build_lang(lang, *in_lang[lang])
 
     # --- legacy Tumblr permalinks -------------------------------------------
     # /post/<id>/<slug> was the shape of every old link; keep them alive.
@@ -914,12 +1161,15 @@ def build():
     <h1>not found</h1>
     <p>That page has moved or never existed.
        <a id="home" href="/">Back to the work</a>.</p>
+    <p lang="fr">Cette page a déménagé, ou n’a jamais existé.
+       <a id="home-fr" href="/fr/">Retour aux projets</a>.</p>
   </main>
   <script>
     // On user.github.io/repo/ the site root is the first path segment.
     var seg = location.pathname.split("/")[1];
-    document.getElementById("home").href =
-      /\.github\.io$/.test(location.hostname) && seg ? "/" + seg + "/" : "/";
+    var base = /\.github\.io$/.test(location.hostname) && seg ? "/" + seg + "/" : "/";
+    document.getElementById("home").href = base;
+    document.getElementById("home-fr").href = base + "fr/";
   </script>
 </body>
 </html>
@@ -927,6 +1177,7 @@ def build():
 
     # --- sitemap & feed ------------------------------------------------------
     urls = ["/"] + [h for h, _ in PAGES] + ["/work/%s/" % p["slug"] for p in posts]
+    urls += [lp("fr", u) for u in urls]
     write("sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -960,7 +1211,7 @@ def build():
 # (www.ronyefrat.work) and from a GitHub Pages project subpath
 # (user.github.io/repo/) without rebuilding.
 
-_ATTR = re.compile(r'\b(href|src|data-full|action)="/(?!/)([^"]*)"')
+_ATTR = re.compile(r'\b(href|src|data-full|data-alt|action)="/(?!/)([^"]*)"')
 _SET = re.compile(r'\b(srcset|data-fullset)="([^"]*)"')
 
 
