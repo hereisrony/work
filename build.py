@@ -355,9 +355,9 @@ def player_frame(src, post=None, watch=None):
                 'allow="autoplay; fullscreen; picture-in-picture" '
                 'allowfullscreen></iframe></div>' % esc(src))
     slug = post["slug"]
-    if "instagram.com" in src:
-        return reel_frame(src, post, watch)
-    return ("""<div class="embed" data-player="%(src)s">
+    # an Instagram player is not 16:9: it grows tall once it replaces the still
+    cls = "embed embed-ig" if "instagram.com" in src else "embed"
+    return ("""<div class="%(cls)s" data-player="%(src)s">
       <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
          aria-label="Play %(name)s">
         <picture>
@@ -375,29 +375,7 @@ def player_frame(src, post=None, watch=None):
         "w1280": asset("/assets/img/poster-%s-1280.webp" % slug),
         "jpg": asset("/assets/img/poster-%s-1280.jpg" % slug),
         "icon": PLAY_ICON,
-    })
-
-
-def reel_frame(src, post, watch=None):
-    """An Instagram reel: a vertical post with the host's frame around it, so
-    it waits behind the project's own square still rather than a 16:9 one."""
-    return ("""<div class="embed embed-reel" data-player="%(src)s">
-      <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
-         aria-label="Play %(name)s">
-        <picture>
-          <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, 400px">
-          <img src="%(jpg)s" alt="" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
-        </picture>
-        <span class="embed-play">%(icon)s</span>
-      </a>
-    </div>""" % {
-        "src": esc(src),
-        "watch": esc(watch or post.get("video", "")),
-        "name": esc(post["title"].split(" \u2014 ")[0].lower()),
-        "webp": srcset(post, "webp"),
-        "jpg": asset("/assets/img/%s-960.jpg" % post["slug"]),
-        "w": post["w"], "h": post["h"],
-        "icon": PLAY_ICON,
+        "cls": cls,
     })
 
 
@@ -427,6 +405,10 @@ def embed_videos(html, post=None):
         if not player:
             player, watch = embed_url(href), href
     if not player:
+        return html
+    # an Instagram link only becomes a player where a still was made for it
+    if post and "instagram.com" in player and not os.path.exists(os.path.join(
+            ROOT, "assets/img/poster-%s-1280.jpg" % post["slug"])):
         return html
     # the paragraph must be just the link(s) and punctuation
     if re.sub(r"<[^>]+>|[\s.,;:]", "", para) not in ("findithere", "watchithere",
