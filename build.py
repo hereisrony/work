@@ -778,7 +778,7 @@ def build():
                 + "\n".join('    <button type="button" class="filter" data-filter="%s" '
                              'aria-pressed="false" hidden>%s</button>' % (esc(k), esc(k))
                              for k in kinds)
-                + '\n    <a class="filter-blog" href="%s" target="_blank" rel="noopener">writing</a>' % BLOG
+                + '\n    <a class="filter" href="%s" target="_blank" rel="noopener">writing</a>' % BLOG
                 + '\n  </h2>')
     write("index.html", document(
         title=tab_title(),
