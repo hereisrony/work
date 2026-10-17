@@ -718,16 +718,20 @@ def srcset(post, ext):
                      for w in post["sizes"])
 
 
+FILTER_ORDER = ("film", "exhibition", "talk", "site-specific", "performance", "music")
+
+
 def tile(post):
     """A grid tile. A plain link — project pages open like any other page."""
     alt = "%s — %s" % (post["title"], post["subtitle"]) if post["subtitle"] else post["title"]
-    return """    <a class="tile" href="/work/%(slug)s/" aria-label="%(aria)s">
+    return """    <a class="tile" href="/work/%(slug)s/" data-category="%(category)s" aria-label="%(aria)s">
       <picture>
         <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 31vw, 26vw">
         <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
       </picture>
     </a>""" % {
         "slug": post["slug"],
+        "category": post.get("category", ""),
         "webp": srcset(post, "webp"),
         "alt": esc(alt),
         "aria": esc("%s, %s" % (post["title"], post["subtitle"]) if post["subtitle"]
@@ -767,8 +771,14 @@ def build():
     # --- index ---------------------------------------------------------------
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
             % "\n".join(tile(p) for p in posts))
-    projects = ('  <h2 class="sec-title">'
-                '<span class="mark">projects</span></h2>')
+    # The front page starts with everything; these narrow it. Without script
+    # the buttons would do nothing, so they stay hidden until it runs.
+    kinds = [k for k in FILTER_ORDER if any(p.get("category") == k for p in posts)]
+    projects = ('  <h2 class="sec-title filters" role="group" aria-label="filter the work" hidden>\n'
+                + "\n".join('    <button type="button" class="filter" data-filter="%s" '
+                             'aria-pressed="false">%s</button>' % (esc(k), esc(k))
+                             for k in kinds)
+                + '\n  </h2>')
     write("index.html", document(
         title=tab_title(),
         description=SEO["/"],

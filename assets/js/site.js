@@ -92,6 +92,37 @@
         }, 1500);
     }
 
+    /* --- filters on the front page ---------------------------------------- */
+
+    var filterBar = $('.filters');
+    if (filterBar) {
+        var buttons = $$('.filter', filterBar);
+        var apply = function (kind) {
+            buttons.forEach(function (b) {
+                b.setAttribute('aria-pressed', String(b.dataset.filter === kind));
+            });
+            $$('.tile').forEach(function (t) {
+                var show = !kind || t.dataset.category === kind;
+                t.hidden = !show;
+                if (show) t.classList.add('in');
+            });
+        };
+        var fromHash = function () {
+            var k = decodeURIComponent(location.hash.slice(1));
+            return buttons.some(function (b) { return b.dataset.filter === k; }) ? k : '';
+        };
+        filterBar.hidden = false;
+        buttons.forEach(function (b) {
+            b.addEventListener('click', function () {
+                // choosing the one already chosen goes back to everything
+                var kind = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.filter;
+                apply(kind);
+                history.replaceState(null, '', kind ? '#' + kind : location.pathname + location.search);
+            });
+        });
+        apply(fromHash());
+    }
+
     /* --- video: the host's player only on request ------------------------- */
 
     $$('.embed[data-player]').forEach(function (box) {
