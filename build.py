@@ -111,8 +111,9 @@ WORK_SEO = {
         "A music video for Garden City Movement that brings ten years of "
         "medium-format portraits to life with early generative video.",
     "women-in-ai":
-        "An AI musical made in 36 hours for a generative-video contest, in "
-        "which women rob an AI company run by identical tech founders.",
+        "An AI musical made in 36 hours for a generative-video contest, and "
+        "the starting point for a documentary on AI, representation and "
+        "consent.",
     "from-accents-to-ai":
         "A talk at Concordia University on language standardization through "
         "technology.",
