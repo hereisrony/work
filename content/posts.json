@@ -52,6 +52,22 @@
   ]
  },
  {
+  "slug": "women-in-ai",
+  "date": "17 October 2026",
+  "type": "text",
+  "title": "WOMEN IN AI",
+  "subtitle": "AI musical, 2026",
+  "category": "music",
+  "body": "<p><a href=\"https://www.youtube.com/watch?v=VizHZLNaM5k\" target=\"_blank\">watch it here</a>.</p><p>In early 2026, I started looking into the world of AI filmmaking. There were a lot of men. So I went looking for women, found about forty, and started talking to them. Many told me they felt quite alone.</p><p>Then Higgsfield (since <a href=\"https://www.forbes.com.au/news/innovation/racist-videos-and-payment-problems-the-dark-side-of-this-ai-startups-super-fast-growth/\" target=\"_blank\">accused of racist and sexually exploitative promotional content, nonconsensual deepfakes, and misleading marketing</a>) announced an AI action-film contest with $500,000 in prizes. I had 36 hours to make something. So naturally, I made a musical.</p><p>Inspired by Hairspray and borrowing from the visual language of action movies, Women in AI follows a group of women who decide to rob an AI company. I rewrote the lyrics to Good Morning Baltimore and used generative tools to create a world of identical tech founders, impossible beauty standards, and women who are everywhere in AI-generated images but rather absent from the rooms where the technology is made.</p><p>The video is part of an ongoing documentary experiment into the emerging AI creator economy and communities, contests, and rather peculiar ideas about who gets to make the future.</p>",
+  "w": 1078,
+  "h": 1078,
+  "sizes": [
+   480,
+   960
+  ],
+  "video": "https://www.youtube.com/watch?v=VizHZLNaM5k"
+ },
+ {
   "id": "802478751373983744",
   "slug": "tech-care",
   "date": "9 December 2025",
