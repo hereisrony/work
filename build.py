@@ -953,11 +953,23 @@ def srcset(post, ext):
 
 FILTER_ORDER = ("film", "exhibition", "talk", "site-specific", "performance", "music")
 
+# Every tile is cut into a pentagon of its own, drawn around what its picture
+# says — the lettering on a poster, a face — so nothing that matters falls in
+# the corners it loses. "x y, x y, ..." in percent of the square; a project
+# without one gets a regular pentagon.
+REGULAR_PENTAGON = "50 0, 100 38, 81 100, 19 100, 0 38"
+
+
+def clip(post):
+    pts = (post.get("pentagon") or REGULAR_PENTAGON).split(",")
+    return "polygon(%s)" % ", ".join(
+        "%s%% %s%%" % tuple(pt.split()) for pt in pts)
+
 
 def tile(post, lang="en"):
     """A grid tile. A plain link — project pages open like any other page."""
     alt = "%s — %s" % (post["title"], post["subtitle"]) if post["subtitle"] else post["title"]
-    return """    <a class="tile" href="%(href)s" data-category="%(category)s" aria-label="%(aria)s">
+    return """    <a class="tile" href="%(href)s" data-category="%(category)s" style="--shape: %(shape)s" aria-label="%(aria)s">
       <picture>
         <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 31vw, 26vw">
         <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
@@ -965,6 +977,7 @@ def tile(post, lang="en"):
     </a>""" % {
         "href": lp(lang, "/work/%s/" % post["slug"]),
         "category": post.get("category", ""),
+        "shape": clip(post),
         "webp": srcset(post, "webp"),
         "alt": esc(alt),
         "aria": esc("%s, %s" % (post["title"], post["subtitle"]) if post["subtitle"]

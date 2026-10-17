@@ -58,6 +58,10 @@ That rewrites every HTML file. Python 3 is the only requirement — no packages.
 existing one), drop the image into `assets/img/` as
 `<slug>-480.webp`, `<slug>-960.webp`, `<slug>-1600.webp` and `<slug>-960.jpg`,
 then run `build.py`. Order in the file is the order on the page.
+Each tile on the front page is cut into its own pentagon: a `pentagon` key
+in the entry, five `x y` points in percent of the square (`"55 0, 100 25,
+100 100, 0 100, 0 22"`), placed so the corners it cuts off hold no lettering
+or faces. Leave it out and the tile gets a regular pentagon.
 
 You can also just edit the generated HTML directly — but `build.py` will
 overwrite it next time it runs, so put lasting changes in `content/`.
