@@ -105,6 +105,7 @@
             f.title = 'Video';
             f.allow = 'autoplay; fullscreen; picture-in-picture';
             f.setAttribute('allowfullscreen', '');
+            box.classList.add('is-playing');
             box.innerHTML = '';
             box.appendChild(f);
         });

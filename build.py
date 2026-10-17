@@ -107,6 +107,9 @@ WORK_SEO = {
     "strike-against-the-archive":
         "A multi-screen installation on family memory, national narratives "
         "and technology, built from interviews with Rony Efrat’s parents.",
+    "mesyeux":
+        "A music video for Garden City Movement that brings ten years of "
+        "medium-format portraits to life with early generative video.",
     "from-accents-to-ai":
         "A talk at Concordia University on language standardization through "
         "technology.",
@@ -334,6 +337,8 @@ VIDEO_HOSTS = (
      "?autoplay=1&modestbranding=1&rel=0&playsinline=1"),
     (re.compile(r"^https?://(?:www\.)?arte\.tv/(\w\w)/videos/([\w-]+)/"),
      "https://www.arte.tv/embeds/%s/%s?autoplay=1"),
+    (re.compile(r"^https?://(?:www\.)?instagram\.com/(?:reels?|p)/([\w-]+)"),
+     "https://www.instagram.com/reel/%s/embed/"),
 )
 
 PLAY_ICON = ('<svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">'
@@ -350,6 +355,8 @@ def player_frame(src, post=None, watch=None):
                 'allow="autoplay; fullscreen; picture-in-picture" '
                 'allowfullscreen></iframe></div>' % esc(src))
     slug = post["slug"]
+    if "instagram.com" in src:
+        return reel_frame(src, post, watch)
     return ("""<div class="embed" data-player="%(src)s">
       <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
          aria-label="Play %(name)s">
@@ -367,6 +374,29 @@ def player_frame(src, post=None, watch=None):
         "w640": asset("/assets/img/poster-%s-640.webp" % slug),
         "w1280": asset("/assets/img/poster-%s-1280.webp" % slug),
         "jpg": asset("/assets/img/poster-%s-1280.jpg" % slug),
+        "icon": PLAY_ICON,
+    })
+
+
+def reel_frame(src, post, watch=None):
+    """An Instagram reel: a vertical post with the host's frame around it, so
+    it waits behind the project's own square still rather than a 16:9 one."""
+    return ("""<div class="embed embed-reel" data-player="%(src)s">
+      <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
+         aria-label="Play %(name)s">
+        <picture>
+          <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 100vw, 400px">
+          <img src="%(jpg)s" alt="" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
+        </picture>
+        <span class="embed-play">%(icon)s</span>
+      </a>
+    </div>""" % {
+        "src": esc(src),
+        "watch": esc(watch or post.get("video", "")),
+        "name": esc(post["title"].split(" \u2014 ")[0].lower()),
+        "webp": srcset(post, "webp"),
+        "jpg": asset("/assets/img/%s-960.jpg" % post["slug"]),
+        "w": post["w"], "h": post["h"],
         "icon": PLAY_ICON,
     })
 
@@ -412,7 +442,7 @@ def project_body(post):
     player, or one named by a "video" key for a project whose text never
     linked to it."""
     html = embed_videos(post["body"], post)
-    if 'class="embed"' not in html and post.get("video"):
+    if 'class="embed' not in html and post.get("video"):
         src = embed_url(post["video"])
         if src:
             html = player_frame(src, post, post["video"]) + html
@@ -840,6 +870,8 @@ def build():
 """ % {"rel": rel, "site": SITE, "slug": post["slug"], "title": esc(post["title"])}
 
     for p in posts:
+        if "id" not in p:              # added after the move: no old link
+            continue
         write("post/%s/%s/index.html" % (p["id"], p["slug"]), stub(p, 3))
         write("post/%s/index.html" % p["id"], stub(p, 2))
 
