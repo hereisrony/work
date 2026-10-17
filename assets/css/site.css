@@ -316,6 +316,27 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     text-transform: lowercase;
 }
 
+/* The filters stand where "projects" did: the same size, the same mark on
+   the one that is chosen. Nothing chosen is everything. */
+.filters { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.filter {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0 0.16em;
+    cursor: pointer;
+    text-transform: lowercase;
+}
+.filter:hover,
+.filter:focus-visible,
+.filter[aria-pressed="true"] {
+    background: var(--accent);
+    color: var(--ink);
+}
+.filter:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.tile[hidden] { display: none; }
+
 .up-cols {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -530,10 +551,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .embed-poster:focus-visible .embed-play { transform: scale(1.09); }
 .embed-poster:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 
-/* An Instagram reel is square here, and its frame (header, caption, counts)
-   adds height; the box is sized for the still, then the player takes over. */
-.embed-reel { max-width: 400px; aspect-ratio: 1 / 1; }
-.embed-reel.is-playing { aspect-ratio: 400 / 720; }
+/* The still is 16:9 like the others; Instagram's player is a vertical frame
+   (header, caption, counts), so the box reshapes once it takes over. */
+.embed-ig.is-playing { max-width: 400px; aspect-ratio: 400 / 720; }
 
 /* The prompt she would have typed at a model — a text box that types itself,
    then clears and starts again. */
