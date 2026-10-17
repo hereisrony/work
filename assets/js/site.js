@@ -108,16 +108,18 @@
             });
         };
         var fromHash = function () {
+            // the front page opens on film; #all is everything
             var k = decodeURIComponent(location.hash.slice(1));
-            return buttons.some(function (b) { return b.dataset.filter === k; }) ? k : '';
+            if (k === 'all') return '';
+            return buttons.some(function (b) { return b.dataset.filter === k; }) ? k : 'film';
         };
-        filterBar.hidden = false;
+        buttons.forEach(function (b) { b.hidden = false; });
         buttons.forEach(function (b) {
             b.addEventListener('click', function () {
-                // choosing the one already chosen goes back to everything
+                // choosing the one already chosen shows everything
                 var kind = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.filter;
                 apply(kind);
-                history.replaceState(null, '', kind ? '#' + kind : location.pathname + location.search);
+                history.replaceState(null, '', '#' + (kind || 'all'));
             });
         });
         apply(fromHash());

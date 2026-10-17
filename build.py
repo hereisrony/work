@@ -592,13 +592,13 @@ def icons(extra_class=""):
             % (extra_class, "".join(lis)))
 
 
-# The blog lives on its own domain, so it opens in a new tab and sits apart
-# from the pages above: first in the list, white on a black band.
+# The blog lives on its own domain, so it opens in a new tab and sits apart:
+# white on a black band, at the end of the filters on the front page.
 BLOG = "https://rony.blog"
 
 
 def nav_list(active):
-    lis = ['<li><a class="nav-link nav-blog" href="%s" target="_blank" rel="noopener">blog</a></li>' % BLOG]
+    lis = []
     for href, label in NAV:
         cur = ' aria-current="page"' if href == active else ""
         lis.append('<li><a class="nav-link" href="%s"%s>%s</a></li>' % (href, cur, esc(label)))
@@ -774,10 +774,11 @@ def build():
     # The front page starts with everything; these narrow it. Without script
     # the buttons would do nothing, so they stay hidden until it runs.
     kinds = [k for k in FILTER_ORDER if any(p.get("category") == k for p in posts)]
-    projects = ('  <h2 class="sec-title filters" role="group" aria-label="filter the work" hidden>\n'
+    projects = ('  <h2 class="sec-title filters" role="group" aria-label="filter the work">\n'
                 + "\n".join('    <button type="button" class="filter" data-filter="%s" '
-                             'aria-pressed="false">%s</button>' % (esc(k), esc(k))
+                             'aria-pressed="false" hidden>%s</button>' % (esc(k), esc(k))
                              for k in kinds)
+                + '\n    <a class="filter-blog" href="%s" target="_blank" rel="noopener">writing</a>' % BLOG
                 + '\n  </h2>')
     write("index.html", document(
         title=tab_title(),
