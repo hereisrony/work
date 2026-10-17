@@ -179,12 +179,6 @@ p { margin: 0 0 14px; }
     margin-left: -0.16em;
     transition: background-color 0.25s linear, color 0.25s linear;
 }
-/* The blog is off-site, so it is set apart in the palette's other pairing:
-   white on a black band, turning green like the rest under the cursor. */
-.nav-blog { background: var(--ink); color: var(--paper); }
-.nav-blog:hover,
-.nav-blog:focus-visible { background: var(--accent); color: var(--ink); }
-
 .social { margin-bottom: 30px; }
 .social ul { display: flex; align-items: center; gap: 12px; }
 .social a {
@@ -335,7 +329,17 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     color: var(--ink);
 }
 .filter:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.filter[hidden] { display: none; }
 .tile[hidden] { display: none; }
+/* Writing is off-site, so it is set apart in the palette's other pairing:
+   white on a black band, turning green like the rest under the cursor. */
+.filter-blog {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 0.16em;
+}
+.filter-blog:hover,
+.filter-blog:focus-visible { background: var(--accent); color: var(--ink); }
 
 .up-cols {
     display: grid;

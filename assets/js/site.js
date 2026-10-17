@@ -113,7 +113,7 @@
             if (k === 'all') return '';
             return buttons.some(function (b) { return b.dataset.filter === k; }) ? k : 'film';
         };
-        filterBar.hidden = false;
+        buttons.forEach(function (b) { b.hidden = false; });
         buttons.forEach(function (b) {
             b.addEventListener('click', function () {
                 // choosing the one already chosen shows everything
