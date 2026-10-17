@@ -86,6 +86,12 @@ UI = {
         "language": "Language",
         "tagline": TAGLINE,
         "og_locale": "en_GB",
+        "role": "filmmaker and artist",
+        "job": "Filmmaker, Artist, Researcher and Educator",
+        "knows": ["Film", "Generative AI", "Language", "Multilingualism",
+                  "Archives", "Systems theory", "Sociolinguistics", "Migration"],
+        "home_alt": "The stone mark of Rony Efrat on green",
+        "page_alt": "Tra il dire e il fare, a sound performance by Rony Efrat",
     },
     "fr": {
         "nav": {"/about/": "à propos", "/filmography/": "filmographie",
@@ -106,6 +112,13 @@ UI = {
         "tagline": "la technologie est le feu de camp autour duquel nous "
                    "racontons nos histoires.",
         "og_locale": "fr_FR",
+        "role": "réalisatrice et artiste",
+        "job": "Réalisatrice, artiste, chercheuse et enseignante",
+        "knows": ["Cinéma", "IA générative", "Langage", "Multilinguisme",
+                  "Archives", "Théorie des systèmes", "Sociolinguistique",
+                  "Migration"],
+        "home_alt": "La pierre de Rony Efrat sur fond vert",
+        "page_alt": "Tra il dire e il fare, performance sonore de Rony Efrat",
     },
 }
 
@@ -323,9 +336,13 @@ SOCIAL = [
      'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm1.78 13.02H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z'),
 ]
 
+PERSON_ID = SITE + "/#person"
+WEBSITE_ID = SITE + "/#website"
+
 JSONLD = {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": PERSON_ID,
     "name": "Rony Efrat",
     "url": SITE,
     "alternateName": "Rony Férat",
@@ -350,8 +367,51 @@ JSONLD = {
         "https://www.lefresnoy.net/en/ecole/etudiant/551/",
         "https://www.linkedin.com/in/hereisrony",
         "https://www.instagram.com/hereisrony/",
+        "https://www.behance.net/hereisrony",
+        "https://rony.blog",
     ],
 }
+
+
+def person_ld(lang):
+    """Who she is, in the page's language."""
+    return dict(JSONLD, jobTitle=UI[lang]["job"], knowsAbout=UI[lang]["knows"],
+                description=(SEO_FR if lang == "fr" else SEO)["/"],
+                url=SITE + lp(lang, "/"))
+
+
+def website_ld(lang):
+    return {"@context": "https://schema.org", "@type": "WebSite", "@id": WEBSITE_ID,
+            "url": SITE + "/", "name": TITLE, "inLanguage": ["en", "fr"],
+            "publisher": {"@id": PERSON_ID}, "author": {"@id": PERSON_ID}}
+
+
+def crumbs_ld(lang, trail):
+    """Rony Efrat › page: [(name, path)] after the home page."""
+    items = [(TITLE, "/")] + trail
+    return {"@context": "https://schema.org", "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": i, "name": n,
+                 "item": SITE + lp(lang, u)}
+                for i, (n, u) in enumerate(items, 1)]}
+
+
+# What kind of thing a project is, for search engines, read off its
+# category and subtitle; everything else stays a CreativeWork.
+def work_type(p):
+    sub = p.get("subtitle", "").lower()
+    if p.get("category") == "film":
+        if "pilot" in sub:                 # pilot, pilote: one episode
+            return "TVEpisode"
+        return "TVSeries" if "series" in sub or "série" in sub else "Movie"
+    if "music video" in sub or sub.startswith("clip"):
+        return "MusicVideoObject"
+    return "CreativeWork"
+
+
+def work_year(p):
+    m = re.search(r"(19|20)\d\d", p.get("subtitle", ""))
+    return m.group(0) if m else None
 
 
 def esc(s):
@@ -362,10 +422,11 @@ def esc(s):
 SEP = "\u22ee"          # the separator she asked for, not a dash
 
 
-def tab_title(name=None):
-    """Lower case, no dash, and never the subtitle: "name \u22ee rony efrat"."""
+def tab_title(name=None, lang="en"):
+    """Lower case, no dash, and never the subtitle: "name \u22ee rony efrat".
+    The front page says what she does: "rony efrat \u22ee filmmaker and artist"."""
     if not name:
-        return TITLE.lower()
+        return "%s %s %s" % (TITLE.lower(), SEP, UI[lang]["role"])
     return "%s %s %s" % (name.split(" \u2014 ")[0].strip().lower(), SEP, TITLE.lower())
 
 
@@ -854,7 +915,7 @@ LANG_JS = ("<script>(function(){var d=document.documentElement,a=d.getAttribute(
 
 
 def document(*, title, description, canonical, body, active, og_image=None,
-             jsonld=False, body_class="", extra_ld=None, lang="en"):
+             jsonld=False, body_class="", extra_ld=None, lang="en", og_alt=None):
     """canonical is the page's path in English; the French one follows."""
     path, canonical = canonical, lp(lang, canonical)
     other = "fr" if lang == "en" else "en"
@@ -867,6 +928,7 @@ def document(*, title, description, canonical, body, active, og_image=None,
         '<meta name="robots" content="index, follow, max-image-preview:large, '
         'max-snippet:-1">',
         '<meta property="og:locale" content="%s">' % UI[lang]["og_locale"],
+        '<meta property="og:locale:alternate" content="%s">' % UI[other]["og_locale"],
         '<meta name="description" content="%s">' % esc(description),
         '<link rel="canonical" href="%s%s">' % (SITE, canonical),
         '<link rel="alternate" hreflang="en" href="%s%s">' % (SITE, path),
@@ -882,7 +944,8 @@ def document(*, title, description, canonical, body, active, og_image=None,
         '<meta name="twitter:description" content="%s">' % esc(description),
         '<link rel="icon" href="%s" type="image/png">' % asset("/assets/favicon.png"),
         '<link rel="apple-touch-icon" href="%s">' % asset("/assets/apple-touch-icon.png"),
-        '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
+        '<link rel="alternate" type="application/rss+xml" title="%s" href="%s">'
+        % (esc(TITLE), "/feed-fr.xml" if lang == "fr" else "/feed.xml"),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
     # A text page shares the one photograph, the front page the mark, and a
@@ -892,14 +955,15 @@ def document(*, title, description, canonical, body, active, og_image=None,
     if w and h:
         head.append('<meta property="og:image:width" content="%d">' % w)
         head.append('<meta property="og:image:height" content="%d">' % h)
+    alt = og_alt or UI[lang]["page_alt"]
+    head.append('<meta property="og:image:alt" content="%s">' % esc(alt))
     head.append('<meta name="twitter:image" content="%s%s">' % (SITE, img))
-    if jsonld:
-        ld = dict(JSONLD, description=(SEO_FR if lang == "fr" else SEO)["/"])
+    head.append('<meta name="twitter:image:alt" content="%s">' % esc(alt))
+    lds = ([person_ld(lang)] if jsonld else []) + (
+        extra_ld if isinstance(extra_ld, list) else [extra_ld] if extra_ld else [])
+    for ld in lds:
         head.append('<script type="application/ld+json">%s</script>'
                     % json.dumps(ld, ensure_ascii=False))
-    if extra_ld:
-        head.append('<script type="application/ld+json">%s</script>'
-                    % json.dumps(extra_ld, ensure_ascii=False))
 
     return """<!DOCTYPE html>
 <html lang="%(lang)s" data-alt="%(alt)s">
@@ -966,15 +1030,17 @@ def clip(post):
         "%s%% %s%%" % tuple(pt.split()) for pt in pts)
 
 
-def tile(post, lang="en"):
+def tile(post, lang="en", eager=False):
     """A grid tile. A plain link — project pages open like any other page."""
     alt = "%s — %s" % (post["title"], post["subtitle"]) if post["subtitle"] else post["title"]
     return """    <a class="tile" href="%(href)s" data-category="%(category)s" style="--shape: %(shape)s" aria-label="%(aria)s">
       <picture>
         <source type="image/webp" srcset="%(webp)s" sizes="(max-width: 740px) 31vw, 26vw">
-        <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" loading="lazy" decoding="async">
+        <img src="%(jpg)s" alt="%(alt)s" width="%(w)d" height="%(h)d" %(load)s decoding="async">
       </picture>
     </a>""" % {
+        # the first row is what a visitor sees first: fetched at once
+        "load": 'fetchpriority="high"' if eager else 'loading="lazy"',
         "href": lp(lang, "/work/%s/" % post["slug"]),
         "category": post.get("category", ""),
         "shape": clip(post),
@@ -991,7 +1057,7 @@ def build_lang(lang, posts, pages):
     """The front page, the text pages and every project, in one language."""
     # --- index ---------------------------------------------------------------
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
-            % "\n".join(tile(p, lang) for p in posts))
+            % "\n".join(tile(p, lang, eager=i < 3) for i, p in enumerate(posts)))
     # The front page starts with everything; these narrow it. Without script
     # the buttons would do nothing, so they stay hidden until it runs.
     kinds = [k for k in FILTER_ORDER if any(p.get("category") == k for p in posts)]
@@ -1007,14 +1073,19 @@ def build_lang(lang, posts, pages):
                 + '\n  </h2>')
     seo = SEO_FR if lang == "fr" else SEO
     root = "" if lang == "en" else "fr/"
+    # The name is in the sidebar; the page itself needs its heading, read by
+    # search engines and screen readers but not drawn.
+    h1 = '  <h1 class="visually-hidden">%s, %s</h1>' % (TITLE, UI[lang]["role"])
     write(root + "index.html", document(
-        title=tab_title(),
+        title=tab_title(lang=lang),
         description=seo["/"],
         canonical="/",
         og_image=HOME_SOCIAL_IMAGE,
-        body="\n".join([upcoming_block(pages, lang), projects, grid]),
+        og_alt=UI[lang]["home_alt"],
+        body="\n".join([h1, upcoming_block(pages, lang), projects, grid]),
         active="/",
         jsonld=True,
+        extra_ld=website_ld(lang),
         body_class="index-page",
         lang=lang,
     ))
@@ -1032,6 +1103,8 @@ def build_lang(lang, posts, pages):
                     page_body(href, page["body"], lang)),
             active=href,
             body_class="text-page",
+            jsonld=(href == "/about/"),
+            extra_ld=crumbs_ld(lang, [(page["title"], href)]),
             lang=lang,
         ))
 
@@ -1048,27 +1121,34 @@ def build_lang(lang, posts, pages):
             "subtitle": ('<p class="subtitle">%s</p>' % esc(p["subtitle"])) if p["subtitle"] else "",
             "body": strip_inline_styles(project_body(p)),
         }
+        name = p.get("name") or p["title"]
         work_ld = {
             "@context": "https://schema.org",
-            "@type": "CreativeWork",
-            "name": p["title"].split("\u2014")[0].strip().lower(),
+            "@type": work_type(p),
+            "name": name,
             "url": "%s%s" % (SITE, lp(lang, "/work/%s/" % p["slug"])),
             "image": "%s/assets/img/%s-960.jpg" % (SITE, p["slug"]),
-            "creator": {"@type": "Person", "name": TITLE, "url": SITE},
+            "creator": {"@type": "Person", "@id": PERSON_ID, "name": TITLE,
+                        "url": SITE + lp(lang, "/")},
             "description": work_seo(p, lang),
             "inLanguage": lang,
+            "isPartOf": {"@id": WEBSITE_ID},
         }
         if p["subtitle"]:
             work_ld["genre"] = p["subtitle"]
+        if work_year(p):
+            work_ld["dateCreated"] = work_year(p)
         write("%swork/%s/index.html" % (root, p["slug"]), document(
             title=tab_title(p["title"]),
             description=work_seo(p, lang),
             canonical="/work/%s/" % p["slug"],
             body=body,
             active="/",
-            og_image=("/assets/img/%s-960.jpg" % p["slug"], None, None),
+            og_image=("/assets/img/%s-960.jpg" % p["slug"], 960,
+                      round(960 * p["h"] / p["w"])),
+            og_alt="%s — %s" % (name, p["subtitle"]) if p["subtitle"] else name,
             body_class="text-page",
-            extra_ld=work_ld,
+            extra_ld=[work_ld, crumbs_ld(lang, [(name, "/work/%s/" % p["slug"])])],
             lang=lang,
         ))
 
@@ -1189,29 +1269,47 @@ def build():
 """ % {"title": esc(TITLE.lower()), "sep": SEP})
 
     # --- sitemap & feed ------------------------------------------------------
-    urls = ["/"] + [h for h, _ in PAGES] + ["/work/%s/" % p["slug"] for p in posts]
-    urls += [lp("fr", u) for u in urls]
+    # Every page with its twin in the other language, and each project with
+    # its picture, the way search engines want a bilingual site described.
+    pics = {"/work/%s/" % p["slug"]: "%s/assets/img/%s-960.jpg" % (SITE, p["slug"])
+            for p in posts}
+    paths = ["/"] + [h for h, _ in PAGES] + list(pics)
+
+    def entry(lang, u):
+        twins = "".join(
+            '    <xhtml:link rel="alternate" hreflang="%s" href="%s%s"/>\n'
+            % (h, SITE, lp(l, u))
+            for h, l in (("en", "en"), ("fr", "fr"), ("x-default", "en")))
+        pic = ("    <image:image><image:loc>%s</image:loc></image:image>\n" % pics[u]
+               if u in pics else "")
+        return "  <url>\n    <loc>%s%s</loc>\n%s%s  </url>\n" % (SITE, lp(lang, u), twins, pic)
+
     write("sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
-          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-          + "".join("  <url><loc>%s%s</loc></url>\n" % (SITE, u) for u in urls)
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+          '        xmlns:xhtml="http://www.w3.org/1999/xhtml"\n'
+          '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
+          + "".join(entry(l, u) for l in LANGS for u in paths)
           + "</urlset>\n")
 
-    items = "".join(
-        "    <item>\n"
-        "      <title>%s</title>\n"
-        "      <link>%s/work/%s/</link>\n"
-        "      <guid>%s/work/%s/</guid>\n"
-        "      <description>%s</description>\n"
-        "    </item>\n" % (
-            esc(p["title"]), SITE, p["slug"], SITE, p["slug"],
-            esc(work_seo(p)))
-        for p in posts)
-    write("feed.xml",
-          '<?xml version="1.0" encoding="UTF-8"?>\n'
-          '<rss version="2.0"><channel>\n'
-          "    <title>%s</title>\n    <link>%s/</link>\n    <description>%s</description>\n%s"
-          "</channel></rss>\n" % (esc(TITLE), SITE, esc(TAGLINE), items))
+    for lang, name in (("en", "feed.xml"), ("fr", "feed-fr.xml")):
+        items = "".join(
+            "    <item>\n"
+            "      <title>%s</title>\n"
+            "      <link>%s%s</link>\n"
+            "      <guid>%s%s</guid>\n"
+            "      <description>%s</description>\n"
+            "    </item>\n" % (
+                esc(p["title"]), SITE, lp(lang, "/work/%s/" % p["slug"]),
+                SITE, lp(lang, "/work/%s/" % p["slug"]), esc(work_seo(p, lang)))
+            for p in posts)
+        write(name,
+              '<?xml version="1.0" encoding="UTF-8"?>\n'
+              '<rss version="2.0"><channel>\n'
+              "    <title>%s</title>\n    <link>%s%s</link>\n"
+              "    <description>%s</description>\n    <language>%s</language>\n%s"
+              "</channel></rss>\n" % (esc(TITLE), SITE, lp(lang, "/"),
+                                      esc(UI[lang]["tagline"]), lang, items))
 
     write("robots.txt", "User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE)
     open(os.path.join(ROOT, ".nojekyll"), "w").close()

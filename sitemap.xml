@@ -1,57 +1,369 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.ronyefrat.work/</loc></url>
-  <url><loc>https://www.ronyefrat.work/upcoming/</loc></url>
-  <url><loc>https://www.ronyefrat.work/about/</loc></url>
-  <url><loc>https://www.ronyefrat.work/filmography/</loc></url>
-  <url><loc>https://www.ronyefrat.work/academia/</loc></url>
-  <url><loc>https://www.ronyefrat.work/ai/</loc></url>
-  <url><loc>https://www.ronyefrat.work/press/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/une-vie-en-france/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/failing-forward/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/exemplaires/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/women-in-ai/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/tech-care/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/strike-against-the-archive/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/mesyeux/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/from-accents-to-ai/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/coupdecoeur/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/multilingual/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/escalesliees/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/toutdonnees/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/premiersejour/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/sonicmuseum/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/clefsdame/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/coincidence/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/falsefriends/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/failure/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/traildire/</loc></url>
-  <url><loc>https://www.ronyefrat.work/work/homecheck/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/upcoming/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/about/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/filmography/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/academia/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/ai/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/press/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/une-vie-en-france/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/failing-forward/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/exemplaires/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/women-in-ai/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/tech-care/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/strike-against-the-archive/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/mesyeux/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/from-accents-to-ai/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/coupdecoeur/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/multilingual/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/escalesliees/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/toutdonnees/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/premiersejour/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/sonicmuseum/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/clefsdame/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/coincidence/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/falsefriends/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/failure/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/traildire/</loc></url>
-  <url><loc>https://www.ronyefrat.work/fr/work/homecheck/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.ronyefrat.work/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/upcoming/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/upcoming/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/upcoming/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/upcoming/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/about/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/about/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/filmography/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/filmography/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/filmography/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/filmography/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/academia/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/academia/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/academia/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/academia/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/ai/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/ai/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/ai/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/press/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/press/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/press/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/press/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/une-vie-en-france/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/une-vie-en-france/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/une-vie-en-france/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/une-vie-en-france/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/une-vie-en-france-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/failing-forward/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/failing-forward/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/failing-forward/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/failing-forward/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/failing-forward-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/exemplaires/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/exemplaires/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/exemplaires/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/exemplaires/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/exemplaires-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/women-in-ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/women-in-ai/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/women-in-ai/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/women-in-ai/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/women-in-ai-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/tech-care/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/tech-care/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/tech-care/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/tech-care/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/tech-care-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/strike-against-the-archive/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/strike-against-the-archive/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/strike-against-the-archive/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/strike-against-the-archive/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/strike-against-the-archive-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/mesyeux/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/mesyeux/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/mesyeux/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/mesyeux/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/mesyeux-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/from-accents-to-ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/from-accents-to-ai/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/from-accents-to-ai/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/from-accents-to-ai/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/from-accents-to-ai-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/coupdecoeur/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/coupdecoeur/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/coupdecoeur/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/coupdecoeur/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/coupdecoeur-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/multilingual/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/multilingual/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/multilingual/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/multilingual/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/multilingual-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/escalesliees/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/escalesliees/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/escalesliees/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/escalesliees/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/escalesliees-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/toutdonnees/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/toutdonnees/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/toutdonnees/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/toutdonnees/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/toutdonnees-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/premiersejour/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/premiersejour/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/premiersejour/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/premiersejour/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/premiersejour-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/sonicmuseum/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/sonicmuseum/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/sonicmuseum/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/sonicmuseum/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/sonicmuseum-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/clefsdame/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/clefsdame/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/clefsdame/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/clefsdame/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/clefsdame-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/coincidence/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/coincidence/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/coincidence/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/coincidence/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/coincidence-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/falsefriends/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/falsefriends/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/falsefriends/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/falsefriends/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/falsefriends-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/failure/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/failure/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/failure/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/failure/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/failure-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/traildire/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/traildire/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/traildire/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/traildire/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/traildire-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/work/homecheck/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/homecheck/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/homecheck/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/homecheck/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/homecheck-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/upcoming/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/upcoming/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/upcoming/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/upcoming/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/about/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/about/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/filmography/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/filmography/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/filmography/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/filmography/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/academia/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/academia/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/academia/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/academia/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/ai/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/ai/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/ai/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/press/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/press/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/press/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/press/"/>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/une-vie-en-france/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/une-vie-en-france/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/une-vie-en-france/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/une-vie-en-france/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/une-vie-en-france-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/failing-forward/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/failing-forward/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/failing-forward/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/failing-forward/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/failing-forward-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/exemplaires/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/exemplaires/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/exemplaires/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/exemplaires/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/exemplaires-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/women-in-ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/women-in-ai/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/women-in-ai/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/women-in-ai/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/women-in-ai-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/tech-care/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/tech-care/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/tech-care/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/tech-care/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/tech-care-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/strike-against-the-archive/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/strike-against-the-archive/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/strike-against-the-archive/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/strike-against-the-archive/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/strike-against-the-archive-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/mesyeux/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/mesyeux/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/mesyeux/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/mesyeux/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/mesyeux-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/from-accents-to-ai/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/from-accents-to-ai/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/from-accents-to-ai/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/from-accents-to-ai/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/from-accents-to-ai-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/coupdecoeur/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/coupdecoeur/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/coupdecoeur/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/coupdecoeur/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/coupdecoeur-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/multilingual/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/multilingual/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/multilingual/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/multilingual/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/multilingual-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/escalesliees/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/escalesliees/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/escalesliees/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/escalesliees/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/escalesliees-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/toutdonnees/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/toutdonnees/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/toutdonnees/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/toutdonnees/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/toutdonnees-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/premiersejour/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/premiersejour/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/premiersejour/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/premiersejour/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/premiersejour-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/sonicmuseum/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/sonicmuseum/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/sonicmuseum/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/sonicmuseum/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/sonicmuseum-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/clefsdame/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/clefsdame/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/clefsdame/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/clefsdame/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/clefsdame-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/coincidence/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/coincidence/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/coincidence/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/coincidence/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/coincidence-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/falsefriends/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/falsefriends/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/falsefriends/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/falsefriends/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/falsefriends-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/failure/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/failure/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/failure/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/failure/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/failure-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/traildire/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/traildire/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/traildire/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/traildire/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/traildire-960.jpg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://www.ronyefrat.work/fr/work/homecheck/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.ronyefrat.work/work/homecheck/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.ronyefrat.work/fr/work/homecheck/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.ronyefrat.work/work/homecheck/"/>
+    <image:image><image:loc>https://www.ronyefrat.work/assets/img/homecheck-960.jpg</image:loc></image:image>
+  </url>
 </urlset>
