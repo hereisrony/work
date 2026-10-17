@@ -50,7 +50,7 @@ NAV = [(h, l) for h, l in PAGES if h != "/upcoming/"]
 # Tra il dire e il fare stands for the work, so it carries every page but one.
 SOCIAL_IMAGE = ("/assets/img/traildire-960.jpg", 960, 956)
 # The front page is the site rather than any one piece, so it carries the mark
-# instead: the same ◩ as the tab icon, on the site's own white paper.
+# instead: the same stone as the tab icon, on the accent.
 HOME_SOCIAL_IMAGE = ("/assets/img/mark-card.png", 1200, 630)
 
 ROLE = "french filmmaker and artist"
@@ -638,8 +638,7 @@ def document(*, title, description, canonical, body, active, og_image=None,
         '<meta name="twitter:card" content="summary_large_image">',
         '<meta name="twitter:title" content="%s">' % esc(title),
         '<meta name="twitter:description" content="%s">' % esc(description),
-        '<link rel="icon" href="%s" type="image/svg+xml">' % asset("/assets/favicon.svg"),
-        '<link rel="alternate icon" href="%s">' % asset("/assets/favicon.png"),
+        '<link rel="icon" href="%s" type="image/png">' % asset("/assets/favicon.png"),
         '<link rel="apple-touch-icon" href="%s">' % asset("/assets/apple-touch-icon.png"),
         '<link rel="alternate" type="application/rss+xml" title="%s" href="/feed.xml">' % esc(TITLE),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
