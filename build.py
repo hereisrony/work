@@ -591,6 +591,10 @@ VIDEO_HOSTS = (
      "https://www.instagram.com/reel/%s/embed/"),
 )
 
+# Sites that will not be shown inside another page (they send
+# X-Frame-Options), so the still is a link out to them instead of a player.
+LINK_OUT = re.compile(r"^https?://(?:www\.)?(?:fawesome\.tv|france\.tv)/")
+
 PLAY_ICON = ('<svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">'
              '<circle cx="40" cy="40" r="40"/>'
              '<path d="M32 24 L58 40 L32 56 Z" class="play-tri"/></svg>')
@@ -606,8 +610,12 @@ def player_frame(src, post=None, watch=None):
                 'allowfullscreen></iframe></div>' % esc(src))
     slug = post["slug"]
     # an Instagram player is not 16:9: it grows tall once it replaces the still
-    cls = "embed embed-ig" if "instagram.com" in src else "embed"
-    return ("""<div class="%(cls)s" data-player="%(src)s">
+    if src is None:                      # a link out: nothing to load in place
+        cls, data = "embed embed-link", ""
+    else:
+        cls = "embed embed-ig" if "instagram.com" in src else "embed"
+        data = ' data-player="%s"' % esc(src)
+    return ("""<div class="%(cls)s"%(data)s>
       <a class="embed-poster" href="%(watch)s" target="_blank" rel="noopener"
          aria-label="%(play)s %(name)s">
         <picture>
@@ -618,7 +626,6 @@ def player_frame(src, post=None, watch=None):
         <span class="embed-play">%(icon)s</span>
       </a>
     </div>""" % {
-        "src": esc(src),
         "watch": esc(watch or post.get("video", "")),
         "name": esc(post["title"].split(" \u2014 ")[0].lower()),
         "w640": asset("/assets/img/poster-%s-640.webp" % slug),
@@ -626,6 +633,7 @@ def player_frame(src, post=None, watch=None):
         "jpg": asset("/assets/img/poster-%s-1280.jpg" % slug),
         "icon": PLAY_ICON,
         "cls": cls,
+        "data": data,
         "play": UI[post.get("_lang", "en")]["play"],
     })
 
@@ -637,6 +645,14 @@ def embed_url(href):
         if m:
             return template % m.groups()
     return None
+
+
+def _is_watch_link(para):
+    """A paragraph that is only "find it here." and the like."""
+    text = re.sub(r"<[^>]+>|[\s.,;:]", "", para).lower()
+    return text in ("findithere", "watchithere", "watchither", "seeithere",
+                    "àvoirici") or text.startswith((
+                        "findithere", "watchithere", "watchither", "àvoirici"))
 
 
 def embed_videos(html, post=None):
@@ -656,19 +672,21 @@ def embed_videos(html, post=None):
         if not player:
             player, watch = embed_url(href), href
     if not player:
+        # a site that cannot be embedded: its still links out, if it has one
+        link = next((h for h in re.findall(r'<a href="([^"]+)"', para)
+                     if LINK_OUT.match(h)), None)
+        if (link and post and os.path.exists(os.path.join(
+                ROOT, "assets/img/poster-%s-1280.jpg" % post["slug"]))
+                and _is_watch_link(para)):
+            return player_frame(None, post, link) + html[m.end():]
         return html
     # an Instagram link only becomes a player where a still was made for it
     if post and "instagram.com" in player and not os.path.exists(os.path.join(
             ROOT, "assets/img/poster-%s-1280.jpg" % post["slug"])):
         return html
     # the paragraph must be just the link(s) and punctuation
-    if re.sub(r"<[^>]+>|[\s.,;:]", "", para) not in ("findithere", "watchithere",
-                                                     "watchither", "seeithere",
-                                                     "àvoirici"):
-        text = re.sub(r"<[^>]+>", "", para).strip().lower().replace(" ", "")
-        if not text.startswith(("findithere", "watchithere", "watchither",
-                                "àvoirici")):
-            return html
+    if not _is_watch_link(para):
+        return html
     return player_frame(player, post, watch) + html[m.end():]
 
 
@@ -1193,6 +1211,9 @@ def build():
     var q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
     el.textContent = q;
     el.parentNode.parentNode.classList.add('is-question');
+    // a question is too wide to share a line with the language switch
+    var brand = el.closest('.brand');
+    if (brand) brand.classList.add('has-question');
 }());
 """ % {"questions": json.dumps(questions, ensure_ascii=False, indent=8)})
 
