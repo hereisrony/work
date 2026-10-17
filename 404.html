@@ -21,12 +21,15 @@
     <h1>not found</h1>
     <p>That page has moved or never existed.
        <a id="home" href="./">Back to the work</a>.</p>
+    <p lang="fr">Cette page a déménagé, ou n’a jamais existé.
+       <a id="home-fr" href="./fr/">Retour aux projets</a>.</p>
   </main>
   <script>
     // On user.github.io/repo/ the site root is the first path segment.
     var seg = location.pathname.split("/")[1];
-    document.getElementById("home").href =
-      /\.github\.io$/.test(location.hostname) && seg ? "/" + seg + "/" : "/";
+    var base = /\.github\.io$/.test(location.hostname) && seg ? "/" + seg + "/" : "/";
+    document.getElementById("home").href = base;
+    document.getElementById("home-fr").href = base + "fr/";
   </script>
 </body>
 </html>

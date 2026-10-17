@@ -147,7 +147,31 @@ p { margin: 0 0 14px; }
 
 #header > .wrap { padding: 70px 25px 70px 50px; }
 
-.logo { margin-bottom: 30px; line-height: 1.1; font-size: 22px; }
+/* The name and, beside it, the switch between the two languages. */
+.brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+.logo { min-width: 0; line-height: 1.1; font-size: 22px; }
+
+.lang {
+    flex: none;
+    font-size: 13px;
+    line-height: 1.1;
+    padding-top: 0.25em;     /* sits on the name's first line */
+    white-space: nowrap;
+}
+.lang-sep { margin: 0 2px; color: var(--ink-soft); font-weight: 400; }
+.lang-link {
+    padding: 0 0.16em;
+    color: var(--ink-soft);
+    transition: background-color 0.25s linear, color 0.25s linear;
+}
+.lang-link:hover,
+.lang-link:focus-visible,
+.lang-link[aria-current="true"] { background: var(--accent); color: var(--ink); }
 .logo a {
     font-weight: 700;
     margin-left: -0.16em;
@@ -163,7 +187,6 @@ p { margin: 0 0 14px; }
 .logo.is-question a { line-height: 1.25; }
 .logo.is-question {
     min-height: 3.75em;     /* 3 lines at 1.25 */
-    margin-bottom: 26px;
 }
 
 .navigation { margin-bottom: 30px; }
@@ -245,6 +268,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
     isolation: isolate;   /* keeps the screen blend inside the tile */
     background: #f2f2f2;
     aspect-ratio: 1 / 1;
+    /* each its own pentagon (build.py); it also bounds what can be clicked */
+    clip-path: var(--shape, none);
     /* entrance state; cleared by .in */
     opacity: 0;
     transform: translate3d(0, 26px, 0);
@@ -286,7 +311,8 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .tile:hover::after,
 .tile:focus-visible::after { opacity: 1; }
 
-.tile:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* an outline would be cut away with the corners; the duotone marks focus */
+.tile:focus-visible { outline: none; }
 
 /* --- Upcoming, on the front page --------------------------------------------
    The listing she sent, at this site's scale and in its colours: the day set
@@ -622,7 +648,9 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
         justify-content: space-between;
         height: 30px;
     }
+    .brand { flex: 1; min-width: 0; align-items: center; margin: 0; }
     .logo { margin: 0; line-height: 30px; }
+    .lang { padding-top: 0; font-size: 12px; }
     /* a question is longer than a name: shrink it and hold it to two lines
        so the bar keeps its height */
     .logo.is-question {
