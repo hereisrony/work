@@ -110,6 +110,9 @@ WORK_SEO = {
     "mesyeux":
         "A music video for Garden City Movement that brings ten years of "
         "medium-format portraits to life with early generative video.",
+    "women-in-ai":
+        "An AI musical made in 36 hours for a generative-video contest, in "
+        "which women rob an AI company run by identical tech founders.",
     "from-accents-to-ai":
         "A talk at Concordia University on language standardization through "
         "technology.",
@@ -247,7 +250,21 @@ def page_body(href, body):
     html = tidy_headings(lazy_iframes(strip_inline_styles(body)))
     if href == "/upcoming/":
         html = one_list(html)
-    return mark_dates(html)
+    return page_players(mark_dates(html))
+
+
+def page_players(html):
+    """A player on a text page, from a marker <!--reel:slug|Name|link-->.
+
+    The still is poster-<slug>-640/1280 in assets/img, the same as a
+    project's; the link is what plays when it is clicked."""
+    def swap(m):
+        slug, name, link = m.group(1).split("|")
+        src = embed_url(link)
+        if not src:
+            return ""
+        return player_frame(src, {"slug": slug, "title": name, "video": link}, link)
+    return re.sub(r"<!--reel:(.*?)-->", swap, html)
 
 
 def tidy_headings(html):
@@ -778,7 +795,7 @@ def build():
                 + "\n".join('    <button type="button" class="filter" data-filter="%s" '
                              'aria-pressed="false" hidden>%s</button>' % (esc(k), esc(k))
                              for k in kinds)
-                + '\n    <a class="filter-blog" href="%s" target="_blank" rel="noopener">writing</a>' % BLOG
+                + '\n    <a class="filter" href="%s" target="_blank" rel="noopener">words</a>' % BLOG
                 + '\n  </h2>')
     write("index.html", document(
         title=tab_title(),
