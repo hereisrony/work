@@ -345,13 +345,16 @@ JSONLD = {
     "@id": PERSON_ID,
     "name": "Rony Efrat",
     "url": SITE,
-    "alternateName": "Rony Férat",
+    "alternateName": ["Rony Férat", "Rony Ferat"],
     "jobTitle": "Filmmaker, Artist, Researcher and Educator",
     "nationality": {"@type": "Country", "name": "France"},
     "image": SITE + SOCIAL_IMAGE[0],
     "homeLocation": {"@type": "Place", "name": "Paris, France"},
-    "worksFor": {"@type": "Organization", "name": "KarmaLab",
-                 "url": "https://www.karmalab.tech"},
+    "worksFor": [
+        {"@type": "Organization", "name": "KarmaLab",
+         "url": "https://www.karmalab.tech"},
+        {"@type": "CollegeOrUniversity", "name": "Sciences Po"},
+    ],
     "description": SEO["/"],
     "alumniOf": {
         "@type": "CollegeOrUniversity",
@@ -369,6 +372,8 @@ JSONLD = {
         "https://www.instagram.com/hereisrony/",
         "https://www.behance.net/hereisrony",
         "https://rony.blog",
+        "https://www.wikidata.org/wiki/Q141803686",
+        "https://vimeo.com/hereisrony",
     ],
 }
 
