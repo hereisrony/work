@@ -348,7 +348,7 @@ JSONLD = {
     "alternateName": ["Rony Férat", "Rony Ferat"],
     "jobTitle": "Filmmaker, Artist, Researcher and Educator",
     "nationality": {"@type": "Country", "name": "France"},
-    "image": SITE + SOCIAL_IMAGE[0],
+    "image": SITE + "/assets/img/rony-efrat-portrait.jpg",
     "homeLocation": {"@type": "Place", "name": "Paris, France"},
     "worksFor": [
         {"@type": "Organization", "name": "KarmaLab",
