@@ -34,7 +34,7 @@ tools/make-icons.py     cuts the mark down: favicons and the social card
 
 A black stone on the accent, the same mark rony.blog carries.
 `assets/img/mark.png` is the 1024px master; `tools/make-icons.py` reduces it to
-the favicon, the icon a phone keeps on its home screen, and `mark-card.png`,
+the favicon (192px, plus a root `favicon.ico`, since Google wants a multiple of 48), the icon a phone keeps on its home screen, and `mark-card.png`,
 the 1200×630 card a shared link to the front page opens with. That script needs
 Pillow, which `build.py` deliberately does not — the build stays stdlib-only,
 so the icons are made once and committed. Run it if the mark changes.

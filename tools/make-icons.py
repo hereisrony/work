@@ -28,9 +28,13 @@ def write(path, img):
     print("%-38s %s" % (path, "x".join(str(v) for v in img.size)))
 
 
-# the tab (64px so it stays sharp on a dense screen), and the icon a phone
-# keeps on its home screen
-write("assets/favicon.png", mark(64))
+# the tab icon. Google only shows a favicon whose side is a multiple of 48px
+# (and at least 48), so it is 192 rather than 64; browsers scale it down.
+# /favicon.ico is the fallback crawlers look for at the root unasked.
+write("assets/favicon.png", mark(192))
+MASTER.save("favicon.ico", sizes=[(48, 48), (96, 96)])
+print("%-38s 48x48, 96x96" % "favicon.ico")
+# the icon a phone keeps on its home screen
 write("assets/apple-touch-icon.png", mark(180))
 
 # the card a shared link opens with: the master's green runs to the edges, so
