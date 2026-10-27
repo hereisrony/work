@@ -154,8 +154,7 @@ SEO = {
              "systems themselves."),
     "/press/": ("Interviews and critical writing on Rony Efrat\u2019s films, "
                 "exhibitions, research and work with technology. Selected coverage "
-                "includes Arte, Forbes, Esprit, Fisheye, Hyperallergic and "
-                "Lib\u00e9ration."),
+                "includes Arte, Forbes, Esprit, Fisheye and Hyperallergic."),
 }
 
 # And hers for each project, keyed by slug. Every project has one; the
@@ -257,7 +256,7 @@ SEO_FR = {
              "ces systèmes de l’intérieur."),
     "/press/": ("Entretiens et textes critiques sur les films, expositions, "
                 "recherches et travaux technologiques de Rony Efrat, dans ARTE, "
-                "Forbes, Esprit, Fisheye, Hyperallergic et Libération."),
+                "Forbes, Esprit, Fisheye et Hyperallergic."),
 }
 
 WORK_SEO_FR = {
