@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ALTER</title>
+<style>
+  :root { --bg:#fafaf8; --fg:#161616; --mute:#6b6b66; --line:#dcdcd6; --card:#fff; --acc:#c8432b; --ok:#2f7d4f; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141413; --fg:#ecece8; --mute:#9a9a92; --line:#33332f; --card:#1c1c1a; --acc:#e8664d; --ok:#5fb283; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui,sans-serif; }
+  main { max-width:960px; margin:0 auto; padding:32px 16px 80px; }
+  h1 { font-size:22px; letter-spacing:.14em; margin:0 0 4px; }
+  .sub { color:var(--mute); margin:0 0 28px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  h2 { font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); margin:0 0 10px; }
+  .drop { border:1.5px dashed var(--line); border-radius:8px; padding:22px; text-align:center; color:var(--mute); cursor:pointer; }
+  .drop.over { border-color:var(--acc); color:var(--fg); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .chip { border:1px solid var(--line); background:none; color:var(--fg); border-radius:99px; padding:5px 12px; cursor:pointer; font:inherit; font-size:13px; }
+  .chip:hover { border-color:var(--acc); }
+  textarea { width:100%; min-height:84px; margin-top:10px; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); font:inherit; resize:vertical; }
+  button.go { background:var(--acc); color:#fff; border:0; border-radius:8px; padding:10px 18px; font:inherit; font-weight:600; cursor:pointer; }
+  button.go:disabled { opacity:.45; cursor:default; }
+  button.alt { background:none; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:10px 18px; font:inherit; cursor:pointer; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:640px) { .pair { grid-template-columns:1fr; } }
+  video, .sheet { width:100%; border-radius:8px; background:#000; }
+  .cap { font-size:12px; color:var(--mute); margin:4px 0 0; }
+  .thumbs { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .thumbs img { height:56px; border-radius:6px; border:1px solid var(--line); }
+  .flag { color:var(--acc); } .ok { color:var(--ok); }
+  label { font-size:13px; color:var(--mute); display:inline-flex; gap:6px; align-items:center; }
+  #status { color:var(--mute); margin:10px 0 0; min-height:1.4em; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ALTER</h1>
+  <p class="sub">Name what to change in a finished video. Acting, lip sync, camera and sound stay. Local tool, not published.</p>
+
+  <section>
+    <h2>1 · Source video</h2>
+    <div class="drop" id="dropVideo">Drop the video here or click (MP4 or MOV, 1.8–30 s)</div>
+    <input type="file" id="fileVideo" accept="video/mp4,video/quicktime" class="hidden">
+    <div id="srcInfo" class="cap"></div>
+  </section>
+
+  <section>
+    <h2>2 · What to change</h2>
+    <div class="row" id="presets"></div>
+    <textarea id="prompt" placeholder="e.g. Replace the woman's jacket with a red leather biker jacket"></textarea>
+    <div class="row" style="margin-top:10px">
+      <div class="drop" id="dropImg" style="padding:8px 14px">+ reference images (new actor, outfit, product)</div>
+      <input type="file" id="fileImg" accept="image/*" multiple class="hidden">
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="row" style="margin-top:12px">
+      <label><input type="checkbox" id="keepAudio" checked> keep original sound</label>
+      <label><input type="checkbox" id="editing" checked> edit mode (keeps length and framing)</label>
+    </div>
+  </section>
+
+  <section>
+    <h2>3 · Draft, then finish</h2>
+    <div class="row">
+      <button class="go" id="draftBtn" disabled>Draft at 480p</button>
+      <button class="alt hidden" id="finalBtn">Finish at 1080p</button>
+    </div>
+    <p id="status"></p>
+  </section>
+
+  <section id="result" class="hidden">
+    <h2>Result</h2>
+    <div class="pair">
+      <div><video id="vSrc" controls loop muted playsinline></video><p class="cap">Source</p></div>
+      <div><video id="vOut" controls loop playsinline></video><p class="cap" id="outCap">Result</p></div>
+    </div>
+    <div id="report" style="margin-top:14px"></div>
+    <img id="sheet" class="sheet" alt="source over result, evenly spaced frames">
+    <p class="cap">Top row source, bottom row result. <a id="dl" download>Download</a></p>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const PRESETS = [
+  ["Swap actor",   "Replace the actor in @Video1 with the person in @Image1."],
+  ["Swap outfit",  "Change what the person is wearing to "],
+  ["Swap product", "Replace the product being held with @Image1."],
+  ["New location", "Move the scene to "],
+  ["Anime",        "Restyle the whole take as anime."],
+  ["3D",           "Restyle the whole take as a stylised 3D animation."],
+  ["Claymation",   "Restyle the whole take as claymation."],
+];
+let video = null, images = [], jobId = null, timer = null;
+
+PRESETS.forEach(([name, text]) => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = name;
+  b.onclick = () => { $("prompt").value = text; $("prompt").focus(); };
+  $("presets").appendChild(b);
+});
+
+function wireDrop(zone, input, onFiles) {
+  zone.onclick = () => input.click();
+  zone.ondragover = e => { e.preventDefault(); zone.classList.add("over"); };
+  zone.ondragleave = () => zone.classList.remove("over");
+  zone.ondrop = e => { e.preventDefault(); zone.classList.remove("over"); onFiles([...e.dataTransfer.files]); };
+  input.onchange = () => onFiles([...input.files]);
+}
+
+async function upload(file, kind) {
+  const r = await fetch(`/api/upload?kind=${kind}&name=${encodeURIComponent(file.name)}`, { method: "POST", body: file });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error);
+  return j;
+}
+
+function status(t, bad) { $("status").textContent = t; $("status").className = bad ? "flag" : ""; }
+
+wireDrop($("dropVideo"), $("fileVideo"), async ([f]) => {
+  if (!f) return;
+  $("srcInfo").textContent = "Uploading…";
+  try {
+    video = await upload(f, "video");
+    const i = video.info;
+    $("srcInfo").textContent = `${video.name} · ${i.width}×${i.height} · ${i.fps.toFixed(0)} fps · ${i.duration.toFixed(1)} s · ${i.has_audio ? "has audio" : "no audio"}`;
+    $("vSrc").src = video.local;
+    $("draftBtn").disabled = false;
+  } catch (e) { $("srcInfo").textContent = e.message; }
+});
+
+wireDrop($("dropImg"), $("fileImg"), async files => {
+  for (const f of files) {
+    try {
+      const j = await upload(f, "image");
+      images.push(j);
+      const img = document.createElement("img");
+      img.src = j.local; img.title = `@Image${images.length}`;
+      $("thumbs").appendChild(img);
+    } catch (e) { status(e.message, true); }
+  }
+});
+
+async function start(path, body) {
+  status("Submitting…");
+  const r = await fetch(path, { method: "POST", body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok) { status(j.error, true); return; }
+  jobId = j.id;
+  $("draftBtn").disabled = true; $("finalBtn").disabled = true;
+  clearInterval(timer);
+  timer = setInterval(poll, 4000); poll();
+}
+
+$("draftBtn").onclick = () => start("/api/run", {
+  video_id: video.id, image_ids: images.map(i => i.id),
+  prompt: $("prompt").value, keep_audio: $("keepAudio").checked,
+  task: $("editing").checked ? "editing" : "reference",
+});
+$("finalBtn").onclick = () => start("/api/finish", { job_id: jobId });
+
+async function poll() {
+  const j = await (await fetch("/api/job/" + jobId)).json();
+  if (j.state === "queued") {
+    status(j.log && j.log.length ? j.log[j.log.length - 1] : (j.final ? "Generating 1080p…" : "Generating draft…"));
+  } else if (j.state === "error") {
+    clearInterval(timer); status(j.error, true);
+    $("draftBtn").disabled = false; $("finalBtn").disabled = false;
+  } else if (j.state === "done") {
+    clearInterval(timer); show(j);
+    $("draftBtn").disabled = false; $("finalBtn").disabled = false;
+  }
+}
+
+function show(j) {
+  const d = j.final || j.draft;
+  status(j.final ? "Final ready." : "Draft ready. Check it, then finish at 1080p or adjust the prompt and draft again.");
+  $("result").classList.remove("hidden");
+  $("vOut").src = d.video; $("dl").href = d.video;
+  $("outCap").textContent = j.final ? "Result, 1080p" : "Result, 480p draft";
+  $("sheet").src = d.sheet + "?t=" + Date.now();
+  const r = d.report;
+  $("report").innerHTML = r.ok
+    ? `<span class="ok">Nothing drifted.</span> Motion match ${r.motion_corr}, layout match ${r.layout_corr_mean}.`
+    : `<strong class="flag">Check these:</strong><ul>${r.flags.map(f => `<li>${f}</li>`).join("")}</ul>`;
+  $("finalBtn").classList.remove("hidden");
+}
+</script>
+</body>
+</html>

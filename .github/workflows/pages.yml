@@ -36,6 +36,10 @@ jobs:
         with:
           enablement: true
 
+      # ALTER is a local-only tool; keep it out of the published site.
+      - name: Keep unpublished tools out
+        run: rm -rf tools/alter
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
