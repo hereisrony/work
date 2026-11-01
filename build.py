@@ -377,10 +377,18 @@ JSONLD = {
 }
 
 
-def person_ld(lang):
+# Said in the metadata only, never in the visible first-person bio.
+ABOUT_PERSON_DESC = {
+    "en": "Rony Efrat is a French artist, writer, filmmaker and researcher.",
+    "fr": "Rony Efrat est une artiste, \u00e9crivaine, cin\u00e9aste et chercheuse "
+          "fran\u00e7aise.",
+}
+
+
+def person_ld(lang, description=None):
     """Who she is, in the page's language."""
     return dict(JSONLD, jobTitle=UI[lang]["job"], knowsAbout=UI[lang]["knows"],
-                description=(SEO_FR if lang == "fr" else SEO)["/"],
+                description=description or (SEO_FR if lang == "fr" else SEO)["/"],
                 url=SITE + lp(lang, "/"))
 
 
@@ -937,7 +945,8 @@ LANG_JS = ("<script>(function(){var d=document.documentElement,a=d.getAttribute(
 
 
 def document(*, title, description, canonical, body, active, og_image=None,
-             jsonld=False, body_class="", extra_ld=None, lang="en", og_alt=None):
+             jsonld=False, body_class="", extra_ld=None, lang="en", og_alt=None,
+             person_desc=None):
     """canonical is the page's path in English; the French one follows."""
     path, canonical = canonical, lp(lang, canonical)
     other = "fr" if lang == "en" else "en"
@@ -982,7 +991,7 @@ def document(*, title, description, canonical, body, active, og_image=None,
     head.append('<meta property="og:image:alt" content="%s">' % esc(alt))
     head.append('<meta name="twitter:image" content="%s%s">' % (SITE, img))
     head.append('<meta name="twitter:image:alt" content="%s">' % esc(alt))
-    lds = ([person_ld(lang)] if jsonld else []) + (
+    lds = ([person_ld(lang, person_desc)] if jsonld else []) + (
         extra_ld if isinstance(extra_ld, list) else [extra_ld] if extra_ld else [])
     for ld in lds:
         head.append('<script type="application/ld+json">%s</script>'
@@ -1127,6 +1136,7 @@ def build_lang(lang, posts, pages):
             active=href,
             body_class="text-page",
             jsonld=(href == "/about/"),
+            person_desc=ABOUT_PERSON_DESC[lang] if href == "/about/" else None,
             extra_ld=crumbs_ld(lang, [(page["title"], href)]),
             lang=lang,
         ))
