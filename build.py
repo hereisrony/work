@@ -129,7 +129,7 @@ MONTHS_FR = ("janvier", "février", "mars", "avril", "mai", "juin", "juillet",
 SEO = {
     "/": ("Rony Efrat is a French multimedia artist, researcher and educator, "
           "working across film, language, technology and systems."),
-    "/about/": ("Rony Efrat is a filmmaker, artist, researcher and educator whose "
+    "/about/": ("Rony Efrat is a French artist, writer, filmmaker and researcher whose "
                 "practice moves between cinema, language, archives, technology and "
                 "public systems. Her work has been presented by ARTE, France "
                 "T\u00e9l\u00e9visions, Le Fresnoy, ADAGP and the Venice "
@@ -230,8 +230,8 @@ SEO_FR = {
     "/": ("Rony Efrat est une artiste multimédia, chercheuse et enseignante "
           "française, qui travaille entre cinéma, langage, technologie et "
           "systèmes."),
-    "/about/": ("Rony Efrat est réalisatrice, artiste, chercheuse et enseignante. Sa "
-                "pratique circule entre cinéma, langage, archives, technologie et "
+    "/about/": ("Rony Efrat est une artiste, écrivaine, cinéaste et chercheuse française "
+                "dont la pratique circule entre cinéma, langage, archives, technologie et "
                 "systèmes publics. Son travail a été présenté par ARTE, France "
                 "Télévisions, Le Fresnoy, l’ADAGP et la Biennale d’architecture "
                 "de Venise."),
