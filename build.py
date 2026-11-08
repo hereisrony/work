@@ -363,8 +363,6 @@ JSONLD = {
     "sameAs": [
         "https://www.imdb.com/name/nm15203874/",
         "https://www.lefresnoy.net/en/ecole/etudiant/551/",
-        "https://www.linkedin.com/in/hereisrony",
-        "https://www.instagram.com/hereisrony/",
         "https://www.behance.net/hereisrony",
         "https://rony.blog",
         "https://www.wikidata.org/wiki/Q141803686",
