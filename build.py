@@ -73,6 +73,7 @@ UI = {
                 "/academia/": "academia", "/ai/": "ai", "/press/": "press"},
         "upcoming": "upcoming",
         "more_upcoming": "more upcoming",
+        "all": "all",
         "filters": {"film": "film", "exhibition": "exhibition", "talk": "talk",
                     "site-specific": "site-specific", "performance": "performance",
                     "music": "music"},
@@ -98,6 +99,7 @@ UI = {
                 "/academia/": "recherche", "/ai/": "ia", "/press/": "presse"},
         "upcoming": "à venir",
         "more_upcoming": "tout l’agenda",
+        "all": "tous",
         "filters": {"film": "film", "exhibition": "exposition", "talk": "conférence",
                     "site-specific": "in-situ", "performance": "performance",
                     "music": "musique"},
@@ -1083,11 +1085,23 @@ def tile(post, lang="en", eager=False):
     }
 
 
+def grid_order(posts):
+    """The grid's order: the films first, then everything else from the most
+    recent project year back. Ties keep the order of the content file."""
+    def year(p):
+        m = re.search(r"\d{4}", p.get("subtitle", ""))
+        return int(m.group()) if m else 0
+    films = [p for p in posts if p.get("category") == "film"]
+    rest = sorted((p for p in posts if p.get("category") != "film"),
+                  key=year, reverse=True)
+    return films + rest
+
+
 def build_lang(lang, posts, pages):
     """The front page, the text pages and every project, in one language."""
     # --- index ---------------------------------------------------------------
     grid = ('  <div class="grid-wrap">\n    <div class="grid">\n%s\n    </div>\n  </div>'
-            % "\n".join(tile(p, lang, eager=i < 3) for i, p in enumerate(posts)))
+            % "\n".join(tile(p, lang, eager=i < 3) for i, p in enumerate(grid_order(posts))))
     # The front page starts with everything; these narrow it. Without script
     # the buttons would do nothing, so they stay hidden until it runs.
     kinds = [k for k in FILTER_ORDER if any(p.get("category") == k for p in posts)]
@@ -1096,8 +1110,9 @@ def build_lang(lang, posts, pages):
                 % words["filter_aria"]
                 + "\n".join('    <button type="button" class="filter" data-filter="%s" '
                              'aria-pressed="false" hidden>%s</button>'
-                             % (esc(k), esc(words["filters"][k]))
-                             for k in kinds)
+                             % (esc(k), esc(words["all"] if k == "all"
+                                            else words["filters"][k]))
+                             for k in ["all"] + kinds)
                 + '\n    <a class="filter" href="%s" target="_blank" rel="noopener">%s</a>'
                 % (BLOG, esc(words["words"]))
                 + '\n  </h2>')
