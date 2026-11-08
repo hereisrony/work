@@ -1086,15 +1086,12 @@ def tile(post, lang="en", eager=False):
 
 
 def grid_order(posts):
-    """The grid's order: the films first, then everything else from the most
-    recent project year back. Ties keep the order of the content file."""
+    """The grid's order: the most recent project year first. Ties keep the
+    order of the content file."""
     def year(p):
         m = re.search(r"\d{4}", p.get("subtitle", ""))
         return int(m.group()) if m else 0
-    films = [p for p in posts if p.get("category") == "film"]
-    rest = sorted((p for p in posts if p.get("category") != "film"),
-                  key=year, reverse=True)
-    return films + rest
+    return sorted(posts, key=year, reverse=True)
 
 
 def build_lang(lang, posts, pages):
