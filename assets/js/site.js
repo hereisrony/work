@@ -108,7 +108,7 @@
         var buttons = $$('button.filter', filterBar);
         var apply = function (kind) {
             buttons.forEach(function (b) {
-                b.setAttribute('aria-pressed', String(b.dataset.filter === kind));
+                b.setAttribute('aria-pressed', String(b.dataset.filter === (kind || 'all')));
             });
             $$('.tile').forEach(function (t) {
                 var show = !kind || t.dataset.category === kind;
@@ -125,8 +125,8 @@
         buttons.forEach(function (b) { b.hidden = false; });
         buttons.forEach(function (b) {
             b.addEventListener('click', function () {
-                // choosing the one already chosen shows everything
-                var kind = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.filter;
+                // "all", or choosing the one already chosen, shows everything
+                var kind = (b.getAttribute('aria-pressed') === 'true' || b.dataset.filter === 'all') ? '' : b.dataset.filter;
                 apply(kind);
                 history.replaceState(null, '', '#' + (kind || 'all'));
             });
