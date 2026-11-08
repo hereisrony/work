@@ -500,6 +500,10 @@ def page_players(html, lang="en"):
         slug, name, link = m.group(1).split("|")
         src = embed_url(link)
         if not src:
+            # a post that cannot be embedded: its still links out to it
+            if LINK_OUT.match(link):
+                return player_frame(None, {"slug": slug, "title": name,
+                                           "video": link, "_lang": lang}, link)
             return ""
         return player_frame(src, {"slug": slug, "title": name, "video": link,
                                   "_lang": lang}, link)
@@ -599,7 +603,7 @@ VIDEO_HOSTS = (
 
 # Sites that will not be shown inside another page (they send
 # X-Frame-Options), so the still is a link out to them instead of a player.
-LINK_OUT = re.compile(r"^https?://(?:www\.)?(?:fawesome\.tv|france\.tv)/")
+LINK_OUT = re.compile(r"^https?://(?:(?:www\.)?(?:fawesome\.tv|france\.tv)/|lnkd\.in/)")
 
 PLAY_ICON = ('<svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">'
              '<circle cx="40" cy="40" r="40"/>'
