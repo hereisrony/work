@@ -99,7 +99,7 @@ UI = {
                 "/academia/": "recherche", "/ai/": "ia", "/press/": "presse"},
         "upcoming": "à venir",
         "more_upcoming": "tout l’agenda",
-        "all": "tous",
+        "all": "tout",
         "filters": {"film": "film", "exhibition": "exposition", "talk": "conférence",
                     "site-specific": "in-situ", "performance": "performance",
                     "music": "musique"},

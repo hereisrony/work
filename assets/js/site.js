@@ -117,10 +117,10 @@
             });
         };
         var fromHash = function () {
-            // the front page opens on film; #all is everything
+            // the front page opens on everything; #film and the like narrow it
             var k = decodeURIComponent(location.hash.slice(1));
             if (k === 'all') return '';
-            return buttons.some(function (b) { return b.dataset.filter === k; }) ? k : 'film';
+            return buttons.some(function (b) { return b.dataset.filter === k; }) ? k : '';
         };
         buttons.forEach(function (b) { b.hidden = false; });
         buttons.forEach(function (b) {
