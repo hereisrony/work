@@ -1086,10 +1086,13 @@ def tile(post, lang="en", eager=False):
 
 
 def grid_order(posts):
-    """The grid's order: the most recent project year first. Ties keep the
-    order of the content file."""
+    """The grid's order: what is ongoing ("present") first, then the most
+    recent project year. Ties keep the order of the content file."""
     def year(p):
-        m = re.search(r"\d{4}", p.get("subtitle", ""))
+        sub = p.get("subtitle", "")
+        if "present" in sub:
+            return 9999
+        m = re.search(r"\d{4}", sub)
         return int(m.group()) if m else 0
     return sorted(posts, key=year, reverse=True)
 
