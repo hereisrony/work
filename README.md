@@ -344,4 +344,4 @@ node tools/endoforeign.mjs pack
 ```
 
 Older versions live in `private/endoforeign/versions/<page>/<date>/`; `dates.json` holds
-the current version's date per page. A second version on the same day becomes `2026-11-20-2`.
+the current version's date per page. A second version on the same day gets the id `2026-11-20-2` internally; readers only ever see dates.

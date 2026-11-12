@@ -242,10 +242,8 @@
   }
   var LOCALES = { en: 'en-GB', fr: 'fr-FR', ko: 'ko-KR' };
   function fmtVersion(v) {
-    var d = new Date(v.date + 'T12:00:00'), out = v.date;
-    try { out = new Intl.DateTimeFormat(LOCALES[state.lang], { dateStyle: 'long' }).format(d); } catch (e) {}
-    var n = /-(\d+)$/.exec(v.id.slice(10));
-    return out + (n ? ' · ' + n[1] : '');
+    var d = new Date(v.date + 'T12:00:00');
+    try { return new Intl.DateTimeFormat(LOCALES[state.lang], { dateStyle: 'long' }).format(d); } catch (e) { return v.date; }
   }
   function verNow() { return state.ver || ''; }
   // a comment belongs to one version of a page; comments saved before versions existed belong to the oldest
