@@ -159,3 +159,11 @@ body.shielded #app,body.shielded .wm{visibility:hidden}
 
 .doc a.back{display:inline-flex;align-items:center;justify-content:center;width:48px;height:44px;margin:-6px 0 18px -10px;text-decoration:none}
 .doc a.back:hover{background:var(--accent)}
+
+/* menu to the other pages, at the top of every page but the home page */
+.pagebar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 30px}
+.doc .pagebar a.back{margin:0 0 0 -10px}
+.menu{display:flex;flex-wrap:wrap;gap:8px}
+.doc .menu a{display:inline-block;padding:8px 14px;border:2px solid var(--ink);text-decoration:none;font-weight:700;font-size:16px;line-height:1.3}
+.doc .menu a:hover,.doc .menu a:focus-visible{background:var(--accent)}
+@media(max-width:560px){.doc .menu a{padding:7px 11px;font-size:15px}}
