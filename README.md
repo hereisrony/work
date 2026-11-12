@@ -312,3 +312,23 @@ Motion, and only motion, was added to the original:
 
 Nothing on the site links to Tumblr. The old `/post/<id>/<slug>` addresses are
 kept as redirects into `/work/<slug>/` so existing inbound links still land.
+
+## /endoforeign/ (private)
+
+A password-gated, unlisted workspace for the script of *The End of Foreign*
+(en / fr / ko, comments on every section). The repo is public, so the pages
+are **never committed as text**: `endoforeign/vault.json` is the content,
+AES-GCM encrypted (PBKDF2, 600k rounds) and decrypted in the browser.
+`app.js` / `app.css` are the public shell and hold no secrets.
+
+```sh
+node tools/endoforeign.mjs unpack   # vault -> private/endoforeign/*.md (git-ignored)
+# edit <page>.<en|fr|ko>.md; sections are "## Title {#id}", ids must match across languages
+node tools/endoforeign.mjs pack     # re-encrypt (password from $ENDOFOREIGN_PASSWORD or prompt)
+```
+
+Pages: home, synopsis, statement, notebook, characters, drafts, moodboard.
+Missing fr/ko files fall back to English with a notice. Comments live in a
+Google Sheet through `tools/endoforeign-comments.gs` (setup steps at the top of
+that file); its URL and token go in `private/endoforeign/config.json`.
+Changing the password = pack again with a new one.

@@ -1,0 +1,119 @@
+/* the end of foreign — private workspace
+   Same language as ronyefrat.work: white, black, one green, one monospace.
+   The green is a ground (a marker behind black type), never a letter colour. */
+
+:root{
+  --ink:#000; --soft:#5c635c; --rule:#d3dad3; --paper:#fff; --accent:#00ff33;
+  --measure:46rem;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+@font-face{font-family:"Inconsolata";font-weight:400 700;font-display:swap;
+  src:url(../assets/fonts/inconsolata-latin.woff2) format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Inconsolata";font-weight:400 700;font-display:swap;
+  src:url(../assets/fonts/inconsolata-latin-ext.woff2) format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font:400 17px/1.7 Consolas,"Inconsolata",Menlo,Monaco,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans Mono CJK KR","Noto Sans KR",monospace;
+  -webkit-font-smoothing:antialiased;
+}
+html[lang="ko"] body{line-height:1.85;word-break:keep-all}
+[hidden]{display:none!important}
+a{color:inherit}
+p{margin:0 0 1em}
+h1,h2,h3{margin:0;font-weight:700;line-height:1.25}
+button,input,textarea{font:inherit;color:inherit}
+
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;box-shadow:0 0 0 6px var(--accent)}
+
+/* --- gate --------------------------------------------------------------- */
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.gate form{width:100%;max-width:26rem}
+.gate-title{font-size:30px;font-weight:700;line-height:1.1;margin:0 0 6px}
+.gate-sub{color:var(--soft);margin:0 0 32px}
+.gate label{display:block;font-size:15px;margin-bottom:6px}
+.gate-row{display:flex;gap:8px}
+.gate-row input{flex:1;min-width:0}
+input[type=password],input[type=text],textarea{
+  width:100%;padding:11px 12px;background:var(--paper);
+  border:2px solid var(--ink);border-radius:0;font-size:16px;line-height:1.5}
+textarea{min-height:7.5em;resize:vertical}
+.btn,.gate-row button,.cform button{
+  padding:11px 20px;background:var(--ink);color:var(--paper);
+  border:2px solid var(--ink);border-radius:0;cursor:pointer;font-weight:700;font-size:16px}
+.btn:hover,.gate-row button:hover,.cform button:hover{background:var(--accent);color:var(--ink)}
+.cform button[disabled]{opacity:.5;cursor:default;background:var(--ink);color:var(--paper)}
+.gate .check{display:flex;gap:8px;align-items:center;margin:14px 0 0;color:var(--soft);font-size:15px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:#000;margin:0}
+.msg{min-height:1.7em;margin:14px 0 0;font-size:15px}
+.gate .langs{margin-top:28px}
+
+/* --- language switch ---------------------------------------------------- */
+.langs{display:inline-flex;gap:4px}
+.langs button{background:none;border:2px solid transparent;padding:2px 8px;cursor:pointer;font-size:15px}
+.langs button:hover{border-color:var(--ink)}
+.langs button[aria-pressed="true"]{background:var(--accent);border-color:var(--ink);font-weight:700}
+
+/* --- top bar ------------------------------------------------------------ */
+.top{border-bottom:1px solid var(--rule);}
+.top-in{max-width:var(--measure);margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;text-decoration:none;margin-right:auto}
+.brand:hover{background:var(--accent)}
+.wip{color:var(--soft);font-size:14px}
+.lock{background:none;border:0;color:var(--soft);cursor:pointer;font-size:14px;text-decoration:underline;padding:2px 4px}
+.lock:hover{color:var(--ink)}
+.notice{width:calc(100% - 48px);max-width:calc(var(--measure) - 48px);margin:20px auto 0;padding:12px 16px;font-size:15px;line-height:1.55;
+  border-left:6px solid var(--accent);background:#f3f6f3}
+.notice button{background:none;border:0;padding:0;font-weight:700;text-decoration:underline;cursor:pointer}
+
+/* --- document ----------------------------------------------------------- */
+.doc{max-width:var(--measure);margin:0 auto;padding:40px 24px 80px;outline:none}
+.doc h1{font-size:34px;margin-bottom:6px}
+.sub{color:var(--soft);margin-bottom:28px}
+.doc h2{font-size:23px;margin:56px 0 14px;padding-top:18px;border-top:1px solid var(--rule)}
+.doc h3{font-size:18px;margin:28px 0 8px}
+.doc ul,.doc ol{margin:0 0 1em;padding-left:1.4em}
+.doc li{margin-bottom:.35em}
+.doc blockquote{margin:0 0 1em;padding-left:16px;border-left:3px solid var(--ink)}
+.doc a{text-decoration-thickness:2px;text-underline-offset:3px}
+.doc a:hover{background:var(--accent)}
+.back{display:inline-block;margin-bottom:26px;font-size:15px}
+
+.doc .pages{padding:0}
+.pages{display:grid;grid-template-columns:1fr;gap:12px;margin:36px 0 8px;padding:0;list-style:none}
+@media(min-width:560px){.pages{grid-template-columns:1fr 1fr}}
+.pages a{display:flex;align-items:baseline;gap:14px;padding:20px 18px;min-height:76px;
+  border:2px solid var(--ink);text-decoration:none;font-size:19px;font-weight:700}
+.pages a:hover,.pages a:focus-visible{background:var(--accent)}
+.pages .n{font-weight:400;font-size:14px;color:var(--soft);min-width:1.6em}
+.pages a:hover .n{color:var(--ink)}
+
+/* --- comments ----------------------------------------------------------- */
+.comments{margin-top:22px}
+.comments summary{cursor:pointer;display:inline-block;font-weight:700;padding:3px 10px 3px 4px;margin-left:-4px;list-style:none}
+.comments summary::-webkit-details-marker{display:none}
+.comments summary::before{content:"+";display:inline-block;width:1.2em;text-align:center}
+.comments details[open] summary::before{content:"−"}
+.comments summary:hover{background:var(--accent)}
+.cbody{margin-top:12px;padding:18px;border:1px solid var(--rule);background:#fafcfa}
+.clist{list-style:none;margin:0 0 18px;padding:0}
+.cempty{color:var(--soft);margin:0 0 16px;font-size:15px}
+.c{padding:0 0 16px;margin:0 0 16px;border-bottom:1px solid var(--rule)}
+.c:last-child{margin-bottom:0}
+.c-head{font-size:14px;color:var(--soft);margin-bottom:4px}
+.c-head b{color:var(--ink);font-size:16px}
+.c-tag{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid var(--rule);font-size:12px}
+.c-text{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.c-reply{margin:10px 0 0;padding:6px 0 6px 12px;border-left:6px solid var(--accent);white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px}
+.c-reply b{font-size:14px}
+.cform label{display:block;font-size:14px;margin:12px 0 4px;color:var(--soft)}
+.cform .row{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.cstatus{font-size:14px;color:var(--soft)}
+.cstatus.err{color:#a40000;font-weight:700}
+.pending-note{font-size:14px;margin:0 0 14px;padding:8px 12px;border-left:6px solid #000;background:#fff}
+
+.foot{max-width:var(--measure);margin:0 auto;padding:0 24px 48px;color:var(--soft);font-size:14px}
+@media(prefers-reduced-motion:no-preference){.pages a,.btn,.cform button{transition:background-color .15s linear}}
