@@ -11,7 +11,7 @@
 
   var UI = {
     en: {
-      notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
+      veil: 'Hidden while this window is not active. Click to continue.', notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
       password: 'password', enter: 'enter',
       checking: 'opening…',
       wrong: 'That password does not open this page.', fail: 'Could not load the page. Try again.',
@@ -30,7 +30,7 @@
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
-      notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
+      veil: 'Masqué tant que cette fenêtre n’est pas active. Cliquez pour continuer.', notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
       password: 'mot de passe', enter: 'entrer',
       checking: 'ouverture…',
       wrong: 'Ce mot de passe n’ouvre pas cette page.', fail: 'Impossible de charger la page. Réessayez.',
@@ -49,7 +49,7 @@
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
-      notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
+      veil: '이 창이 활성 상태가 아닌 동안에는 숨겨집니다. 계속하려면 클릭하세요.', notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
       password: '비밀번호', enter: '입장',
       checking: '여는 중…',
       wrong: '비밀번호가 맞지 않습니다.', fail: '페이지를 불러오지 못했습니다. 다시 시도해 주세요.',
@@ -150,6 +150,7 @@
     var data;
     try { data = await decrypt(vault, pw); } catch (err) { err.kind = 'wrong'; throw err; }
     state.content = data; state.name = name;
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawMark); drawMark();
     $('gate').hidden = true;
     $('app').hidden = false;
     applyChrome();
@@ -493,6 +494,62 @@
   document.addEventListener('dragstart', function (e) { if (!inField(e)) e.preventDefault(); }, true);
   document.addEventListener('contextmenu', function (e) {
     if (window.matchMedia && matchMedia('(pointer: fine)').matches && !inField(e)) e.preventDefault();
+  }, true);
+
+  /* ---------- watermark + shield ----------
+     Neither can stop a screenshot (the operating system takes those). The watermark makes a
+     leaked screenshot traceable to the name typed at the gate; the shield hides the page when
+     the window loses focus or a screenshot shortcut is pressed, which catches some tools. */
+  var wm = $('wm'), wmStyle = '';
+  function drawMark() {
+    if (!state.name) return;
+    var d = new Date(), pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    var label = state.name.slice(0, 40) + ' · ' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    var font = '700 16px "CMU Sans","Noto Sans KR",sans-serif', dpr = 2;
+    var probe = document.createElement('canvas').getContext('2d'); probe.font = font;
+    var w = Math.max(360, Math.ceil(probe.measureText(label).width) + 90), h = 230;
+    var c = document.createElement('canvas'); c.width = w * dpr; c.height = h * dpr;
+    var x = c.getContext('2d'); x.scale(dpr, dpr); x.translate(w / 2, h / 2); x.rotate(-Math.PI / 9);
+    x.font = font; x.fillStyle = 'rgba(0,0,0,0.09)'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(label, 0, 0);
+    wm.hidden = false;
+    wm.style.backgroundImage = 'url(' + c.toDataURL() + ')';
+    wm.style.backgroundSize = w + 'px ' + h + 'px';
+    wmStyle = wm.getAttribute('style');
+  }
+  // put the watermark back if someone removes it or restyles it in the developer tools
+  new MutationObserver(function () {
+    if (!state.content) return;
+    if (!document.body.contains(wm)) document.body.appendChild(wm);
+    if (wm.getAttribute('style') !== wmStyle) wm.setAttribute('style', wmStyle);
+    if (wm.hidden) wm.hidden = false;
+  }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'hidden'] });
+
+  var veil = $('veil'), holdUntil = 0, holdTimer = null;
+  function shield(on) {
+    if (!state.content) return;
+    document.body.classList.toggle('shielded', on);
+    veil.hidden = !on;
+    if (on) { veil.textContent = t('veil'); }
+  }
+  function hold(ms) {
+    shield(true); holdUntil = Date.now() + ms;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(function () { if (document.hasFocus() && !document.hidden) shield(false); }, ms);
+  }
+  window.addEventListener('blur', function () { shield(true); });
+  window.addEventListener('focus', function () { if (Date.now() >= holdUntil && !document.hidden) shield(false); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) shield(true); else if (Date.now() >= holdUntil && document.hasFocus()) shield(false); });
+  veil.addEventListener('click', function () { if (Date.now() >= holdUntil) shield(false); });
+  document.addEventListener('keydown', function (e) {
+    // Cmd/Win + Shift (Mac screenshots, Windows Snipping Tool), or Print Screen
+    if ((e.key === 'Shift' && e.metaKey) || (e.key === 'Meta' && e.shiftKey) || e.key === 'PrintScreen') hold(8000);
+  }, true);
+  document.addEventListener('keyup', function (e) {
+    if (e.key === 'PrintScreen') {
+      hold(8000);
+      try { navigator.clipboard.writeText(' ').catch(function () {}); } catch (err) {}   // replace whatever the screenshot put on the clipboard
+    }
   }, true);
 
   /* ---------- start ---------- */
