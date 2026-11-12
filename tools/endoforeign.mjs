@@ -46,6 +46,8 @@ function ids(md) { return [...md.matchAll(/^## .*?(?:\{#([a-z0-9-]+)\})?\s*$/gm)
 
 const readJson = (f, d) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : d);
 const DATES = join(SRC, 'dates.json');            // { page: id of its current version } — an id is a date, "2026-11-12", or "2026-11-12-2" for a second one that day
+const IMGDIR = join(SRC, 'images');                // images/<name>.webp|jpg|png, used in pages as ![alt](img:<name>)
+const MIME = { webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif' };
 const VDIR = (p) => join(SRC, 'versions', p);     // versions/<page>/<id>/<lang>.md  = the older versions
 function readLangs(base) {
   const o = {};
@@ -76,10 +78,18 @@ async function pack() {
     }
     pages[p] = { versions };
   }
+  const images = {};
+  if (existsSync(IMGDIR))
+    for (const f of readdirSync(IMGDIR)) {
+      const m = /^([a-z0-9-]+)\.(webp|jpe?g|png|gif)$/i.exec(f);
+      if (m) images[m[1]] = `data:${MIME[m[2].toLowerCase()]};base64,${readFileSync(join(IMGDIR, f)).toString('base64')}`;
+    }
+  for (const p of Object.values(pages)) for (const v of p.versions) for (const l of LANGS) for (const m of (v[l] || '').matchAll(/\(img:([a-z0-9-]+)\)/g))
+    if (!images[m[1]]) console.warn(`warning: an image called "${m[1]}" is used but images/${m[1]}.* does not exist`);
   const pw = await password();
   const salt = randomBytes(16), iv = randomBytes(12);
   const key = await keyFor(pw, salt);
-  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify({ config, pages })));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify({ config, pages, images })));
   writeFileSync(VAULT, JSON.stringify({ v: 1, iter: ITER, salt: b64(salt), iv: b64(iv), ct: b64(new Uint8Array(ct)) }) + '\n');
   console.log('wrote endoforeign/vault.json');
 }
@@ -94,6 +104,11 @@ async function unpack() {
   mkdirSync(SRC, { recursive: true });
   writeFileSync(join(SRC, 'config.json'), JSON.stringify(data.config, null, 2) + '\n');
   const dates = readJson(DATES, {});
+  mkdirSync(IMGDIR, { recursive: true });
+  for (const [name, uri] of Object.entries(data.images || {})) {
+    const m = /^data:image\/([a-z]+);base64,(.*)$/.exec(uri);
+    if (m) writeFileSync(join(IMGDIR, `${name}.${m[1] === 'jpeg' ? 'jpg' : m[1]}`), Buffer.from(m[2], 'base64'));
+  }
   for (const [p, pg] of Object.entries(data.pages)) {
     const versions = pg.versions || [{ id: '', ...pg }];          // pages saved before versions existed
     versions.forEach((ver, i) => {

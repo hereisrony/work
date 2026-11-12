@@ -197,6 +197,7 @@
         var sec = { id: m[2] || ('s' + (out.sections.length + 1)), title: m[1].trim(), blocks: [] };
         out.sections.push(sec); target = sec.blocks; return;
       }
+      if ((m = line.match(/^!\[([^\]]*)\]\(img:([a-z0-9-]+)\)\s*$/))) { flush(); target.push({ t: 'img', alt: m[1], key: m[2] }); return; }
       if ((m = line.match(/^### (.*)$/))) { flush(); target.push({ t: 'h3', x: m[1].trim() }); return; }
       if ((m = line.match(/^> ?(.*)$/))) { flush(); target.push({ t: 'q', x: m[1] }); return; }
       if ((m = line.match(/^\s*[-*] +(.*)$/))) {
@@ -216,6 +217,10 @@
   function blocksHtml(bs, sec) {
     return bs.map(function (b, i) {
       var a = sec ? ' data-sec="' + sec + '" data-b="' + i + '"' : '';
+      if (b.t === 'img') {
+        var uri = (state.content.images || {})[b.key];
+        return uri ? '<figure class="fig"' + a + '><img src="' + uri + '" alt="' + esc(b.alt) + '" draggable="false"></figure>' : '';
+      }
       if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
       if (b.t === 'h3') return '<h3' + a + '>' + inline(b.x) + '</h3>';
       if (b.t === 'q') return '<blockquote' + a + '>' + inline(b.x) + '</blockquote>';
