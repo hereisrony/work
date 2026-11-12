@@ -55,6 +55,12 @@ function readLangs(base) {
   return o;
 }
 
+// English on this site is American. These are the British spellings and words that slip in most often.
+const BRITISH = /\b(\w*(colour|honour|favour|behaviour|neighbour|labour|humour|rumour|harbour|flavour)\w*|\w*(centre|metre|litre|theatre|fibre)s?|\w*(realis|organis|recognis|apologis|emphasis|criticis|analys|summaris|memoris|prioritis)(e|ed|es|ing|ation|ations)\b|towards|whilst|amongst|learnt|spelt|judgement|licence|defence|offence|programme|grey|cheque|travell\w+|cancell\w+|pupils?|lift|mum|maths|autumn|fortnight|cinema)\b/gi;
+function britishCheck(name, md) {
+  md.split('\n').forEach((line, i) => { for (const m of line.matchAll(BRITISH)) console.warn(`American English? ${name}:${i + 1}: "${m[0]}"`); });
+}
+
 async function pack() {
   const config = readJson(join(SRC, 'config.json'), {});
   const dates = readJson(DATES, {});
@@ -71,6 +77,7 @@ async function pack() {
         if (id >= versions[0].id) console.warn(`warning: ${p} version ${id} is not older than the current one (${versions[0].id})`);
         versions.push({ id, date: id.slice(0, 10), ...v });
       }
+    for (const v of versions) britishCheck(`${p}${v.id ? ' ' + v.id : ''}.en`, v.en);
     for (const v of versions) for (const l of LANGS.slice(1)) {
       if (v[l] && JSON.stringify(ids(v[l])) !== JSON.stringify(ids(v.en)))
         console.warn(`warning: ${p} ${v.id || 'current'} (${l}) has different section ids than English — comments would not line up`);

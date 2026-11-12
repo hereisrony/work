@@ -245,7 +245,7 @@
     if (v[state.lang]) return { md: v[state.lang], translated: true };
     return { md: v.en || '', translated: state.lang === 'en' };
   }
-  var LOCALES = { en: 'en-GB', fr: 'fr-FR', ko: 'ko-KR' };
+  var LOCALES = { en: 'en-US', fr: 'fr-FR', ko: 'ko-KR' };
   function fmtVersion(v) {
     var d = new Date(v.date + 'T12:00:00');
     try { return new Intl.DateTimeFormat(LOCALES[state.lang], { dateStyle: 'long' }).format(d); } catch (e) { return v.date; }
