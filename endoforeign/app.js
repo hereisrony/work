@@ -478,6 +478,23 @@
     if (e.key === 'Escape' && !$('composer').hidden) closeComposer();
   });
 
+  /* ---------- no copying ----------
+     A deterrent, not a lock: it stops copy, cut, drag, the right-click menu and printing of the
+     page text. Selecting stays possible because that is how passages are commented on.
+     Typing and copying inside the comment boxes still works. */
+  function inField(e) { var t = e.target; return t && t.closest && t.closest('textarea,input'); }
+  ['copy', 'cut'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      if (inField(e)) return;
+      e.preventDefault();
+      if (e.clipboardData) e.clipboardData.setData('text/plain', '');
+    }, true);
+  });
+  document.addEventListener('dragstart', function (e) { if (!inField(e)) e.preventDefault(); }, true);
+  document.addEventListener('contextmenu', function (e) {
+    if (window.matchMedia && matchMedia('(pointer: fine)').matches && !inField(e)) e.preventDefault();
+  }, true);
+
   /* ---------- start ---------- */
   applyChrome();
   $('nm').value = store('eof-name') || '';
