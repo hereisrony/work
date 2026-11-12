@@ -26,7 +26,7 @@
       postFail: 'Could not post. Your text is still in the box. Try again.',
       loadFail: 'Could not load the comments.',
       local: 'The shared comment notebook is not connected yet. Comments are saved on this device only, and nobody else sees them.',
-      rony: 'rony', page: { synopsis: 'synopsis', statement: 'director’s statement', notebook: 'development notebook', characters: 'character sheets', drafts: 'drafts', moodboard: 'moodboard' },
+      rony: 'rony', page: { synopsis: 'synopsis', statement: 'statement', notebook: 'development notebook', characters: 'characters', drafts: 'drafts', moodboard: 'moodboard' },
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
@@ -45,7 +45,7 @@
       postFail: 'Envoi impossible. Votre texte est toujours dans la zone. Réessayez.',
       loadFail: 'Impossible de charger les commentaires.',
       local: 'Le carnet de commentaires partagé n’est pas encore connecté. Les commentaires sont enregistrés sur cet appareil uniquement, et personne d’autre ne les voit.',
-      rony: 'rony', page: { synopsis: 'synopsis', statement: 'note d’intention', notebook: 'carnet de développement', characters: 'fiches personnages', drafts: 'brouillons', moodboard: 'moodboard' },
+      rony: 'rony', page: { synopsis: 'synopsis', statement: 'intention', notebook: 'carnet de développement', characters: 'personnages', drafts: 'brouillons', moodboard: 'moodboard' },
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
@@ -64,7 +64,7 @@
       postFail: '등록하지 못했습니다. 입력한 내용은 그대로 남아 있습니다. 다시 시도해 주세요.',
       loadFail: '댓글을 불러오지 못했습니다.',
       local: '공유 댓글 노트가 아직 연결되지 않았습니다. 댓글은 이 기기에만 저장되며 다른 사람에게는 보이지 않습니다.',
-      rony: 'rony', page: { synopsis: '시놉시스', statement: '연출 의도', notebook: '개발 노트', characters: '캐릭터 시트', drafts: '초안', moodboard: '무드보드' },
+      rony: 'rony', page: { synopsis: '시놉시스', statement: '의도', notebook: '개발 노트', characters: '캐릭터', drafts: '초안', moodboard: '무드보드' },
       allPages: '전체 페이지', foot: '비공개입니다. 링크, 비밀번호, 그리고 이 페이지의 내용을 공유하지 말아 주세요.'
     }
   };
