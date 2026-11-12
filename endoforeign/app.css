@@ -156,3 +156,6 @@ body.shielded #app,body.shielded .wm{visibility:hidden}
 /* images live inside the encrypted vault; they cannot be dragged, saved from the menu or selected */
 .fig{margin:8px 0 14px}
 .fig img{display:block;width:auto;height:auto;max-width:100%;max-height:85vh;-webkit-user-drag:none;user-select:none;-webkit-user-select:none;pointer-events:none}
+
+.doc a.back{display:inline-flex;align-items:center;justify-content:center;width:48px;height:44px;margin:-6px 0 18px -10px;text-decoration:none}
+.doc a.back:hover{background:var(--accent)}
