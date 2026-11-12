@@ -3,6 +3,7 @@
 //
 //   node tools/endoforeign.mjs pack      private/endoforeign/*  ->  endoforeign/vault.json
 //   node tools/endoforeign.mjs unpack    endoforeign/vault.json ->  private/endoforeign/*
+//   node tools/endoforeign.mjs release <page> [date]   keeps the current text as an older version, dates the new one
 //   node tools/endoforeign.mjs token     prints a random token for the comment endpoint
 //
 // The password comes from $ENDOFOREIGN_PASSWORD, or is asked for. Zero dependencies.
@@ -43,21 +44,37 @@ async function keyFor(pw, salt) {
 // every page must have the same ## {#ids} in every language, or comments drift apart
 function ids(md) { return [...md.matchAll(/^## .*?(?:\{#([a-z0-9-]+)\})?\s*$/gm)].map((m) => m[1] || '(no id)'); }
 
+const readJson = (f, d) => (existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : d);
+const DATES = join(SRC, 'dates.json');            // { page: id of its current version } — an id is a date, "2026-11-12", or "2026-11-12-2" for a second one that day
+const VDIR = (p) => join(SRC, 'versions', p);     // versions/<page>/<id>/<lang>.md  = the older versions
+function readLangs(base) {
+  const o = {};
+  for (const l of LANGS) { const f = base(l); if (existsSync(f)) o[l] = readFileSync(f, 'utf8'); }
+  return o;
+}
+
 async function pack() {
-  const config = existsSync(join(SRC, 'config.json')) ? JSON.parse(readFileSync(join(SRC, 'config.json'), 'utf8')) : {};
+  const config = readJson(join(SRC, 'config.json'), {});
+  const dates = readJson(DATES, {});
   const pages = {};
   for (const p of PAGES) {
-    pages[p] = {};
-    for (const l of LANGS) {
-      const f = join(SRC, `${p}.${l}.md`);
-      if (existsSync(f)) pages[p][l] = readFileSync(f, 'utf8');
+    const versions = [];
+    const cur = readLangs((l) => join(SRC, `${p}.${l}.md`));
+    if (!cur.en) throw new Error(`missing ${p}.en.md — English is the original`);
+    versions.push({ id: dates[p] || '', date: (dates[p] || '').slice(0, 10), ...cur });
+    if (existsSync(VDIR(p)))
+      for (const id of readdirSync(VDIR(p)).sort().reverse()) {
+        const v = readLangs((l) => join(VDIR(p), id, `${l}.md`));
+        if (!v.en) throw new Error(`versions/${p}/${id}/en.md is missing`);
+        if (id >= versions[0].id) console.warn(`warning: ${p} version ${id} is not older than the current one (${versions[0].id})`);
+        versions.push({ id, date: id.slice(0, 10), ...v });
+      }
+    for (const v of versions) for (const l of LANGS.slice(1)) {
+      if (v[l] && JSON.stringify(ids(v[l])) !== JSON.stringify(ids(v.en)))
+        console.warn(`warning: ${p} ${v.id || 'current'} (${l}) has different section ids than English — comments would not line up`);
+      if (!v[l]) console.warn(`note: ${p} ${v.id || 'current'} has no ${l} version, readers will see English`);
     }
-    if (!pages[p].en) throw new Error(`missing ${p}.en.md — English is the original`);
-    for (const l of LANGS.slice(1)) {
-      if (pages[p][l] && JSON.stringify(ids(pages[p][l])) !== JSON.stringify(ids(pages[p].en)))
-        console.warn(`warning: ${p}.${l}.md has different section ids than ${p}.en.md — comments would not line up`);
-      if (!pages[p][l]) console.warn(`note: ${p}.${l}.md missing, readers will see English`);
-    }
+    pages[p] = { versions };
   }
   const pw = await password();
   const salt = randomBytes(16), iv = randomBytes(12);
@@ -76,12 +93,45 @@ async function unpack() {
   catch { console.error('wrong password'); process.exit(1); }
   mkdirSync(SRC, { recursive: true });
   writeFileSync(join(SRC, 'config.json'), JSON.stringify(data.config, null, 2) + '\n');
-  for (const [p, langs] of Object.entries(data.pages)) for (const [l, md] of Object.entries(langs)) writeFileSync(join(SRC, `${p}.${l}.md`), md);
+  const dates = readJson(DATES, {});
+  for (const [p, pg] of Object.entries(data.pages)) {
+    const versions = pg.versions || [{ id: '', ...pg }];          // pages saved before versions existed
+    versions.forEach((ver, i) => {
+      if (i === 0) {
+        if (ver.id) dates[p] = ver.id;
+        for (const l of LANGS) if (ver[l]) writeFileSync(join(SRC, `${p}.${l}.md`), ver[l]);
+      } else {
+        const d = join(VDIR(p), ver.id); mkdirSync(d, { recursive: true });
+        for (const l of LANGS) if (ver[l]) writeFileSync(join(d, `${l}.md`), ver[l]);
+      }
+    });
+  }
+  writeFileSync(DATES, JSON.stringify(dates, null, 2) + '\n');
   console.log('unpacked to private/endoforeign/');
+}
+
+// release <page> [YYYY-MM-DD]: the text now in <page>.<lang>.md becomes an older version, and the
+// page gets a new current version dated today. Then write the new text into <page>.<lang>.md.
+function release() {
+  const page = process.argv[3], date = process.argv[4] || new Date().toISOString().slice(0, 10);
+  if (!PAGES.includes(page) || page === 'home') { console.error('usage: release <page> [YYYY-MM-DD]   pages: ' + PAGES.slice(1).join(', ')); process.exit(1); }
+  const dates = readJson(DATES, {}), old = dates[page];
+  const taken = new Set([old, ...(existsSync(VDIR(page)) ? readdirSync(VDIR(page)) : [])].filter(Boolean));
+  let id = date, n = 1;
+  while (taken.has(id)) id = `${date}-${++n}`;
+  if (old) {
+    const d = join(VDIR(page), old); mkdirSync(d, { recursive: true });
+    for (const l of LANGS) { const f = join(SRC, `${page}.${l}.md`); if (existsSync(f)) writeFileSync(join(d, `${l}.md`), readFileSync(f)); }
+  }
+  dates[page] = id;
+  writeFileSync(DATES, JSON.stringify(dates, null, 2) + '\n');
+  console.log(old ? `archived ${page} ${old}; ${page} is now version ${id}. Write the new text into private/endoforeign/${page}.<lang>.md, then pack.`
+                  : `${page} is now dated ${id}.`);
 }
 
 const cmd = process.argv[2];
 if (cmd === 'pack') await pack();
 else if (cmd === 'unpack') await unpack();
+else if (cmd === 'release') release();
 else if (cmd === 'token') console.log(randomBytes(18).toString('base64url'));
-else console.log('usage: node tools/endoforeign.mjs pack | unpack | token');
+else console.log('usage: node tools/endoforeign.mjs pack | unpack | release <page> [date] | token');
