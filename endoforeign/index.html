@@ -15,6 +15,8 @@
 <main id="gate" class="gate">
   <form id="gate-form" autocomplete="off">
     <p class="gate-title">the end of foreign</p>
+    <label for="nm" id="g-name-label">your name</label>
+    <input id="nm" type="text" autocomplete="name" maxlength="80" required>
     <label for="pw" id="g-label">password</label>
     <div class="gate-row">
       <input id="pw" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" required>
@@ -36,6 +38,13 @@
   <p class="notice" id="notice" role="note" hidden></p>
   <main class="doc" id="doc" tabindex="-1"></main>
   <footer class="foot" id="foot"></footer>
+  <div class="selbar" id="selbar" hidden><button type="button" id="selbtn">comment on selection</button></div>
+  <form class="composer" id="composer" hidden>
+    <blockquote id="cq"></blockquote>
+    <label class="visually-hidden" for="ct" id="ct-label">your comment</label>
+    <textarea id="ct" maxlength="4000"></textarea>
+    <div class="row"><button type="submit" id="cpost">post comment</button><button type="button" id="ccancel" class="plain">cancel</button><span class="cstatus" id="cstat" role="status" aria-live="polite"></span></div>
+  </form>
 </div>
 
 <noscript><p style="padding:24px;font:16px monospace">This page needs JavaScript.</p></noscript>

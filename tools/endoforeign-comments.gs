@@ -13,12 +13,12 @@
  *
  * The URL and token live only inside the encrypted vault, so only people who
  * have the password ever learn them. Comments land in the "comments" tab, one row each.
- * Write in the "reply" column and your answer shows under that comment on the site.
+ * Each row holds the page, the quoted passage and the comment. Write in the "reply" column and your answer shows under that note on the site.
  * Delete a row to delete a comment. Editing this script later needs a new
  * deployment version (Deploy → Manage deployments → edit → New version).
  */
 var TOKEN = 'REPLACE-WITH-A-RANDOM-STRING';
-var HEADERS = ['id', 'ts', 'section', 'name', 'comment', 'lang', 'reply'];
+var HEADERS = ['id', 'ts', 'page', 'section', 'block', 'name', 'quote', 'comment', 'lang', 'reply'];
 
 function sheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -28,7 +28,7 @@ function sheet_() {
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
     sh.getRange('1:1').setFontWeight('bold');
-    sh.setColumnWidth(5, 480); sh.setColumnWidth(7, 360);
+    sh.setColumnWidth(7, 360); sh.setColumnWidth(8, 420); sh.setColumnWidth(10, 360);
   }
   return sh;
 }
@@ -41,8 +41,8 @@ function doGet(e) {
   var sh = sheet_(), n = sh.getLastRow() - 1;
   var rows = n > 0 ? sh.getRange(2, 1, n, HEADERS.length).getDisplayValues() : [];
   return out_({
-    comments: rows.filter(function (r) { return r[0] && r[2] && r[4]; }).map(function (r) {
-      return { id: r[0], ts: r[1], section: r[2], name: r[3], text: r[4], lang: r[5], reply: r[6] };
+    comments: rows.filter(function (r) { return r[0] && r[2] && r[7]; }).map(function (r) {
+      return { id: r[0], ts: r[1], page: r[2], section: r[3], block: r[4], name: r[5], quote: r[6], text: r[7], lang: r[8], reply: r[9] };
     })
   });
 }
@@ -51,16 +51,17 @@ function doPost(e) {
   var d;
   try { d = JSON.parse(e.postData.contents); } catch (err) { return out_({ error: 'bad' }); }
   if (d.token !== TOKEN) return out_({ error: 'auth' });
-  var section = String(d.section || ''), name = String(d.name || '').trim(), text = String(d.text || '').trim();
-  if (!/^[a-z0-9-]+\/[a-z0-9-]+$/.test(section) || !name || !text) return out_({ error: 'invalid' });
-  name = name.slice(0, 80); text = text.slice(0, 4000);
+  var page = String(d.page || ''), section = String(d.section || ''), block = String(d.block == null ? '' : d.block);
+  var name = String(d.name || '').trim(), text = String(d.text || '').trim(), quote = String(d.quote || '').trim();
+  if (!/^[a-z0-9-]+$/.test(page) || !/^[a-z0-9_-]*$/.test(section) || !/^[0-9]*$/.test(block) || !name || !text) return out_({ error: 'invalid' });
+  name = name.slice(0, 80); text = text.slice(0, 4000); quote = quote.slice(0, 800);
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
     var sh = sheet_(), row = sh.getLastRow() + 1;
     // plain-text cells, so a comment that starts with "=" can never run as a formula
     sh.getRange(row, 1, 1, HEADERS.length).setNumberFormat('@')
-      .setValues([[Utilities.getUuid(), new Date().toISOString(), section, name, text, String(d.lang || '').slice(0, 5), '']]);
+      .setValues([[Utilities.getUuid(), new Date().toISOString(), page, section, block, name, quote, text, String(d.lang || '').slice(0, 5), '']]);
   } finally { lock.releaseLock(); }
   return out_({ ok: true });
 }
