@@ -21,7 +21,7 @@ const SRC = join(root, 'private', 'endoforeign');
 const VAULT = join(root, 'endoforeign', 'vault.json');
 const ITER = 600000;
 const LANGS = ['en', 'fr', 'ko'];
-const PAGES = ['home', 'synopsis', 'statement', 'notebook', 'characters', 'drafts', 'moodboard'];
+const PAGES = ['home', 'synopsis', 'statement', 'characters', 'drafts', 'moodboard'];
 
 const b64 = (u) => Buffer.from(u).toString('base64');
 
