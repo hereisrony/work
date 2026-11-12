@@ -70,7 +70,8 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var state = { lang: 'en', content: null, comments: [], commentsOk: true };
+  var CARD_PAGES = { characters: true };   // pages whose sections are cards that open and close
+  var state = { lang: 'en', content: null, comments: [], commentsOk: true, open: {} };
 
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   function t(k) { return UI[state.lang][k] !== undefined ? UI[state.lang][k] : UI.en[k]; }
@@ -281,8 +282,15 @@ if (on) h += '<div class="pagebar">' +     '<a class="back" href="#/" aria-label
         return '<li><a href="#/' + p + '">' + esc(t('page')[p]) + '</a></li>';
       }).join('') + '</ul>';
     }
+    var cards = !!CARD_PAGES[r.page], openSet = (state.open[r.page] = state.open[r.page] || {});
+    if (cards && r.section) openSet[r.section] = true;
     pg.sections.forEach(function (s) {
-      h += '<section class="sec" id="sec-' + esc(s.id) + '"><h2>' + inline(s.title) + '</h2>' + blocksHtml(s.blocks, on ? s.id : '') + '</section>';
+      if (cards) {
+        h += '<details class="card" id="sec-' + esc(s.id) + '" data-card="' + esc(s.id) + '"' + (openSet[s.id] ? ' open' : '') + '><summary><h2>' + inline(s.title) + '</h2></summary>' +
+          '<div class="card-body">' + blocksHtml(s.blocks, s.id) + '</div></details>';
+      } else {
+        h += '<section class="sec" id="sec-' + esc(s.id) + '"><h2>' + inline(s.title) + '</h2>' + blocksHtml(s.blocks, on ? s.id : '') + '</section>';
+      }
     });
     if (on) {
       h += '<section class="notes" id="notes"><h2>' + esc(t('notes')) + ' (<span id="ncount">0</span>)</h2>' +
@@ -396,9 +404,20 @@ if (on) h += '<div class="pagebar">' +     '<a class="back" href="#/" aria-label
     var marks = Array.prototype.slice.call(document.querySelectorAll('mark.hl[data-c="' + id + '"]'));
     var els = marks.length ? marks : [blockEl(c) || $('sec-' + c.section)].filter(Boolean);
     if (!els.length) return;
+    openCardOf(els[0]);
     els[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
     flash(els);
   }
+  // a closed card hides its text: open the one holding this element before going to it
+  function openCardOf(el) {
+    var d = el && el.closest && el.closest('details.card');
+    if (d && !d.open) d.open = true;
+  }
+  document.addEventListener('toggle', function (e) {
+    var d = e.target;
+    if (!d.classList || !d.classList.contains('card')) return;
+    var pg = route().page; (state.open[pg] = state.open[pg] || {})[d.getAttribute('data-card')] = d.open;
+  }, true);
   document.addEventListener('click', function (e) {
     var j = e.target.closest && e.target.closest('[data-jump]');
     if (j) { jumpTo(j.getAttribute('data-jump')); return; }
