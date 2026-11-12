@@ -345,3 +345,6 @@ node tools/endoforeign.mjs pack
 
 Older versions live in `private/endoforeign/versions/<page>/<date>/`; `dates.json` holds
 the current version's date per page. A second version on the same day gets the id `2026-11-20-2` internally; readers only ever see dates.
+
+**Spelling.** English on the site is American (color, theater, neighbor, kilometers, elevator).
+`pack` prints "American English?" warnings for common British spellings in the English texts.
