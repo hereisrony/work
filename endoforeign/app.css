@@ -83,8 +83,6 @@ textarea{min-height:7.5em;resize:vertical}
 .pages a{display:flex;align-items:baseline;gap:14px;padding:20px 18px;min-height:76px;
   border:2px solid var(--ink);text-decoration:none;font-size:19px;font-weight:700}
 .pages a:hover,.pages a:focus-visible{background:var(--accent)}
-.pages .n{font-weight:400;font-size:14px;color:var(--soft);min-width:1.6em}
-.pages a:hover .n{color:var(--ink)}
 
 /* --- comments ----------------------------------------------------------- */
 .comments{margin-top:22px}
