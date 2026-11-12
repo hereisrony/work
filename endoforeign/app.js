@@ -11,11 +11,11 @@
 
   var UI = {
     en: {
-      sub: 'work in progress · private', password: 'password', enter: 'enter',
-      remember: 'stay unlocked on this device', checking: 'opening…',
+      password: 'password', enter: 'enter',
+      checking: 'opening…',
       wrong: 'That password does not open this page.', fail: 'Could not load the page. Try again.',
       nocrypto: 'This browser cannot decrypt the page. Use a recent browser over https.',
-      wip: 'work in progress', lock: 'lock', home: 'the end of foreign',
+      wip: 'work in progress', home: 'the end of foreign',
       notice: 'Automatic translation. The original is in English, and the English version is the one that counts.',
       original: 'read the English original',
       untranslated: 'This page is not translated yet. It is shown in English.',
@@ -29,11 +29,11 @@
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
-      sub: 'travail en cours · privé', password: 'mot de passe', enter: 'entrer',
-      remember: 'rester connecté sur cet appareil', checking: 'ouverture…',
+      password: 'mot de passe', enter: 'entrer',
+      checking: 'ouverture…',
       wrong: 'Ce mot de passe n’ouvre pas cette page.', fail: 'Impossible de charger la page. Réessayez.',
       nocrypto: 'Ce navigateur ne peut pas déchiffrer la page. Utilisez un navigateur récent en https.',
-      wip: 'travail en cours', lock: 'verrouiller', home: 'the end of foreign',
+      wip: 'travail en cours', home: 'the end of foreign',
       notice: 'Traduction automatique. L’original est en anglais, et c’est la version anglaise qui fait foi.',
       original: 'lire l’original en anglais',
       untranslated: 'Cette page n’est pas encore traduite. Elle s’affiche en anglais.',
@@ -47,11 +47,11 @@
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
-      sub: '작업 중 · 비공개', password: '비밀번호', enter: '입장',
-      remember: '이 기기에서 로그인 유지', checking: '여는 중…',
+      password: '비밀번호', enter: '입장',
+      checking: '여는 중…',
       wrong: '비밀번호가 맞지 않습니다.', fail: '페이지를 불러오지 못했습니다. 다시 시도해 주세요.',
       nocrypto: '이 브라우저에서는 페이지를 열 수 없습니다. https로 최신 브라우저를 사용해 주세요.',
-      wip: '작업 중', lock: '잠그기', home: 'the end of foreign',
+      wip: '작업 중', home: 'the end of foreign',
       notice: '자동 번역입니다. 원문은 영어이며, 영어 버전이 기준입니다.',
       original: '영어 원문 보기',
       untranslated: '이 페이지는 아직 번역되지 않아 영어로 표시됩니다.',
@@ -103,12 +103,9 @@
   }
   function applyChrome() {
     document.documentElement.lang = state.lang;
-    $('g-sub').textContent = t('sub');
     $('g-label').textContent = t('password');
     $('g-enter').textContent = t('enter');
-    $('g-remember').textContent = t('remember');
     $('wip').textContent = t('wip');
-    $('lock').textContent = t('lock');
     $('foot').textContent = t('foot');
     drawLangs();
     var n = $('notice');
@@ -138,14 +135,13 @@
     return vaultPromise;
   }
 
-  async function tryUnlock(pw, remember) {
+  async function tryUnlock(pw) {
     if (!(window.crypto && crypto.subtle)) { var e = new Error('nocrypto'); e.kind = 'nocrypto'; throw e; }
     var vault;
     try { vault = await getVault(); } catch (err) {  vaultPromise = null; err.kind = 'fail'; throw err; }
     var data;
     try { data = await decrypt(vault, pw); } catch (err) { err.kind = 'wrong'; throw err; }
     state.content = data;
-    if (remember) store('eof-pw', pw);
     $('gate').hidden = true;
     $('app').hidden = false;
     applyChrome();
@@ -158,13 +154,12 @@
     e.preventDefault();
     var msg = $('g-msg'), pw = $('pw').value;
     msg.textContent = t('checking');
-    try { await tryUnlock(pw, $('remember').checked); $('pw').value = ''; msg.textContent = ''; }
+    try { await tryUnlock(pw); $('pw').value = ''; msg.textContent = ''; }
     catch (err) {
       msg.textContent = err.kind === 'wrong' ? t('wrong') : err.kind === 'nocrypto' ? t('nocrypto') : t('fail');
       if (err.kind === 'wrong') { $('pw').select(); }
     }
   });
-  $('lock').addEventListener('click', function () { store('eof-pw', null); location.hash = ''; location.reload(); });
 
   /* ---------- tiny markdown ---------- */
   function inline(s) {
@@ -370,8 +365,5 @@
 
   /* ---------- start ---------- */
   applyChrome();
-  var saved = store('eof-pw');
-  if (saved) {
-    tryUnlock(saved, true).catch(function () { store('eof-pw', null); });
-  } else { $('pw').focus(); }
+  $('pw').focus();
 })();
