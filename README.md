@@ -327,7 +327,7 @@ node tools/endoforeign.mjs unpack   # vault -> private/endoforeign/*.md (git-ign
 node tools/endoforeign.mjs pack     # re-encrypt (password from $ENDOFOREIGN_PASSWORD or prompt)
 ```
 
-Pages: home, synopsis, statement, notebook, characters, drafts, moodboard.
+Pages: home, synopsis, statement, characters, drafts, moodboard.
 Missing fr/ko files fall back to English with a notice. Comments live in a
 Google Sheet through `tools/endoforeign-comments.gs` (setup steps at the top of
 that file); its URL and token go in `private/endoforeign/config.json`.
