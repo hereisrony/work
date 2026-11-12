@@ -11,7 +11,7 @@
 
   var UI = {
     en: {
-      notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
+      versionOf: 'Version of {d}', olderNote: 'You are reading an earlier version.', currentVersion: 'current version', versions: 'versions', veil: 'Hidden while this window is not active. Click to continue.', notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
       password: 'password', enter: 'enter',
       checking: 'opening…',
       wrong: 'That password does not open this page.', fail: 'Could not load the page. Try again.',
@@ -30,7 +30,7 @@
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
-      notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
+      versionOf: 'Version du {d}', olderNote: 'Vous lisez une version précédente.', currentVersion: 'version actuelle', versions: 'versions', veil: 'Masqué tant que cette fenêtre n’est pas active. Cliquez pour continuer.', notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
       password: 'mot de passe', enter: 'entrer',
       checking: 'ouverture…',
       wrong: 'Ce mot de passe n’ouvre pas cette page.', fail: 'Impossible de charger la page. Réessayez.',
@@ -49,7 +49,7 @@
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
-      notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
+      versionOf: '{d} 버전', olderNote: '이전 버전을 보고 있습니다.', currentVersion: '현재 버전', versions: '버전', veil: '이 창이 활성 상태가 아닌 동안에는 숨겨집니다. 계속하려면 클릭하세요.', notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
       password: '비밀번호', enter: '입장',
       checking: '여는 중…',
       wrong: '비밀번호가 맞지 않습니다.', fail: '페이지를 불러오지 못했습니다. 다시 시도해 주세요.',
@@ -150,6 +150,7 @@
     var data;
     try { data = await decrypt(vault, pw); } catch (err) { err.kind = 'wrong'; throw err; }
     state.content = data; state.name = name;
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawMark); drawMark();
     $('gate').hidden = true;
     $('app').hidden = false;
     applyChrome();
@@ -227,23 +228,44 @@
     var h = (location.hash || '').replace(/^#\/?/, '').split('/');
     var page = h[0] || 'home';
     if (page !== 'home' && PAGES.indexOf(page) < 0) page = 'home';
-    return { page: page, section: h[1] || '' };
+    var ver = '', sec = '';
+    if (h[1] === 'v' && h[2]) ver = h[2]; else sec = h[1] || '';
+    return { page: page, section: sec, version: ver };
   }
   window.addEventListener('hashchange', function () { if (state.content) { render(); window.scrollTo(0, 0); } });
 
-  function sourceFor(page) {
-    var p = state.content.pages[page] || {};
-    if (p[state.lang]) return { md: p[state.lang], translated: true };
-    return { md: p.en || '', translated: state.lang === 'en' };
+  function versionsOf(page) { return ((state.content.pages[page] || {}).versions) || []; }
+  function sourceFor(v) {
+    v = v || {};
+    if (v[state.lang]) return { md: v[state.lang], translated: true };
+    return { md: v.en || '', translated: state.lang === 'en' };
+  }
+  var LOCALES = { en: 'en-GB', fr: 'fr-FR', ko: 'ko-KR' };
+  function fmtVersion(v) {
+    var d = new Date(v.date + 'T12:00:00');
+    try { return new Intl.DateTimeFormat(LOCALES[state.lang], { dateStyle: 'long' }).format(d); } catch (e) { return v.date; }
+  }
+  function verNow() { return state.ver || ''; }
+  // a comment belongs to one version of a page; comments saved before versions existed belong to the oldest
+  function verOf(c) {
+    if (c.version) return c.version;
+    var vs = versionsOf(c.page);
+    return vs.length ? vs[vs.length - 1].id : '';
   }
 
   function render() {
     var r = route(), doc = $('doc'), on = r.page !== 'home';
-    var src = sourceFor(r.page), pg = parse(src.md);
+    var vs = versionsOf(r.page), v = vs.filter(function (x) { return x.id === r.version; })[0] || vs[0];
+    state.ver = v ? v.id : '';
+    var src = sourceFor(v), pg = parse(src.md);
     state.sections = {}; pg.sections.forEach(function (x) { state.sections[x.id] = x.title; });
     var h = '';
     if (on) h += '<a class="back" href="#/">← ' + esc(t('allPages')) + '</a>';
     h += '<h1>' + inline(pg.title || t('page')[r.page] || t('home')) + '</h1>';
+    if (on && v && v.date) {
+      h += '<p class="soft vline">' + esc(t('versionOf').replace('{d}', fmtVersion(v))) + '</p>';
+      if (v !== vs[0]) h += '<p class="soft">' + esc(t('olderNote')) + ' <a href="#/' + r.page + '">' + esc(t('currentVersion')) + '</a></p>';
+    }
     if (!src.translated) h += '<p class="soft">' + esc(t('untranslated')) + '</p>';
     h += blocksHtml(pg.intro, on ? '_intro' : '');
     if (!on) {
@@ -260,6 +282,13 @@
         '<form class="cform" id="pageform" novalidate><label for="pagetext">' + esc(t('pageNote')) + '</label>' +
         '<textarea id="pagetext" maxlength="4000"></textarea>' +
         '<div class="row"><button type="submit">' + esc(t('pageBtn')) + '</button><span class="cstatus" id="pagestat" role="status" aria-live="polite"></span></div></form></section>';
+      var others = vs.filter(function (x) { return v && x.id !== v.id && x.date; });
+      if (others.length) {
+        h += '<section class="versions"><h2>' + esc(t('versions')) + '</h2><ul class="vlist">' + others.map(function (x) {
+          var cur = x === vs[0];
+          return '<li><a class="vbtn" href="#/' + r.page + (cur ? '' : '/v/' + x.id) + '">' + esc((cur ? t('currentVersion') + ' · ' : '') + fmtVersion(x)) + '</a></li>';
+        }).join('') + '</ul></section>';
+      }
     }
     doc.innerHTML = h;
     closeComposer(); hideSel();
@@ -334,7 +363,7 @@
   function paintComments(force) {
     var list = $('nlist');
     if (!list) return;
-    var mine = state.comments.filter(function (c) { return c.page === pageNow(); })
+    var mine = state.comments.filter(function (c) { return c.page === pageNow() && verOf(c) === verNow(); })
       .sort(function (a, b) { return new Date(a.ts) - new Date(b.ts); });
     var sig = mine.map(function (c) { return c.id + (c.reply || '') + state.lang; }).join('|');
     if (!force && sig === lastSig) return;
@@ -396,7 +425,7 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden) loadComments(); });
   }
   async function postComment(c) {
-    c.page = pageNow(); c.name = state.name; c.lang = state.lang;
+    c.page = pageNow(); c.version = verNow(); c.name = state.name; c.lang = state.lang;
     if (!remote()) {
       c.id = 'l' + Date.now(); c.ts = new Date().toISOString();
       state.comments.push(c); store(localKey(), JSON.stringify(state.comments)); return;
@@ -404,7 +433,7 @@
     var r = await fetch(cfg().endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // a "simple" request: no CORS preflight
-      body: JSON.stringify({ token: cfg().token || '', page: c.page, section: c.section || '', block: c.block == null ? '' : c.block,
+      body: JSON.stringify({ token: cfg().token || '', page: c.page, version: c.version, section: c.section || '', block: c.block == null ? '' : c.block,
         name: c.name, quote: c.quote || '', text: c.text, lang: c.lang })
     });
     var d = await r.json();
@@ -493,6 +522,62 @@
   document.addEventListener('dragstart', function (e) { if (!inField(e)) e.preventDefault(); }, true);
   document.addEventListener('contextmenu', function (e) {
     if (window.matchMedia && matchMedia('(pointer: fine)').matches && !inField(e)) e.preventDefault();
+  }, true);
+
+  /* ---------- watermark + shield ----------
+     Neither can stop a screenshot (the operating system takes those). The watermark makes a
+     leaked screenshot traceable to the name typed at the gate; the shield hides the page when
+     the window loses focus or a screenshot shortcut is pressed, which catches some tools. */
+  var wm = $('wm'), wmStyle = '';
+  function drawMark() {
+    if (!state.name) return;
+    var d = new Date(), pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    var label = state.name.slice(0, 40) + ' · ' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    var font = '700 16px "CMU Sans","Noto Sans KR",sans-serif', dpr = 2;
+    var probe = document.createElement('canvas').getContext('2d'); probe.font = font;
+    var w = Math.max(360, Math.ceil(probe.measureText(label).width) + 90), h = 230;
+    var c = document.createElement('canvas'); c.width = w * dpr; c.height = h * dpr;
+    var x = c.getContext('2d'); x.scale(dpr, dpr); x.translate(w / 2, h / 2); x.rotate(-Math.PI / 9);
+    x.font = font; x.fillStyle = 'rgba(0,0,0,0.09)'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(label, 0, 0);
+    wm.hidden = false;
+    wm.style.backgroundImage = 'url(' + c.toDataURL() + ')';
+    wm.style.backgroundSize = w + 'px ' + h + 'px';
+    wmStyle = wm.getAttribute('style');
+  }
+  // put the watermark back if someone removes it or restyles it in the developer tools
+  new MutationObserver(function () {
+    if (!state.content) return;
+    if (!document.body.contains(wm)) document.body.appendChild(wm);
+    if (wm.getAttribute('style') !== wmStyle) wm.setAttribute('style', wmStyle);
+    if (wm.hidden) wm.hidden = false;
+  }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'hidden'] });
+
+  var veil = $('veil'), holdUntil = 0, holdTimer = null;
+  function shield(on) {
+    if (!state.content) return;
+    document.body.classList.toggle('shielded', on);
+    veil.hidden = !on;
+    if (on) { veil.textContent = t('veil'); }
+  }
+  function hold(ms) {
+    shield(true); holdUntil = Date.now() + ms;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(function () { if (document.hasFocus() && !document.hidden) shield(false); }, ms);
+  }
+  window.addEventListener('blur', function () { shield(true); });
+  window.addEventListener('focus', function () { if (Date.now() >= holdUntil && !document.hidden) shield(false); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) shield(true); else if (Date.now() >= holdUntil && document.hasFocus()) shield(false); });
+  veil.addEventListener('click', function () { if (Date.now() >= holdUntil) shield(false); });
+  document.addEventListener('keydown', function (e) {
+    // Cmd/Win + Shift (Mac screenshots, Windows Snipping Tool), or Print Screen
+    if ((e.key === 'Shift' && e.metaKey) || (e.key === 'Meta' && e.shiftKey) || e.key === 'PrintScreen') hold(8000);
+  }, true);
+  document.addEventListener('keyup', function (e) {
+    if (e.key === 'PrintScreen') {
+      hold(8000);
+      try { navigator.clipboard.writeText(' ').catch(function () {}); } catch (err) {}   // replace whatever the screenshot put on the clipboard
+    }
   }, true);
 
   /* ---------- start ---------- */

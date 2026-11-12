@@ -18,7 +18,7 @@
  * deployment version (Deploy → Manage deployments → edit → New version).
  */
 var TOKEN = 'REPLACE-WITH-A-RANDOM-STRING';
-var HEADERS = ['id', 'ts', 'page', 'section', 'block', 'name', 'quote', 'comment', 'lang', 'reply'];
+var HEADERS = ['id', 'ts', 'page', 'version', 'section', 'block', 'name', 'quote', 'comment', 'lang', 'reply'];
 
 function sheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -28,7 +28,7 @@ function sheet_() {
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
     sh.getRange('1:1').setFontWeight('bold');
-    sh.setColumnWidth(7, 360); sh.setColumnWidth(8, 420); sh.setColumnWidth(10, 360);
+    sh.setColumnWidth(8, 360); sh.setColumnWidth(9, 420); sh.setColumnWidth(11, 360);
   }
   return sh;
 }
@@ -41,8 +41,8 @@ function doGet(e) {
   var sh = sheet_(), n = sh.getLastRow() - 1;
   var rows = n > 0 ? sh.getRange(2, 1, n, HEADERS.length).getDisplayValues() : [];
   return out_({
-    comments: rows.filter(function (r) { return r[0] && r[2] && r[7]; }).map(function (r) {
-      return { id: r[0], ts: r[1], page: r[2], section: r[3], block: r[4], name: r[5], quote: r[6], text: r[7], lang: r[8], reply: r[9] };
+    comments: rows.filter(function (r) { return r[0] && r[2] && r[8]; }).map(function (r) {
+      return { id: r[0], ts: r[1], page: r[2], version: r[3], section: r[4], block: r[5], name: r[6], quote: r[7], text: r[8], lang: r[9], reply: r[10] };
     })
   });
 }
@@ -51,9 +51,9 @@ function doPost(e) {
   var d;
   try { d = JSON.parse(e.postData.contents); } catch (err) { return out_({ error: 'bad' }); }
   if (d.token !== TOKEN) return out_({ error: 'auth' });
-  var page = String(d.page || ''), section = String(d.section || ''), block = String(d.block == null ? '' : d.block);
+  var page = String(d.page || ''), version = String(d.version || ''), section = String(d.section || ''), block = String(d.block == null ? '' : d.block);
   var name = String(d.name || '').trim(), text = String(d.text || '').trim(), quote = String(d.quote || '').trim();
-  if (!/^[a-z0-9-]+$/.test(page) || !/^[a-z0-9_-]*$/.test(section) || !/^[0-9]*$/.test(block) || !name || !text) return out_({ error: 'invalid' });
+  if (!/^[a-z0-9-]+$/.test(page) || !/^[0-9-]*$/.test(version) || !/^[a-z0-9_-]*$/.test(section) || !/^[0-9]*$/.test(block) || !name || !text) return out_({ error: 'invalid' });
   name = name.slice(0, 80); text = text.slice(0, 4000); quote = quote.slice(0, 800);
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -61,7 +61,7 @@ function doPost(e) {
     var sh = sheet_(), row = sh.getLastRow() + 1;
     // plain-text cells, so a comment that starts with "=" can never run as a formula
     sh.getRange(row, 1, 1, HEADERS.length).setNumberFormat('@')
-      .setValues([[Utilities.getUuid(), new Date().toISOString(), page, section, block, name, quote, text, String(d.lang || '').slice(0, 5), '']]);
+      .setValues([[Utilities.getUuid(), new Date().toISOString(), page, version, section, block, name, quote, text, String(d.lang || '').slice(0, 5), '']]);
   } finally { lock.releaseLock(); }
   return out_({ ok: true });
 }

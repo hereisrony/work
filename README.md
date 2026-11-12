@@ -332,3 +332,16 @@ Missing fr/ko files fall back to English with a notice. Comments live in a
 Google Sheet through `tools/endoforeign-comments.gs` (setup steps at the top of
 that file); its URL and token go in `private/endoforeign/config.json`.
 Changing the password = pack again with a new one.
+
+**Versions.** Each dated page shows "Version of <date>" under its title, and the older
+versions as buttons at the bottom. Comments belong to the version they were written on.
+When a new text arrives:
+
+```sh
+node tools/endoforeign.mjs release synopsis      # keeps the current text as an older version, dates the new one today
+# write the new text into private/endoforeign/synopsis.<en|fr|ko>.md
+node tools/endoforeign.mjs pack
+```
+
+Older versions live in `private/endoforeign/versions/<page>/<date>/`; `dates.json` holds
+the current version's date per page. A second version on the same day gets the id `2026-11-20-2` internally; readers only ever see dates.

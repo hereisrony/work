@@ -132,3 +132,23 @@ mark.hl{background:var(--accent);color:inherit;cursor:pointer;padding:0}
 /* no copying: see app.js. Printing shows nothing but a line of text. */
 .doc{-webkit-touch-callout:none}
 @media print{body *{display:none!important}body::before{content:"Private. Not for printing.";display:block;font-size:16px}}
+
+/* watermark: the reader's name and the date, tiled and faint (drawn by app.js) */
+.wm{position:fixed;inset:0;z-index:40;pointer-events:none;background-repeat:repeat}
+/* shield: the page is hidden while the window is inactive or a screenshot shortcut is held */
+.veil{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:24px;border:0;border-radius:0;background:var(--paper);cursor:pointer;font-size:19px;text-align:center}
+.veil[hidden]{display:none}
+body.shielded #app,body.shielded .wm{visibility:hidden}
+
+/* versions */
+.vline{margin:-8px 0 22px}
+.versions{margin-top:64px}
+.versions h2{margin-bottom:16px}
+.doc .vlist{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:12px}
+.vbtn,.doc a.vbtn{display:inline-block;padding:12px 18px;border:2px solid var(--ink);text-decoration:none;font-weight:700}
+.vbtn:hover,.doc a.vbtn:hover{background:var(--accent)}
+
+.gate-quote{margin:0 0 32px}
+.gate-quote blockquote{margin:0}
+.gate-quote p{margin:0 0 10px;font-style:italic;font-size:20px;line-height:1.5}
+.gate-quote figcaption{color:var(--soft);font-size:15px}
