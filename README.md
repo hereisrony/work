@@ -316,7 +316,7 @@ kept as redirects into `/work/<slug>/` so existing inbound links still land.
 ## /endoforeign/ (private)
 
 A password-gated, unlisted workspace for the script of *The End of Foreign*
-(en / fr / ko, comments on every section). The repo is public, so the pages
+(en / fr / ko; readers highlight a passage and comment, notes collect at the end of each page). The repo is public, so the pages
 are **never committed as text**: `endoforeign/vault.json` is the content,
 AES-GCM encrypted (PBKDF2, 600k rounds) and decrypted in the browser.
 `app.js` / `app.css` are the public shell and hold no secrets.

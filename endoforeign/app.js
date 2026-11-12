@@ -11,6 +11,7 @@
 
   var UI = {
     en: {
+      notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
       password: 'password', enter: 'enter',
       checking: 'opening…',
       wrong: 'That password does not open this page.', fail: 'Could not load the page. Try again.',
@@ -29,6 +30,7 @@
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
+      notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
       password: 'mot de passe', enter: 'entrer',
       checking: 'ouverture…',
       wrong: 'Ce mot de passe n’ouvre pas cette page.', fail: 'Impossible de charger la page. Réessayez.',
@@ -47,6 +49,7 @@
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
+      notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
       password: '비밀번호', enter: '입장',
       checking: '여는 중…',
       wrong: '비밀번호가 맞지 않습니다.', fail: '페이지를 불러오지 못했습니다. 다시 시도해 주세요.',
@@ -103,7 +106,12 @@
   }
   function applyChrome() {
     document.documentElement.lang = state.lang;
+    $('g-name-label').textContent = t('name');
     $('g-label').textContent = t('password');
+    $('ct-label').textContent = t('comment');
+    $('cpost').textContent = t('post');
+    $('ccancel').textContent = t('cancel');
+    $('selbtn').textContent = t('selBtn');
     $('g-enter').textContent = t('enter');
     $('wip').textContent = t('wip');
     $('foot').textContent = t('foot');
@@ -135,13 +143,13 @@
     return vaultPromise;
   }
 
-  async function tryUnlock(pw) {
+  async function tryUnlock(pw, name) {
     if (!(window.crypto && crypto.subtle)) { var e = new Error('nocrypto'); e.kind = 'nocrypto'; throw e; }
     var vault;
     try { vault = await getVault(); } catch (err) {  vaultPromise = null; err.kind = 'fail'; throw err; }
     var data;
     try { data = await decrypt(vault, pw); } catch (err) { err.kind = 'wrong'; throw err; }
-    state.content = data;
+    state.content = data; state.name = name;
     $('gate').hidden = true;
     $('app').hidden = false;
     applyChrome();
@@ -152,9 +160,11 @@
 
   $('gate-form').addEventListener('submit', async function (e) {
     e.preventDefault();
-    var msg = $('g-msg'), pw = $('pw').value;
+    var msg = $('g-msg'), pw = $('pw').value, name = $('nm').value.trim();
+    if (!name) { $('nm').focus(); return; }
+    store('eof-name', name);
     msg.textContent = t('checking');
-    try { await tryUnlock(pw); $('pw').value = ''; msg.textContent = ''; }
+    try { await tryUnlock(pw, name); $('pw').value = ''; msg.textContent = ''; }
     catch (err) {
       msg.textContent = err.kind === 'wrong' ? t('wrong') : err.kind === 'nocrypto' ? t('nocrypto') : t('fail');
       if (err.kind === 'wrong') { $('pw').select(); }
@@ -202,12 +212,13 @@
     flush();
     return out;
   }
-  function blocksHtml(bs) {
-    return bs.map(function (b) {
-      if (b.t === 'p') return '<p>' + inline(b.x) + '</p>';
-      if (b.t === 'h3') return '<h3>' + inline(b.x) + '</h3>';
-      if (b.t === 'q') return '<blockquote>' + inline(b.x) + '</blockquote>';
-      return '<' + b.t + '>' + b.items.map(function (i) { return '<li>' + inline(i) + '</li>'; }).join('') + '</' + b.t + '>';
+  function blocksHtml(bs, sec) {
+    return bs.map(function (b, i) {
+      var a = sec ? ' data-sec="' + sec + '" data-b="' + i + '"' : '';
+      if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
+      if (b.t === 'h3') return '<h3' + a + '>' + inline(b.x) + '</h3>';
+      if (b.t === 'q') return '<blockquote' + a + '>' + inline(b.x) + '</blockquote>';
+      return '<' + b.t + a + '>' + b.items.map(function (i) { return '<li>' + inline(i) + '</li>'; }).join('') + '</' + b.t + '>';
     }).join('');
   }
 
@@ -227,45 +238,41 @@
   }
 
   function render() {
-    var r = route(), doc = $('doc');
+    var r = route(), doc = $('doc'), on = r.page !== 'home';
     var src = sourceFor(r.page), pg = parse(src.md);
+    state.sections = {}; pg.sections.forEach(function (x) { state.sections[x.id] = x.title; });
     var h = '';
-    if (r.page !== 'home') h += '<a class="back" href="#/">← ' + esc(t('allPages')) + '</a>';
+    if (on) h += '<a class="back" href="#/">← ' + esc(t('allPages')) + '</a>';
     h += '<h1>' + inline(pg.title || t('page')[r.page] || t('home')) + '</h1>';
-    if (!src.translated) h += '<p class="notice-inline" style="color:var(--soft);font-size:15px">' + esc(t('untranslated')) + '</p>';
-    h += blocksHtml(pg.intro);
-    if (r.page === 'home') {
-      h += '<ul class="pages">' + PAGES.map(function (p, i) {
+    if (!src.translated) h += '<p class="soft">' + esc(t('untranslated')) + '</p>';
+    h += blocksHtml(pg.intro, on ? '_intro' : '');
+    if (!on) {
+      h += '<ul class="pages">' + PAGES.map(function (p) {
         return '<li><a href="#/' + p + '">' + esc(t('page')[p]) + '</a></li>';
       }).join('') + '</ul>';
     }
     pg.sections.forEach(function (s) {
-      h += '<section class="sec" id="sec-' + esc(s.id) + '"><h2>' + inline(s.title) + '</h2>' + blocksHtml(s.blocks);
-      if (r.page !== 'home') h += commentsShell(r.page + '/' + s.id);
-      h += '</section>';
+      h += '<section class="sec" id="sec-' + esc(s.id) + '"><h2>' + inline(s.title) + '</h2>' + blocksHtml(s.blocks, on ? s.id : '') + '</section>';
     });
+    if (on) {
+      h += '<section class="notes" id="notes"><h2>' + esc(t('notes')) + ' (<span id="ncount">0</span>)</h2>' +
+        '<ul class="nlist" id="nlist"></ul>' +
+        '<form class="cform" id="pageform" novalidate><label for="pagetext">' + esc(t('pageNote')) + '</label>' +
+        '<textarea id="pagetext" maxlength="4000"></textarea>' +
+        '<div class="row"><button type="submit">' + esc(t('pageBtn')) + '</button><span class="cstatus" id="pagestat" role="status" aria-live="polite"></span></div></form></section>';
+    }
     doc.innerHTML = h;
+    closeComposer(); hideSel();
     document.title = (pg.title ? pg.title + ' · ' : '') + 'the end of foreign';
-    paintComments();
+    paintComments(true);
     if (r.section) { var el = $('sec-' + r.section); if (el) el.scrollIntoView(); }
   }
 
-  /* ---------- comments ---------- */
+  /* ---------- comments: highlight a passage, note at the end of the page ---------- */
   function cfg() { return (state.content && state.content.config) || {}; }
   function remote() { return !!cfg().endpoint; }
-
-  function commentsShell(key) {
-    return '<div class="comments" data-key="' + esc(key) + '"><details>' +
-      '<summary><span class="clabel">' + esc(t('comments')) + '</span> (<span class="count">0</span>)</summary>' +
-      '<div class="cbody">' +
-      (remote() ? '' : '<p class="pending-note">' + esc(t('local')) + '</p>') +
-      '<div class="clist-wrap"></div>' +
-      '<form class="cform" novalidate>' +
-      '<label>' + esc(t('name')) + '<input type="text" name="name" maxlength="80" autocomplete="name"></label>' +
-      '<label>' + esc(t('comment')) + '<textarea name="text" maxlength="4000"></textarea></label>' +
-      '<div class="row"><button type="submit">' + esc(t('post')) + '</button><span class="cstatus" role="status" aria-live="polite"></span></div>' +
-      '</form></div></details></div>';
-  }
+  function norm(x) { return String(x).replace(/\s+/g, ' ').trim(); }
+  function pageNow() { return route().page; }
 
   function fmtDate(ts) {
     var d = new Date(ts);
@@ -273,24 +280,101 @@
     try { return new Intl.DateTimeFormat(state.lang, { dateStyle: 'medium', timeStyle: 'short' }).format(d); }
     catch (e) { return d.toLocaleString(); }
   }
-  function commentHtml(c) {
-    return '<li class="c"><div class="c-head"><b>' + esc(c.name) + '</b> · ' + esc(fmtDate(c.ts)) +
-      (c.lang ? '<span class="c-tag">' + esc(c.lang) + '</span>' : '') + '</div>' +
-      '<p class="c-text">' + esc(c.text) + '</p>' +
-      (c.reply ? '<p class="c-reply"><b>' + esc(t('rony')) + '</b><br>' + esc(c.reply) + '</p>' : '') + '</li>';
+
+  // --- highlights in the text
+  function textNodes(el) {
+    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), a = [], n;
+    while ((n = w.nextNode())) a.push(n);
+    return a;
   }
-  function paintComments() {
-    var by = {};
-    state.comments.forEach(function (c) { (by[c.section] = by[c.section] || []).push(c); });
-    Array.prototype.forEach.call(document.querySelectorAll('.comments'), function (box) {
-      var list = (by[box.getAttribute('data-key')] || []).slice().sort(function (a, b) { return new Date(a.ts) - new Date(b.ts); });
-      box.querySelector('.count').textContent = list.length;
-      var wrap = box.querySelector('.clist-wrap');
-      wrap.innerHTML = list.length ? '<ul class="clist">' + list.map(commentHtml).join('') + '</ul>'
-        : '<p class="cempty">' + esc(state.commentsOk ? t('none') : t('loadFail')) + '</p>';
+  function highlight(el, quote, id) {
+    var nodes = textNodes(el), full = nodes.map(function (n) { return n.nodeValue; }).join('');
+    var idx = full.indexOf(quote);
+    if (idx < 0 || !quote) return false;
+    var end = idx + quote.length, pos = 0;
+    nodes.forEach(function (n) {
+      var len = n.nodeValue.length, s = Math.max(idx, pos) - pos, e = Math.min(end, pos + len) - pos;
+      pos += len;
+      if (e <= s) return;
+      var mid = n;
+      if (s > 0) mid = n.splitText(s);
+      if (e - s < mid.nodeValue.length) mid.splitText(e - s);
+      var m = document.createElement('mark');
+      m.className = 'hl'; m.setAttribute('data-c', id);
+      mid.parentNode.replaceChild(m, mid); m.appendChild(mid);
+    });
+    return true;
+  }
+  function clearMarks() {
+    Array.prototype.forEach.call(document.querySelectorAll('mark.hl'), function (m) {
+      var p = m.parentNode;
+      while (m.firstChild) p.insertBefore(m.firstChild, m);
+      p.removeChild(m); p.normalize();
+    });
+  }
+  function blockEl(c) {
+    return document.querySelector('[data-sec="' + c.section + '"][data-b="' + c.block + '"]');
+  }
+
+  // --- the notes at the end
+  function noteHtml(c) {
+    var q = '';
+    if (c.quote) {
+      var secTitle = c.section && state.sections && state.sections[c.section];
+      q = '<button type="button" class="cite" data-jump="' + esc(c.id) + '">' +
+        (secTitle ? '<span class="csec">' + esc(secTitle) + '</span>' : '') +
+        '<span class="cq">' + esc(c.quote.length > 220 ? c.quote.slice(0, 220) + '…' : c.quote) + '</span></button>';
+    }
+    return '<li class="note" id="n-' + esc(c.id) + '"><div class="nhead"><b>' + esc(c.name) + '</b> · ' + esc(fmtDate(c.ts)) +
+      (c.lang ? '<span class="tag">' + esc(c.lang) + '</span>' : '') + '</div>' + q +
+      '<p class="ntext">' + esc(c.text) + '</p>' +
+      (c.reply ? '<p class="nreply"><b>' + esc(t('rony')) + '</b><br>' + esc(c.reply) + '</p>' : '') + '</li>';
+  }
+  var lastSig = '';
+  function paintComments(force) {
+    var list = $('nlist');
+    if (!list) return;
+    var mine = state.comments.filter(function (c) { return c.page === pageNow(); })
+      .sort(function (a, b) { return new Date(a.ts) - new Date(b.ts); });
+    var sig = mine.map(function (c) { return c.id + (c.reply || '') + state.lang; }).join('|');
+    if (!force && sig === lastSig) return;
+    lastSig = sig;
+    clearMarks();
+    $('ncount').textContent = mine.length;
+    list.innerHTML = mine.length ? mine.map(noteHtml).join('')
+      : '<li class="nempty">' + esc(state.commentsOk ? t('noNotes') : t('loadFail')) + '</li>';
+    mine.forEach(function (c) {
+      if (c.quote && c.lang === state.lang && c.block !== '' && c.block != null) {
+        var el = blockEl(c); if (el) highlight(el, norm(c.quote), c.id);
+      }
     });
   }
 
+  function flash(els) {
+    els.forEach(function (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); });
+    setTimeout(function () { els.forEach(function (el) { el.classList.remove('flash'); }); }, 1800);
+  }
+  function jumpTo(id) {
+    var c = state.comments.filter(function (x) { return x.id === id; })[0]; if (!c) return;
+    var marks = Array.prototype.slice.call(document.querySelectorAll('mark.hl[data-c="' + id + '"]'));
+    var els = marks.length ? marks : [blockEl(c) || $('sec-' + c.section)].filter(Boolean);
+    if (!els.length) return;
+    els[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    flash(els);
+  }
+  document.addEventListener('click', function (e) {
+    var j = e.target.closest && e.target.closest('[data-jump]');
+    if (j) { jumpTo(j.getAttribute('data-jump')); return; }
+    var m = e.target.closest && e.target.closest('mark.hl');
+    if (m) {
+      var sel = window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      var n = $('n-' + m.getAttribute('data-c'));
+      if (n) { n.scrollIntoView({ block: 'center', behavior: 'smooth' }); flash([n]); }
+    }
+  });
+
+  // --- storage
   function localKey() { return 'eof-comments-local'; }
   async function loadComments() {
     if (!remote()) {
@@ -311,9 +395,8 @@
     pollTimer = setInterval(function () { if (!document.hidden) loadComments(); }, 60000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) loadComments(); });
   }
-
-  async function postComment(key, name, text) {
-    var c = { section: key, name: name, text: text, lang: state.lang };
+  async function postComment(c) {
+    c.page = pageNow(); c.name = state.name; c.lang = state.lang;
     if (!remote()) {
       c.id = 'l' + Date.now(); c.ts = new Date().toISOString();
       state.comments.push(c); store(localKey(), JSON.stringify(state.comments)); return;
@@ -321,49 +404,99 @@
     var r = await fetch(cfg().endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // a "simple" request: no CORS preflight
-      body: JSON.stringify({ token: cfg().token || '', section: key, name: name, text: text, lang: state.lang })
+      body: JSON.stringify({ token: cfg().token || '', page: c.page, section: c.section || '', block: c.block == null ? '' : c.block,
+        name: c.name, quote: c.quote || '', text: c.text, lang: c.lang })
     });
     var d = await r.json();
     if (!d || !d.ok) throw new Error((d && d.error) || 'post');
   }
 
-  document.addEventListener('submit', async function (e) {
-    var form = e.target.closest && e.target.closest('.cform');
-    if (!form) return;
+  // --- selecting a passage
+  var pending = null, hideTimer = null;
+  function blockOf(node) {
+    var el = node && (node.nodeType === 3 ? node.parentNode : node);
+    return el && el.closest ? el.closest('#doc [data-b]') : null;
+  }
+  function captureSelection() {
+    var sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
+    var r = sel.getRangeAt(0), a = blockOf(r.startContainer);
+    if (!a || !blockOf(r.endContainer) && r.endContainer !== a) { if (!a) return null; }
+    var range = r.cloneRange();
+    if (!a.contains(r.endContainer)) range.setEnd(a, a.childNodes.length);   // keep to the first paragraph
+    var quote = norm(range.toString());
+    if (!quote) return null;
+    return { section: a.getAttribute('data-sec'), block: +a.getAttribute('data-b'), quote: quote.slice(0, 600) };
+  }
+  function hideSel() { $('selbar').hidden = true; }
+  document.addEventListener('selectionchange', function () {
+    if (!state.content || !$('composer').hidden) return;
+    var c = captureSelection();
+    clearTimeout(hideTimer);
+    if (c) { pending = c; $('selbar').hidden = false; }
+    else hideTimer = setTimeout(function () { if ($('composer').hidden) { pending = null; hideSel(); } }, 700);
+  });
+  $('selbtn').addEventListener('mousedown', function (e) { e.preventDefault(); });
+  $('selbtn').addEventListener('click', function () {
+    if (!pending) return;
+    $('cq').textContent = pending.quote.length > 300 ? pending.quote.slice(0, 300) + '…' : pending.quote;
+    $('cstat').textContent = ''; $('cstat').className = 'cstatus';
+    hideSel(); $('composer').hidden = false; $('ct').focus();
+  });
+  function closeComposer() { $('composer').hidden = true; $('ct').value = ''; pending = null; }
+  $('ccancel').addEventListener('click', closeComposer);
+  $('composer').addEventListener('submit', async function (e) {
     e.preventDefault();
-    var box = form.closest('.comments'), key = box.getAttribute('data-key');
-    var status = form.querySelector('.cstatus'), btn = form.querySelector('button');
-    var name = form.elements.name.value.trim(), text = form.elements.text.value.trim();
-    status.className = 'cstatus';
-    if (!name || !text) { status.textContent = t('needBoth'); status.className = 'cstatus err'; return; }
-    btn.disabled = true; status.textContent = t('posting');
+    var text = $('ct').value.trim(), btn = $('cpost'), st = $('cstat');
+    if (!text || !pending) return;
+    btn.disabled = true; st.className = 'cstatus'; st.textContent = t('posting');
     try {
-      await postComment(key, name, text);
-      store('eof-name', name);
-      form.elements.text.value = '';
-      status.textContent = t('posted');
-      await loadComments();
-    } catch (err) {
-      status.textContent = t('postFail'); status.className = 'cstatus err';
-    }
+      await postComment({ section: pending.section, block: pending.block, quote: pending.quote, text: text });
+      var sel = window.getSelection(); if (sel) sel.removeAllRanges();
+      closeComposer(); await loadComments(); paintComments(true);
+      var last = $('nlist') && $('nlist').lastElementChild; if (last) { last.scrollIntoView({ block: 'center', behavior: 'smooth' }); flash([last]); }
+    } catch (err) { st.textContent = t('postFail'); st.className = 'cstatus err'; }
     btn.disabled = false;
   });
-
-  // keep the name between visits; Ctrl/Cmd+Enter posts (never while an IME is composing)
-  document.addEventListener('toggle', function (e) {
-    var d = e.target;
-    if (d.tagName !== 'DETAILS' || !d.open) return;
-    var n = d.querySelector('input[name=name]');
-    if (n && !n.value) n.value = store('eof-name') || '';
-    if (remote()) loadComments();
-  }, true);
+  document.addEventListener('submit', async function (e) {
+    if (e.target.id !== 'pageform') return;
+    e.preventDefault();
+    var ta = $('pagetext'), st = $('pagestat'), btn = e.target.querySelector('button'), text = ta.value.trim();
+    if (!text) return;
+    btn.disabled = true; st.className = 'cstatus'; st.textContent = t('posting');
+    try {
+      await postComment({ section: '', block: null, quote: '', text: text });
+      ta.value = ''; st.textContent = t('posted'); await loadComments(); paintComments(true);
+    } catch (err) { st.textContent = t('postFail'); st.className = 'cstatus err'; }
+    btn.disabled = false;
+  });
+  // Ctrl/Cmd+Enter posts, never while an IME is composing (Korean, Japanese, Chinese)
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing && e.target.tagName === 'TEXTAREA') {
-      var f = e.target.closest('.cform'); if (f) { e.preventDefault(); f.requestSubmit(); }
+      var f = e.target.closest('form'); if (f) { e.preventDefault(); f.requestSubmit(); }
     }
+    if (e.key === 'Escape' && !$('composer').hidden) closeComposer();
   });
+
+  /* ---------- no copying ----------
+     A deterrent, not a lock: it stops copy, cut, drag, the right-click menu and printing of the
+     page text. Selecting stays possible because that is how passages are commented on.
+     Typing and copying inside the comment boxes still works. */
+  function inField(e) { var t = e.target; return t && t.closest && t.closest('textarea,input'); }
+  ['copy', 'cut'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      if (inField(e)) return;
+      e.preventDefault();
+      if (e.clipboardData) e.clipboardData.setData('text/plain', '');
+    }, true);
+  });
+  document.addEventListener('dragstart', function (e) { if (!inField(e)) e.preventDefault(); }, true);
+  document.addEventListener('contextmenu', function (e) {
+    if (window.matchMedia && matchMedia('(pointer: fine)').matches && !inField(e)) e.preventDefault();
+  }, true);
 
   /* ---------- start ---------- */
   applyChrome();
-  $('pw').focus();
+  $('nm').value = store('eof-name') || '';
+  (($('nm').value) ? $('pw') : $('nm')).focus();
 })();
