@@ -265,7 +265,7 @@
     var src = sourceFor(v), pg = parse(src.md);
     state.sections = {}; pg.sections.forEach(function (x) { state.sections[x.id] = x.title; });
     var h = '';
-    if (on) h += '<a class="back" href="#/">← ' + esc(t('allPages')) + '</a>';
+    if (on) h += '<a class="back" href="#/" aria-label="' + esc(t('allPages')) + '" title="' + esc(t('allPages')) + '"><svg viewBox="0 0 24 20" width="30" height="25" aria-hidden="true" focusable="false"><path d="M8 4 L3 9 L8 14 M3 9 H16 Q21 9 21 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></svg></a>';
     h += '<h1>' + inline(pg.title || t('page')[r.page] || t('home')) + '</h1>';
     if (on && v && v.date) {
       h += '<p class="soft vline">' + esc(t('versionOf').replace('{d}', fmtVersion(v))) + '</p>';
