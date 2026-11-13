@@ -667,6 +667,23 @@ def _is_watch_link(para):
                         "findithere", "watchithere", "watchither", "àvoirici"))
 
 
+def _rest(para, href):
+    """What follows the watch link inside its own paragraph.
+
+    Some bodies run on in the same paragraph — "watch it here.<br><br>The
+    text…" — and the link is all the player replaces: the writing after it
+    stays, as a paragraph of its own."""
+    after = para.split("</a>", 1)[1] if "</a>" in para else ""
+    for a in re.finditer(r'<a href="([^"]+)"[^>]*>.*?</a>', para, re.S):
+        if a.group(1) == href:
+            after = para[a.end():]
+            break
+    after = re.sub(r"^(?:\s|&nbsp;|<br\s*/?>|[.\u2026,;:])+", "", after)
+    # links alone are not writing: a stray one after "watch it here" stays dropped
+    loose = re.sub(r"<a\b[^>]*>.*?</a>", "", after, flags=re.S)
+    return "<p>%s</p>" % after if re.search(r"\w", strip_tags(loose)) else ""
+
+
 def embed_videos(html, post=None):
     """Swap a project's opening 'find it here' link for the video itself.
 
@@ -690,7 +707,7 @@ def embed_videos(html, post=None):
         if (link and post and os.path.exists(os.path.join(
                 ROOT, "assets/img/poster-%s-1280.jpg" % post["slug"]))
                 and _is_watch_link(para)):
-            return player_frame(None, post, link) + html[m.end():]
+            return player_frame(None, post, link) + _rest(para, link) + html[m.end():]
         return html
     # an Instagram link only becomes a player where a still was made for it
     if post and "instagram.com" in player and not os.path.exists(os.path.join(
@@ -699,7 +716,7 @@ def embed_videos(html, post=None):
     # the paragraph must be just the link(s) and punctuation
     if not _is_watch_link(para):
         return html
-    return player_frame(player, post, watch) + html[m.end():]
+    return player_frame(player, post, watch) + _rest(para, watch) + html[m.end():]
 
 
 def project_body(post):
