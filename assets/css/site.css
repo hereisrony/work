@@ -46,6 +46,20 @@
         U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+/* The about page sets each way she names herself in its own typeface — ten
+   open-licence (OFL) faces, Latin subset, self-hosted like Inconsolata. They
+   are only fetched where the page uses them. */
+@font-face { font-family: "Fraunces"; font-style: italic; font-weight: 900; font-display: swap; src: url(../fonts/fraunces.woff2) format("woff2"); }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/caveat.woff2) format("woff2"); }
+@font-face { font-family: "Syne"; font-style: normal; font-weight: 800; font-display: swap; src: url(../fonts/syne.woff2) format("woff2"); }
+@font-face { font-family: "Gloria Hallelujah"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/gloria-hallelujah.woff2) format("woff2"); }
+@font-face { font-family: "Shrikhand"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/shrikhand.woff2) format("woff2"); }
+@font-face { font-family: "Special Elite"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/special-elite.woff2) format("woff2"); }
+@font-face { font-family: "Anton"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/anton.woff2) format("woff2"); }
+@font-face { font-family: "Permanent Marker"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/permanent-marker.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant Garamond"; font-style: italic; font-weight: 400; font-display: swap; src: url(../fonts/cormorant-garamond.woff2) format("woff2"); }
+@font-face { font-family: "Orbitron"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/orbitron.woff2) format("woff2"); }
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
@@ -486,6 +500,25 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .page .page-body h2:first-child { margin-top: 0; }
 .page .page-body p { margin: 0 0 20px; }
 .page .page-body p:last-child { margin-bottom: 0; }
+
+/* ---- the selves: each definition in a typeface of its own ----------------
+   Display faces at display sizes, tilted a few degrees and no more, so every
+   one stays plain to read. Green stays a ground and black the ink. */
+.page-body [class^="f-"] { line-height: 1.15; }
+.page-body .f-artist     { font-family: "Fraunces", serif; font-style: italic; font-weight: 900; font-size: 1.55em; letter-spacing: -0.01em; }
+.page-body .f-daughter   { font-family: "Caveat", cursive; font-weight: 700; font-size: 1.75em; display: inline-block; transform: rotate(-3deg); }
+.page-body .f-outlier    { font-family: "Syne", sans-serif; font-weight: 800; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em; background: var(--ink); color: var(--paper); padding: 0.18em 0.5em; }
+.page-body .f-teacher    { font-family: "Gloria Hallelujah", cursive; font-size: 1.2em; background: linear-gradient(transparent 68%, var(--accent) 68%); }
+.page-body .f-shape      { font-family: "Shrikhand", serif; font-size: 1.4em; display: inline-block; transform: rotate(2deg); white-space: nowrap; }
+.page-body .f-player     { font-family: "Special Elite", monospace; font-size: 0.95em; border: 1.5px solid var(--ink); padding: 0.05em 0.4em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.page-body .f-crisis     { font-family: "Anton", sans-serif; font-size: 1.45em; text-transform: uppercase; letter-spacing: 0.03em; }
+.page-body .f-impatience { font-family: "Permanent Marker", cursive; font-size: 1.15em; display: inline-block; transform: rotate(-2deg); background: var(--accent); padding: 0 0.3em; }
+.page-body .f-belonging  { font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 400; font-size: 1.6em; }
+.page-body .f-ai         { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 0.95em; letter-spacing: 0.04em; }
+@media (max-width: 700px) {
+    .page-body .f-daughter, .page-body .f-shape, .page-body .f-impatience { transform: none; }
+}
+
 .page .page-body a,
 .project .project-text a {
     font-weight: 700;
