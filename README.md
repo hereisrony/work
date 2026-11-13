@@ -18,7 +18,7 @@ assets/js/name.js       generated from content/questions.json
 assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback,
                         mark.png, the master of the mark, and mark-card.png,
                         the card a shared link opens with
-assets/fonts/           Inconsolata, self-hosted (two variable subsets)
+assets/fonts/           JetBrains Mono, self-hosted (two variable subsets)
 content/posts.json      the 18 projects: title, subtitle, date, body HTML,
                         and an optional "video" to embed
 content/pages.json      the six text pages
@@ -233,10 +233,9 @@ header simply reads Rony Efrat everywhere.
 
 ## Type
 
-Everything is set in Consolas, with Inconsolata — drawn as a free counterpart
-to Consolas — self-hosted for the machines that do not have it, so the page
-reads the same everywhere and makes no third-party requests. One variable file
-per subset (latin, latin-ext) covers regular through bold, about 65KB in all.
+Everything is set in JetBrains Mono, self-hosted so the page reads the same
+everywhere and makes no third-party requests. One variable file per subset
+(latin, latin-ext) covers thin through extra bold, about 55KB in all.
 
 The `@font-face` URLs are relative to the stylesheet rather than the site root:
 CSS resolves `url()` against the stylesheet, so the fonts load at the domain
