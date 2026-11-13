@@ -46,19 +46,34 @@
         U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* The about page sets each way she names herself in its own typeface — ten
-   open-licence (OFL) faces, Latin subset, self-hosted like Inconsolata. They
-   are only fetched where the page uses them. */
-@font-face { font-family: "Fraunces"; font-style: italic; font-weight: 900; font-display: swap; src: url(../fonts/fraunces.woff2) format("woff2"); }
-@font-face { font-family: "Caveat"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/caveat.woff2) format("woff2"); }
-@font-face { font-family: "Syne"; font-style: normal; font-weight: 800; font-display: swap; src: url(../fonts/syne.woff2) format("woff2"); }
-@font-face { font-family: "Gloria Hallelujah"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/gloria-hallelujah.woff2) format("woff2"); }
-@font-face { font-family: "Shrikhand"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/shrikhand.woff2) format("woff2"); }
+/* The about page sets each way she names herself, and each thing she works
+   through, in a typeface of its own: twenty-four open-licence (OFL) faces,
+   Latin subset, self-hosted like Inconsolata and fetched only where the page
+   uses them. */
+@font-face { font-family: "Playfair Display"; font-style: italic; font-weight: 700; font-display: swap; src: url(../fonts/playfair-display.woff2) format("woff2"); }
+@font-face { font-family: "Caveat"; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/caveat.woff2) format("woff2"); }
+@font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/space-grotesk.woff2) format("woff2"); }
+@font-face { font-family: "Libre Baskerville"; font-style: italic; font-weight: 400; font-display: swap; src: url(../fonts/libre-baskerville.woff2) format("woff2"); }
+@font-face { font-family: "Fredoka"; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/fredoka.woff2) format("woff2"); }
 @font-face { font-family: "Special Elite"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/special-elite.woff2) format("woff2"); }
-@font-face { font-family: "Anton"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/anton.woff2) format("woff2"); }
-@font-face { font-family: "Permanent Marker"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/permanent-marker.woff2) format("woff2"); }
+@font-face { font-family: "Oswald"; font-style: normal; font-weight: 500; font-display: swap; src: url(../fonts/oswald.woff2) format("woff2"); }
+@font-face { font-family: "Kalam"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/kalam.woff2) format("woff2"); }
 @font-face { font-family: "Cormorant Garamond"; font-style: italic; font-weight: 400; font-display: swap; src: url(../fonts/cormorant-garamond.woff2) format("woff2"); }
 @font-face { font-family: "Orbitron"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/orbitron.woff2) format("woff2"); }
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url(../fonts/dm-sans.woff2) format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 500; font-display: swap; src: url(../fonts/eb-garamond.woff2) format("woff2"); }
+@font-face { font-family: "Spectral"; font-style: italic; font-weight: 300; font-display: swap; src: url(../fonts/spectral.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url(../fonts/jetbrains-mono.woff2) format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/source-serif-4.woff2) format("woff2"); }
+@font-face { font-family: "Old Standard TT"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/old-standard-tt.woff2) format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url(../fonts/inter.woff2) format("woff2"); }
+@font-face { font-family: "Handlee"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/handlee.woff2) format("woff2"); }
+@font-face { font-family: "Bebas Neue"; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/bebas-neue.woff2) format("woff2"); }
+@font-face { font-family: "Syne"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/syne.woff2) format("woff2"); }
+@font-face { font-family: "Zilla Slab"; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/zilla-slab.woff2) format("woff2"); }
+@font-face { font-family: "Amiri"; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/amiri.woff2) format("woff2"); }
+@font-face { font-family: "Fraunces"; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/fraunces.woff2) format("woff2"); }
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/cinzel.woff2) format("woff2"); }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -501,23 +516,34 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .page .page-body p { margin: 0 0 20px; }
 .page .page-body p:last-child { margin-bottom: 0; }
 
-/* ---- the selves: each definition in a typeface of its own ----------------
-   Display faces at display sizes, tilted a few degrees and no more, so every
-   one stays plain to read. Green stays a ground and black the ink. */
-.page-body [class^="f-"] { line-height: 1.15; }
-.page-body .f-artist     { font-family: "Fraunces", serif; font-style: italic; font-weight: 900; font-size: 1.55em; letter-spacing: -0.01em; }
-.page-body .f-daughter   { font-family: "Caveat", cursive; font-weight: 700; font-size: 1.75em; display: inline-block; transform: rotate(-3deg); }
-.page-body .f-outlier    { font-family: "Syne", sans-serif; font-weight: 800; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em; background: var(--ink); color: var(--paper); padding: 0.18em 0.5em; }
-.page-body .f-teacher    { font-family: "Gloria Hallelujah", cursive; font-size: 1.2em; background: linear-gradient(transparent 68%, var(--accent) 68%); }
-.page-body .f-shape      { font-family: "Shrikhand", serif; font-size: 1.4em; display: inline-block; transform: rotate(2deg); white-space: nowrap; }
-.page-body .f-player     { font-family: "Special Elite", monospace; font-size: 0.95em; border: 1.5px solid var(--ink); padding: 0.05em 0.4em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-.page-body .f-crisis     { font-family: "Anton", sans-serif; font-size: 1.45em; text-transform: uppercase; letter-spacing: 0.03em; }
-.page-body .f-impatience { font-family: "Permanent Marker", cursive; font-size: 1.15em; display: inline-block; transform: rotate(-2deg); background: var(--accent); padding: 0 0.3em; }
-.page-body .f-belonging  { font-family: "Cormorant Garamond", serif; font-style: italic; font-weight: 400; font-size: 1.6em; }
-.page-body .f-ai         { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 0.95em; letter-spacing: 0.04em; }
-@media (max-width: 700px) {
-    .page-body .f-daughter, .page-body .f-shape, .page-body .f-impatience { transform: none; }
-}
+/* ---- the selves: every definition and every thing she works through in a
+   typeface of its own. No tilt, no boxes, no colour — only the face changes.
+   Each face is scaled so its lowercase matches the x-height of the page's own
+   type, and all twenty-four read at one size on one line. ---------------- */
+.page-body .f-artist { font-family: "Playfair Display", serif; font-weight: 700; font-style: italic; font-size: 0.92em; }
+.page-body .f-daughter { font-family: "Caveat", cursive; font-weight: 600; font-size: 1.3em; }
+.page-body .f-outlier { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 0.94em; }
+.page-body .f-teacher { font-family: "Libre Baskerville", serif; font-weight: 400; font-style: italic; font-size: 0.88em; }
+.page-body .f-shape { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 0.92em; }
+.page-body .f-player { font-family: "Special Elite", monospace; font-weight: 400; font-size: 1.0em; }
+.page-body .f-crisis { font-family: "Oswald", sans-serif; font-weight: 500; font-size: 0.95em; }
+.page-body .f-impatience { font-family: "Kalam", cursive; font-weight: 700; font-size: 0.9em; }
+.page-body .f-belonging { font-family: "Cormorant Garamond", serif; font-weight: 400; font-style: italic; font-size: 1.22em; }
+.page-body .f-ai { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 0.86em; }
+.page-body .f-natural { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 0.92em; }
+.page-body .f-legal { font-family: "EB Garamond", serif; font-weight: 500; font-size: 1.1em; }
+.page-body .f-poetry { font-family: "Spectral", serif; font-weight: 300; font-style: italic; font-size: 1.1em; }
+.page-body .f-code { font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: 0.86em; }
+.page-body .f-dict { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 0.96em; }
+.page-body .f-prec { font-family: "Old Standard TT", serif; font-weight: 700; font-size: 0.96em; }
+.page-body .f-ui { font-family: "Inter", sans-serif; font-weight: 500; font-size: 0.88em; }
+.page-body .f-intimacy { font-family: "Handlee", cursive; font-weight: 400; font-size: 1.2em; }
+.page-body .f-film { font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: 0.95em; }
+.page-body .f-anderson { font-family: "Syne", sans-serif; font-weight: 700; font-size: 0.92em; }
+.page-body .f-curtis { font-family: "Zilla Slab", sans-serif; font-weight: 600; font-size: 1.0em; }
+.page-body .f-saadawi { font-family: "Amiri", serif; font-weight: 700; font-size: 1.05em; }
+.page-body .f-ostrom { font-family: "Fraunces", serif; font-weight: 600; font-size: 0.95em; }
+.page-body .f-civil { font-family: "Cinzel", serif; font-weight: 600; font-size: 0.95em; }
 
 .page .page-body a,
 .project .project-text a {

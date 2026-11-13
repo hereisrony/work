@@ -19,10 +19,8 @@ assets/img/             every image, as WebP (480/960/1600) + a JPEG fallback,
                         mark.png, the master of the mark, and mark-card.png,
                         the card a shared link opens with
 assets/fonts/           Inconsolata, self-hosted (two variable subsets)
-                        and ten OFL display faces for the about page's "selves"
-                        (Fraunces, Caveat, Syne, Gloria Hallelujah, Shrikhand,
-                        Special Elite, Anton, Permanent Marker, Cormorant
-                        Garamond, Orbitron), Latin subset from Fontsource
+                        and 24 OFL faces for the about page's opening list, one per phrase
+                        (Latin subset, via Fontsource)
 content/posts.json      the 18 projects: title, subtitle, date, body HTML,
                         and an optional "video" to embed
 content/pages.json      the six text pages
