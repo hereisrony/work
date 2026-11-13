@@ -22,7 +22,7 @@
 }
 
 /* JetBrains Mono, everywhere. One variable file per subset covers the whole
-   weight range. Self-hosted: the site makes no third-party requests. */
+   weight range. Self-hosted; the only third-party request is the about page's Google Fonts. */
 @font-face {
     font-family: "JetBrains Mono";
     font-style: normal;
@@ -484,6 +484,35 @@ body.text-page #main > .wrap { padding-left: 20.5%; }
 .page .page-body h2:first-child { margin-top: 0; }
 .page .page-body p { margin: 0 0 20px; }
 .page .page-body p:last-child { margin-bottom: 0; }
+
+/* ---- the selves: every definition and every thing she works through in a
+   typeface of its own. No tilt, no boxes, no colour — only the face changes,
+   each scaled to sit at the size of the page's own type. The faces come from
+   Google Fonts, requested on this page alone (see build.py). ------------- */
+.page-body .f-artist { font-family: "Playfair Display", serif; font-weight: 700; font-style: italic; font-size: 1.1em; }
+.page-body .f-daughter { font-family: "Caveat", cursive; font-weight: 600; font-size: 1.55em; }
+.page-body .f-outlier { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.12em; }
+.page-body .f-teacher { font-family: "Libre Baskerville", serif; font-weight: 400; font-style: italic; font-size: 1.05em; }
+.page-body .f-shape { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 1.1em; }
+.page-body .f-player { font-family: "Special Elite", monospace; font-weight: 400; font-size: 1.2em; }
+.page-body .f-crisis { font-family: "Oswald", sans-serif; font-weight: 500; font-size: 1.12em; }
+.page-body .f-impatience { font-family: "Kalam", cursive; font-weight: 700; font-size: 1.05em; }
+.page-body .f-belonging { font-family: "Cormorant Garamond", serif; font-weight: 400; font-style: italic; font-size: 1.45em; }
+.page-body .f-ai { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 1.0em; }
+.page-body .f-natural { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 1.1em; }
+.page-body .f-legal { font-family: "EB Garamond", serif; font-weight: 500; font-size: 1.3em; }
+.page-body .f-poetry { font-family: "Spectral", serif; font-weight: 300; font-style: italic; font-size: 1.3em; }
+.page-body .f-code { font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: 1.0em; }
+.page-body .f-dict { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 1.15em; }
+.page-body .f-prec { font-family: "Old Standard TT", serif; font-weight: 700; font-size: 1.15em; }
+.page-body .f-ui { font-family: "Inter", sans-serif; font-weight: 500; font-size: 1.05em; }
+.page-body .f-intimacy { font-family: "Handlee", cursive; font-weight: 400; font-size: 1.4em; }
+.page-body .f-film { font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: 1.1em; }
+.page-body .f-anderson { font-family: "Syne", sans-serif; font-weight: 700; font-size: 1.1em; }
+.page-body .f-curtis { font-family: "Zilla Slab", serif; font-weight: 600; font-size: 1.2em; }
+.page-body .f-saadawi { font-family: "Amiri", serif; font-weight: 700; font-size: 1.25em; }
+.page-body .f-ostrom { font-family: "Fraunces", serif; font-weight: 600; font-size: 1.12em; }
+.page-body .f-civil { font-family: "Cinzel", serif; font-weight: 600; font-size: 1.1em; }
 .page .page-body a,
 .project .project-text a {
     font-weight: 700;

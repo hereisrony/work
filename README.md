@@ -234,7 +234,9 @@ header simply reads Rony Efrat everywhere.
 ## Type
 
 Everything is set in JetBrains Mono, self-hosted so the page reads the same
-everywhere and makes no third-party requests. One variable file per subset
+everywhere. The one exception is the about page, which sets each phrase of its
+opening list in its own Google Font (23 families, one request, only on that page;
+the list is `ABOUT_FONTS` in `build.py`). One variable file per subset
 (latin, latin-ext) covers thin through extra bold, about 55KB in all.
 
 The `@font-face` URLs are relative to the stylesheet rather than the site root:

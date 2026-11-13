@@ -944,6 +944,19 @@ LANG_JS = ("<script>(function(){var d=document.documentElement,a=d.getAttribute(
            "if(w!==d.lang)location.replace(a+location.hash)}())</script>")
 
 
+ABOUT_FONTS = (
+    "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,"
+    "700&family=Caveat:wght@600&family=Space+Grotesk:wght@700&family=Libre+"
+    "Baskerville:ital@1&family=Fredoka:wght@600&family=Special+Elite&family"
+    "=Oswald:wght@500&family=Kalam:wght@700&family=Cormorant+Garamond:ital,"
+    "wght@1,400&family=Orbitron:wght@700&family=DM+Sans:wght@500&family=EB+"
+    "Garamond:wght@500&family=Spectral:ital,wght@1,300&family=Source+Serif+"
+    "4:wght@600&family=Old+Standard+TT:wght@700&family=Inter:wght@500&famil"
+    "y=Handlee&family=Bebas+Neue&family=Syne:wght@700&family=Zilla+Slab:wgh"
+    "t@600&family=Amiri:wght@700&family=Fraunces:wght@600&family=Cinzel:wgh"
+    "t@600&display=swap")
+
+
 def document(*, title, description, canonical, body, active, og_image=None,
              jsonld=False, body_class="", extra_ld=None, lang="en", og_alt=None,
              person_desc=None):
@@ -980,6 +993,11 @@ def document(*, title, description, canonical, body, active, og_image=None,
         % (esc(TITLE), "/feed-fr.xml" if lang == "fr" else "/feed.xml"),
         '<link rel="stylesheet" href="%s">' % asset("/assets/css/site.css"),
     ]
+    if path == "/about/":
+        # The about page sets its opening list in twenty-three Google Fonts.
+        head += ['<link rel="preconnect" href="https://fonts.googleapis.com">',
+                 '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+                 '<link rel="stylesheet" href="%s">' % ABOUT_FONTS]
     # A text page shares the one photograph, the front page the mark, and a
     # project its own still — the picture that stands for it on the grid.
     img, w, h = og_image or SOCIAL_IMAGE
