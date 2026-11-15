@@ -1107,7 +1107,7 @@ def grid_order(posts):
     recent project year. Ties keep the order of the content file."""
     def year(p):
         sub = p.get("subtitle", "")
-        if "present" in sub:
+        if re.search(r"present|présent|depuis", sub):   # ongoing, in either language
             return 9999
         m = re.search(r"\d{4}", sub)
         return int(m.group()) if m else 0
