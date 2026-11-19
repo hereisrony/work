@@ -72,7 +72,7 @@ UI = {
         "nav": {"/about/": "about", "/filmography/": "filmography",
                 "/academia/": "academia", "/ai/": "ai", "/press/": "press"},
         "upcoming": "upcoming",
-        "more_upcoming": "more upcoming",
+        "more_upcoming": "past events",
         "all": "all",
         "filters": {"film": "film", "exhibition": "exhibition", "talk": "talk",
                     "site-specific": "site-specific", "performance": "performance",
@@ -98,7 +98,7 @@ UI = {
         "nav": {"/about/": "à propos", "/filmography/": "filmographie",
                 "/academia/": "recherche", "/ai/": "ia", "/press/": "presse"},
         "upcoming": "à venir",
-        "more_upcoming": "tout l’agenda",
+        "more_upcoming": "événements passés",
         "all": "tout",
         "filters": {"film": "film", "exhibition": "exposition", "talk": "conférence",
                     "site-specific": "in-situ", "performance": "performance",
@@ -735,8 +735,8 @@ def project_body(post):
 # A short list above the work, taken from the upcoming page so an event is
 # written once. Only the two months below, and only what has not happened yet —
 # the page's own P A S T divider says where that stops.
-UPCOMING_FROM = (2026, 10)    # the first month shown
-UPCOMING_MONTHS = 3           # october, then november and december
+UPCOMING_FROM = (2026, 11)    # the first month shown
+UPCOMING_MONTHS = 3           # november, then december and january
 
 MONTH_NAMES = ("january", "february", "march", "april", "may", "june", "july",
                "august", "september", "october", "november", "december")
