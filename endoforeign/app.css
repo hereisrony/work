@@ -186,3 +186,6 @@ body.shielded #app,body.shielded .wm{visibility:hidden}
 .dlg .paren{font-weight:400;text-transform:none;letter-spacing:0;font-style:italic;color:var(--soft)}
 .dlg .say{margin-top:2px}
 @media(max-width:560px){.dlg{margin-left:0}}
+
+/* a picture that has not arrived yet */
+.ph{display:flex;align-items:center;justify-content:center;aspect-ratio:4/3;max-width:420px;background:#f3f6f3;color:var(--soft);font-size:15px}
