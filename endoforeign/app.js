@@ -11,7 +11,7 @@
 
   var UI = {
     en: {
-      versionOf: 'Version of {d}', olderNote: 'You are reading an earlier version.', currentVersion: 'current version', versions: 'versions', veil: 'Hidden while this window is not active. Click to continue.', notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
+      imageSoon: 'image to come', versionOf: 'Version of {d}', olderNote: 'You are reading an earlier version.', currentVersion: 'current version', versions: 'versions', veil: 'Hidden while this window is not active. Click to continue.', notes: 'notes', noNotes: 'No notes yet. Select a passage above to comment on it, or write a note below.', selBtn: 'comment on selection', cancel: 'cancel', pageNote: 'a note on the whole page', pageBtn: 'add note', 
       password: 'password', enter: 'enter',
       checking: 'opening…',
       wrong: 'That password does not open this page.', fail: 'Could not load the page. Try again.',
@@ -30,7 +30,7 @@
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
-      versionOf: 'Version du {d}', olderNote: 'Vous lisez une version précédente.', currentVersion: 'version actuelle', versions: 'versions', veil: 'Masqué tant que cette fenêtre n’est pas active. Cliquez pour continuer.', notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
+      imageSoon: 'image à venir', versionOf: 'Version du {d}', olderNote: 'Vous lisez une version précédente.', currentVersion: 'version actuelle', versions: 'versions', veil: 'Masqué tant que cette fenêtre n’est pas active. Cliquez pour continuer.', notes: 'notes', noNotes: 'Pas encore de notes. Sélectionnez un passage pour le commenter, ou écrivez une note ci-dessous.', selBtn: 'commenter la sélection', cancel: 'annuler', pageNote: 'une note sur toute la page', pageBtn: 'ajouter la note', 
       password: 'mot de passe', enter: 'entrer',
       checking: 'ouverture…',
       wrong: 'Ce mot de passe n’ouvre pas cette page.', fail: 'Impossible de charger la page. Réessayez.',
@@ -49,7 +49,7 @@
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
-      versionOf: '{d} 버전', olderNote: '이전 버전을 보고 있습니다.', currentVersion: '현재 버전', versions: '버전', veil: '이 창이 활성 상태가 아닌 동안에는 숨겨집니다. 계속하려면 클릭하세요.', notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
+      imageSoon: '이미지 준비 중', versionOf: '{d} 버전', olderNote: '이전 버전을 보고 있습니다.', currentVersion: '현재 버전', versions: '버전', veil: '이 창이 활성 상태가 아닌 동안에는 숨겨집니다. 계속하려면 클릭하세요.', notes: '메모', noNotes: '아직 메모가 없습니다. 문장을 선택해 댓글을 남기거나, 아래에 메모를 적어 주세요.', selBtn: '선택한 부분에 댓글 달기', cancel: '취소', pageNote: '페이지 전체에 대한 메모', pageBtn: '메모 추가', 
       password: '비밀번호', enter: '입장',
       checking: '여는 중…',
       wrong: '비밀번호가 맞지 않습니다.', fail: '페이지를 불러오지 못했습니다. 다시 시도해 주세요.',
@@ -226,7 +226,8 @@
       var a = sec ? ' data-sec="' + sec + '" data-b="' + i + '"' : '';
       if (b.t === 'img') {
         var uri = (state.content.images || {})[b.key];
-        return uri ? '<figure class="fig"' + a + '><img src="' + uri + '" alt="' + esc(b.alt) + '" draggable="false"></figure>' : '';
+        return uri ? '<figure class="fig"' + a + '><img src="' + uri + '" alt="' + esc(b.alt) + '" draggable="false"></figure>'
+          : '<figure class="fig"' + a + '><div class="ph" role="img" aria-label="' + esc(b.alt) + '">' + esc(t('imageSoon')) + '</div></figure>';
       }
       if (b.t === 'dlg') return '<div class="dlg"' + a + '><div class="cue">' + inline(b.cue) + (b.paren ? ' <span class="paren">' + inline(b.paren) + '</span>' : '') + '</div><div class="say">' + inline(b.x.join(' ')) + '</div></div>';
       if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
