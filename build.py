@@ -74,9 +74,9 @@ UI = {
         "upcoming": "upcoming",
         "more_upcoming": "past events",
         "all": "all",
-        "filters": {"film": "film", "exhibition": "immersive", "talk": "talk",
-                    "site-specific": "site-specific", "performance": "performance",
-                    "music": "music"},
+        "filters": {"film": "film", "exhibition": "immersive", "talk": "educational",
+                    "site-specific": "site-specific", "performance": "performative",
+                    "music": "musical"},
         "words": "words",
         "filter_aria": "filter the work",
         "play": "Play",
@@ -100,9 +100,9 @@ UI = {
         "upcoming": "à venir",
         "more_upcoming": "événements passés",
         "all": "tout",
-        "filters": {"film": "film", "exhibition": "immersif", "talk": "conférence",
-                    "site-specific": "in-situ", "performance": "performance",
-                    "music": "musique"},
+        "filters": {"film": "film", "exhibition": "immersif", "talk": "éducatif",
+                    "site-specific": "in-situ", "performance": "performatif",
+                    "music": "musical"},
         "words": "mots",
         "filter_aria": "filtrer les projets",
         "play": "Lire",
@@ -1120,15 +1120,19 @@ def build_lang(lang, posts, pages):
     # the buttons would do nothing, so they stay hidden until it runs.
     kinds = [k for k in FILTER_ORDER if any(p.get("category") == k for p in posts)]
     words = UI[lang]
+    words_link = ('    <a class="filter" href="%s" target="_blank" rel="noopener">%s</a>'
+                  % (BLOG, esc(words["words"])))
+    items = []
+    for k in ["all"] + kinds:
+        items.append('    <button type="button" class="filter" data-filter="%s" '
+                     'aria-pressed="false" hidden>%s</button>'
+                     % (esc(k), esc(words["all"] if k == "all"
+                                    else words["filters"][k])))
+        if k == "film":
+            items.append(words_link)
     projects = ('  <h2 class="sec-title filters" role="group" aria-label="%s">\n'
                 % words["filter_aria"]
-                + "\n".join('    <button type="button" class="filter" data-filter="%s" '
-                             'aria-pressed="false" hidden>%s</button>'
-                             % (esc(k), esc(words["all"] if k == "all"
-                                            else words["filters"][k]))
-                             for k in ["all"] + kinds)
-                + '\n    <a class="filter" href="%s" target="_blank" rel="noopener">%s</a>'
-                % (BLOG, esc(words["words"]))
+                + "\n".join(items)
                 + '\n  </h2>')
     seo = SEO_FR if lang == "fr" else SEO
     root = "" if lang == "en" else "fr/"
