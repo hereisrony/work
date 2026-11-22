@@ -326,7 +326,7 @@ node tools/endoforeign.mjs unpack   # vault -> private/endoforeign/*.md (git-ign
 node tools/endoforeign.mjs pack     # re-encrypt (password from $ENDOFOREIGN_PASSWORD or prompt)
 ```
 
-Pages: home, synopsis, statement, characters, drafts, moodboard.
+Pages: home, synopsis, statement, characters, scenes (treatments and scenes), drafts (full drafts), moodboard.
 Missing fr/ko files fall back to English with a notice. Comments live in a
 Google Sheet through `tools/endoforeign-comments.gs` (setup steps at the top of
 that file); its URL and token go in `private/endoforeign/config.json`.
@@ -347,3 +347,8 @@ the current version's date per page. A second version on the same day gets the i
 
 **Spelling.** English on the site is American (color, theater, neighbor, kilometers, elevator).
 `pack` prints "American English?" warnings for common British spellings in the English texts.
+
+**Written scenes.** On a page set up as cards (characters, scenes), each `## Title {#id}` is a card. A line of
+dialogue is written `@NAME (parenthetical)` followed by the spoken text on the next line, with a blank line after;
+each one becomes its own block that can be highlighted and commented, like any paragraph. Action and treatment
+stay ordinary paragraphs.

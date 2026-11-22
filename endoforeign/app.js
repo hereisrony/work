@@ -7,7 +7,7 @@
 
   var LANGS = ['en', 'fr', 'ko'];
   var LANG_NAMES = { en: 'English', fr: 'Français', ko: '한국어' };
-  var PAGES = ['synopsis', 'statement', 'characters', 'drafts', 'moodboard'];
+  var PAGES = ['synopsis', 'statement', 'characters', 'scenes', 'drafts', 'moodboard'];
 
   var UI = {
     en: {
@@ -26,7 +26,7 @@
       postFail: 'Could not post. Your text is still in the box. Try again.',
       loadFail: 'Could not load the comments.',
       local: 'The shared comment notebook is not connected yet. Comments are saved on this device only, and nobody else sees them.',
-      rony: 'rony', page: { synopsis: 'synopsis', statement: 'statement', characters: 'characters', drafts: 'drafts', moodboard: 'moodboard' },
+      rony: 'rony', page: { synopsis: 'synopsis', statement: 'statement', characters: 'characters', scenes: 'treatments and scenes', drafts: 'full drafts', moodboard: 'moodboard' },
       allPages: 'all pages', foot: 'Private. Please do not share the link, the password or what is on these pages.'
     },
     fr: {
@@ -45,7 +45,7 @@
       postFail: 'Envoi impossible. Votre texte est toujours dans la zone. Réessayez.',
       loadFail: 'Impossible de charger les commentaires.',
       local: 'Le carnet de commentaires partagé n’est pas encore connecté. Les commentaires sont enregistrés sur cet appareil uniquement, et personne d’autre ne les voit.',
-      rony: 'rony', page: { synopsis: 'synopsis', statement: 'intention', characters: 'personnages', drafts: 'brouillons', moodboard: 'moodboard' },
+      rony: 'rony', page: { synopsis: 'synopsis', statement: 'intention', characters: 'personnages', scenes: 'traitements et scènes', drafts: 'brouillons complets', moodboard: 'moodboard' },
       allPages: 'toutes les pages', foot: 'Privé. Merci de ne pas partager le lien, le mot de passe ni le contenu de ces pages.'
     },
     ko: {
@@ -64,13 +64,13 @@
       postFail: '등록하지 못했습니다. 입력한 내용은 그대로 남아 있습니다. 다시 시도해 주세요.',
       loadFail: '댓글을 불러오지 못했습니다.',
       local: '공유 댓글 노트가 아직 연결되지 않았습니다. 댓글은 이 기기에만 저장되며 다른 사람에게는 보이지 않습니다.',
-      rony: 'rony', page: { synopsis: '시놉시스', statement: '의도', characters: '캐릭터', drafts: '초안', moodboard: '무드보드' },
+      rony: 'rony', page: { synopsis: '시놉시스', statement: '의도', characters: '캐릭터', scenes: '트리트먼트와 장면', drafts: '전체 초안', moodboard: '무드보드' },
       allPages: '전체 페이지', foot: '비공개입니다. 링크, 비밀번호, 그리고 이 페이지의 내용을 공유하지 말아 주세요.'
     }
   };
 
   var $ = function (id) { return document.getElementById(id); };
-  var CARD_PAGES = { characters: true };   // pages whose sections are cards that open and close
+  var CARD_PAGES = { characters: true, scenes: true };   // pages whose sections are cards that open and close
   var state = { lang: 'en', content: null, comments: [], commentsOk: true, open: {} };
 
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
@@ -184,8 +184,9 @@
   // returns { title, sub, intro:[blocks], sections:[{id,title,blocks}] }
   function parse(md) {
     var out = { title: '', intro: [], sections: [] };
-    var target = out.intro, para = [], list = null;
+    var target = out.intro, para = [], list = null, curDlg = null;
     function flush() {
+      curDlg = null;
       if (para.length) { target.push({ t: 'p', x: para.join(' ') }); para = []; }
       if (list) { target.push(list); list = null; }
     }
@@ -200,6 +201,11 @@
       }
       if ((m = line.match(/^!\[([^\]]*)\]\(img:([a-z0-9-]+)\)\s*$/))) { flush(); target.push({ t: 'img', alt: m[1], key: m[2] }); return; }
       if ((m = line.match(/^### (.*)$/))) { flush(); target.push({ t: 'h3', x: m[1].trim() }); return; }
+      if ((m = line.match(/^@\s*(.+?)\s*$/))) {              // a line of dialogue: @NAME (parenthetical), then the spoken text
+        flush(); var pm = m[1].match(/^(.*?)\s*(\(.*\))?\s*$/);
+        curDlg = { t: 'dlg', cue: pm[1], paren: pm[2] || '', x: [] }; target.push(curDlg); return;
+      }
+      if (curDlg) { curDlg.x.push(line.trim()); return; }
       if ((m = line.match(/^> ?(.*)$/))) { flush(); target.push({ t: 'q', x: m[1] }); return; }
       if ((m = line.match(/^\s*[-*] +(.*)$/))) {
         if (!list || list.t !== 'ul') { flush(); list = { t: 'ul', items: [] }; }
@@ -222,6 +228,7 @@
         var uri = (state.content.images || {})[b.key];
         return uri ? '<figure class="fig"' + a + '><img src="' + uri + '" alt="' + esc(b.alt) + '" draggable="false"></figure>' : '';
       }
+      if (b.t === 'dlg') return '<div class="dlg"' + a + '><div class="cue">' + inline(b.cue) + (b.paren ? ' <span class="paren">' + inline(b.paren) + '</span>' : '') + '</div><div class="say">' + inline(b.x.join(' ')) + '</div></div>';
       if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
       if (b.t === 'h3') return '<h3' + a + '>' + inline(b.x) + '</h3>';
       if (b.t === 'q') return '<blockquote' + a + '>' + inline(b.x) + '</blockquote>';
