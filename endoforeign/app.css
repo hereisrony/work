@@ -179,3 +179,10 @@ body.shielded #app,body.shielded .wm{visibility:hidden}
 .card-body{padding:26px 20px 30px}
 .card-body>:last-child{margin-bottom:0}
 .card-body h3:first-child{margin-top:0}
+
+/* written scenes: a line of dialogue is a block of its own, so it can be highlighted and commented */
+.dlg{margin:0 0 20px 6%;max-width:34rem}
+.dlg .cue{font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:15px;line-height:1.4}
+.dlg .paren{font-weight:400;text-transform:none;letter-spacing:0;font-style:italic;color:var(--soft)}
+.dlg .say{margin-top:2px}
+@media(max-width:560px){.dlg{margin-left:0}}
