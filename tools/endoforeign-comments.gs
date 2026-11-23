@@ -11,6 +11,10 @@
  *       { "endpoint": "https://script.google.com/macros/s/…/exec", "token": "…" }
  *     and run:  node tools/endoforeign.mjs pack
  *
+ * Emails: NOTIFY below sends you an email at each new comment. After pasting a new version of this script,
+ * run authorize_ once from the editor, then Deploy > Manage deployments > pencil > New version > Deploy
+ * (the web address stays the same).
+ *
  * The URL and token live only inside the encrypted vault, so only people who
  * have the password ever learn them. Comments land in the "comments" tab, one row each.
  * Each row holds the page, the quoted passage and the comment. Write in the "reply" column and your answer shows under that note on the site.
@@ -18,6 +22,8 @@
  * deployment version (Deploy → Manage deployments → edit → New version).
  */
 var TOKEN = 'REPLACE-WITH-A-RANDOM-STRING';
+// Email you (the owner of this script) at every new comment. Set to false to stop.
+var NOTIFY = true;
 var HEADERS = ['id', 'ts', 'page', 'version', 'section', 'block', 'name', 'quote', 'comment', 'lang', 'reply'];
 
 function sheet_() {
@@ -63,5 +69,24 @@ function doPost(e) {
     sh.getRange(row, 1, 1, HEADERS.length).setNumberFormat('@')
       .setValues([[Utilities.getUuid(), new Date().toISOString(), page, version, section, block, name, quote, text, String(d.lang || '').slice(0, 5), '']]);
   } finally { lock.releaseLock(); }
+  notify_(page, version, name, quote, text);
   return out_({ ok: true });
+}
+
+// Sends one plain-text email to you. A failure here never blocks the comment itself.
+function notify_(page, version, name, quote, text) {
+  if (!NOTIFY) return;
+  try {
+    var subject = 'New comment on ' + page + ' by ' + name;
+    var body = name + ' commented on "' + page + '"' + (version ? ' (version ' + version + ')' : '') + '.\n\n' +
+      (quote ? 'On the passage: "' + quote + '"\n\n' : '') + text + '\n\n' +
+      'Reply in the "reply" column of the sheet:\n' + SpreadsheetApp.getActiveSpreadsheet().getUrl();
+    MailApp.sendEmail(Session.getEffectiveUser().getEmail(), subject, body);
+  } catch (err) {}
+}
+
+// Run this once from the editor (function menu, then Run) to give the script permission to send you email.
+function authorize_() {
+  MailApp.getRemainingDailyQuota();
+  SpreadsheetApp.getActiveSpreadsheet();
 }
