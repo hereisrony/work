@@ -184,9 +184,9 @@
   // returns { title, sub, intro:[blocks], sections:[{id,title,blocks}] }
   function parse(md) {
     var out = { title: '', intro: [], sections: [] };
-    var target = out.intro, para = [], list = null, curDlg = null;
+    var target = out.intro, para = [], list = null, curDlg = null, curVerse = null;
     function flush() {
-      curDlg = null;
+      curDlg = null; curVerse = null;
       if (para.length) { target.push({ t: 'p', x: para.join(' ') }); para = []; }
       if (list) { target.push(list); list = null; }
     }
@@ -206,6 +206,10 @@
         curDlg = { t: 'dlg', cue: pm[1], paren: pm[2] || '', x: [] }; target.push(curDlg); return;
       }
       if (curDlg) { curDlg.x.push(line.trim()); return; }
+      if ((m = line.match(/^\|\s?(.*)$/))) {                    // a poem: lines starting with "| " keep their line breaks
+        if (!curVerse) { flush(); curVerse = { t: 'verse', lines: [] }; target.push(curVerse); }
+        curVerse.lines.push(m[1]); return;
+      }
       if ((m = line.match(/^> ?(.*)$/))) { flush(); target.push({ t: 'q', x: m[1] }); return; }
       if ((m = line.match(/^\s*[-*] +(.*)$/))) {
         if (!list || list.t !== 'ul') { flush(); list = { t: 'ul', items: [] }; }
@@ -230,6 +234,7 @@
           : '<figure class="fig"' + a + '><div class="ph" role="img" aria-label="' + esc(b.alt) + '">' + esc(t('imageSoon')) + '</div></figure>';
       }
       if (b.t === 'dlg') return '<div class="dlg"' + a + '><div class="cue">' + inline(b.cue) + (b.paren ? ' <span class="paren">' + inline(b.paren) + '</span>' : '') + '</div><div class="say">' + inline(b.x.join(' ')) + '</div></div>';
+      if (b.t === 'verse') return '<p class="verse"' + a + '>' + b.lines.map(inline).join('<br>') + '</p>';
       if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
       if (b.t === 'h3') return '<h3' + a + '>' + inline(b.x) + '</h3>';
       if (b.t === 'q') return '<blockquote' + a + '>' + inline(b.x) + '</blockquote>';
