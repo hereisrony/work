@@ -192,3 +192,36 @@ body.shielded #app,body.shielded .wm{visibility:hidden}
 
 /* poems */
 .verse{margin:0 0 22px 24px;max-width:34rem}
+
+/* --- moodboard: pictures and words together, pinned like a real board ---- */
+.doc.board{max-width:70rem}
+.board h1,.board .vline,.board .notes,.board .versions,.board .pagebar,.board>p,.board>.soft{max-width:var(--measure)}
+.board .sec h2{margin:64px 0 18px;line-height:1.5}
+.board .sec h2{display:block}
+.board .sec h2 span{padding:2px 10px 4px;background:var(--accent);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.board .strip{display:flex;flex-wrap:wrap;gap:0;margin:0 0 34px;padding-left:6px}
+.board .thumb{display:block;width:clamp(72px,11vw,120px);aspect-ratio:1;margin:0 -8px 8px 0;padding:4px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.28);transform:rotate(-3deg);cursor:zoom-in}
+.board .thumb:nth-child(even){transform:rotate(2.5deg) translateY(6px)}
+.board .thumb:nth-child(3n){transform:rotate(-1deg) translateY(-3px)}
+.board .thumb img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.board .topic{margin:0 0 54px}
+.board .words{max-width:var(--measure)}
+.board .words h3:first-child{margin-top:0}
+.board .media .fig{position:relative;margin:0 0 26px;padding:10px;background:#fff;box-shadow:0 3px 16px rgba(0,0,0,.24);cursor:zoom-in;transform:rotate(-1.1deg)}
+.board .media .fig:nth-child(even){transform:rotate(1deg)}
+.board .media .fig::before{content:"";position:absolute;top:-13px;left:50%;width:86px;height:26px;margin-left:-43px;background:rgba(246,238,205,.82);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:rotate(-2deg)}
+.board .media .fig:nth-child(even)::before{transform:rotate(3deg)}
+.board .media .fig img{width:100%;max-height:none}
+.board .media .fig .ph{max-width:none}
+@media (min-width:820px){
+  .board .topic.has-media{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:0 56px;align-items:start}
+  .board .topic.has-media.flip{grid-template-columns:minmax(0,6fr) minmax(0,5fr)}
+  .board .topic.has-media.flip .media{order:2}
+  .board .topic.has-media .media{padding:14px 0 0}
+  .board .topic.multi .media .fig:nth-child(n+2){margin-top:-6px;width:88%}
+  .board .topic.multi .media .fig:nth-child(even){margin-left:auto}
+  .board .topic.has-media .words{padding-top:6px}
+}
+.lightbox{position:fixed;inset:0;z-index:35;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.9);cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:100%;width:auto;height:auto;pointer-events:none;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+@media (max-width:819px){.board .media .fig img{max-height:72vh;margin:0 auto}}

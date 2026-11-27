@@ -225,21 +225,45 @@
     flush();
     return out;
   }
+  function blockHtml(b, i, sec) {
+    var a = sec ? ' data-sec="' + sec + '" data-b="' + i + '"' : '';
+    if (b.t === 'img') {
+      var uri = (state.content.images || {})[b.key];
+      return uri ? '<figure class="fig"' + a + '><img src="' + uri + '" alt="' + esc(b.alt) + '" draggable="false"></figure>'
+        : '<figure class="fig"' + a + '><div class="ph" role="img" aria-label="' + esc(b.alt) + '">' + esc(t('imageSoon')) + '</div></figure>';
+    }
+    if (b.t === 'dlg') return '<div class="dlg"' + a + '><div class="cue">' + inline(b.cue) + (b.paren ? ' <span class="paren">' + inline(b.paren) + '</span>' : '') + '</div><div class="say">' + inline(b.x.join(' ')) + '</div></div>';
+    if (b.t === 'verse') return '<p class="verse"' + a + '>' + b.lines.map(inline).join('<br>') + '</p>';
+    if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
+    if (b.t === 'h3') return '<h3' + a + '>' + inline(b.x) + '</h3>';
+    if (b.t === 'q') return '<blockquote' + a + '>' + inline(b.x) + '</blockquote>';
+    return '<' + b.t + a + '>' + b.items.map(function (i) { return '<li>' + inline(i) + '</li>'; }).join('') + '</' + b.t + '>';
+  }
   function blocksHtml(bs, sec) {
-    return bs.map(function (b, i) {
-      var a = sec ? ' data-sec="' + sec + '" data-b="' + i + '"' : '';
-      if (b.t === 'img') {
+    return bs.map(function (b, i) { return blockHtml(b, i, sec); }).join('');
+  }
+  // moodboard: each topic (a ### heading and what follows) puts its pictures and its words side by side
+  function boardHtml(s) {
+    var topics = [], cur = null;
+    s.blocks.forEach(function (b, i) {
+      if (b.t === 'h3' || !cur) { cur = { media: [], words: [] }; topics.push(cur); }
+      (b.t === 'img' ? cur.media : cur.words).push(blockHtml(b, i, s.id));
+    });
+    var thumbs = '';
+    var n = 0;
+    s.blocks.forEach(function (b) {
+      if (b.t === 'img' && n < 6) {
         var uri = (state.content.images || {})[b.key];
-        return uri ? '<figure class="fig"' + a + '><img src="' + uri + '" alt="' + esc(b.alt) + '" draggable="false"></figure>'
-          : '<figure class="fig"' + a + '><div class="ph" role="img" aria-label="' + esc(b.alt) + '">' + esc(t('imageSoon')) + '</div></figure>';
+        if (uri) { n++; thumbs += '<span class="thumb"><img src="' + uri + '" alt="" draggable="false"></span>'; }
       }
-      if (b.t === 'dlg') return '<div class="dlg"' + a + '><div class="cue">' + inline(b.cue) + (b.paren ? ' <span class="paren">' + inline(b.paren) + '</span>' : '') + '</div><div class="say">' + inline(b.x.join(' ')) + '</div></div>';
-      if (b.t === 'verse') return '<p class="verse"' + a + '>' + b.lines.map(inline).join('<br>') + '</p>';
-      if (b.t === 'p') return '<p' + a + '>' + inline(b.x) + '</p>';
-      if (b.t === 'h3') return '<h3' + a + '>' + inline(b.x) + '</h3>';
-      if (b.t === 'q') return '<blockquote' + a + '>' + inline(b.x) + '</blockquote>';
-      return '<' + b.t + a + '>' + b.items.map(function (i) { return '<li>' + inline(i) + '</li>'; }).join('') + '</' + b.t + '>';
-    }).join('');
+    });
+    var h = thumbs ? '<div class="strip" aria-hidden="true">' + thumbs + '</div>' : '';
+    topics.forEach(function (tp, k) {
+      var cls = 'topic' + (tp.media.length ? ' has-media' : '') + (tp.media.length > 1 ? ' multi' : '') + (k % 2 ? ' flip' : '');
+      h += '<div class="' + cls + '">' + (tp.media.length ? '<div class="media">' + tp.media.join('') + '</div>' : '') +
+        '<div class="words">' + tp.words.join('') + '</div></div>';
+    });
+    return h;
   }
 
   /* ---------- routing + rendering ---------- */
@@ -302,7 +326,7 @@ if (on) h += '<div class="pagebar">' +     '<a class="back" href="#/" aria-label
         h += '<details class="card" id="sec-' + esc(s.id) + '" data-card="' + esc(s.id) + '"' + (openSet[s.id] ? ' open' : '') + '><summary><h2>' + inline(s.title) + '</h2></summary>' +
           '<div class="card-body">' + blocksHtml(s.blocks, s.id) + '</div></details>';
       } else {
-        h += '<section class="sec" id="sec-' + esc(s.id) + '"><h2>' + inline(s.title) + '</h2>' + blocksHtml(s.blocks, on ? s.id : '') + '</section>';
+        h += '<section class="sec" id="sec-' + esc(s.id) + '"><h2>' + (r.page === 'moodboard' ? '<span>' + inline(s.title) + '</span>' : inline(s.title)) + '</h2>' + (r.page === 'moodboard' ? boardHtml(s) : blocksHtml(s.blocks, on ? s.id : '')) + '</section>';
       }
     });
     if (on) {
@@ -320,6 +344,7 @@ if (on) h += '<div class="pagebar">' +     '<a class="back" href="#/" aria-label
       }
     }
     doc.innerHTML = h;
+    doc.classList.toggle('board', r.page === 'moodboard');
     closeComposer(); hideSel();
     document.title = (pg.title ? pg.title + ' · ' : '') + 'the end of foreign';
     paintComments(true);
@@ -563,6 +588,25 @@ if (on) h += '<div class="pagebar">' +     '<a class="back" href="#/" aria-label
   document.addEventListener('contextmenu', function (e) {
     if (window.matchMedia && matchMedia('(pointer: fine)').matches && !inField(e)) e.preventDefault();
   }, true);
+
+  /* ---------- moodboard: tap a picture to see it large ---------- */
+  (function () {
+    var box = null;
+    function close() { if (box) { box.remove(); box = null; } }
+    document.addEventListener('click', function (e) {
+      if (box) { close(); return; }
+      var f = e.target.closest && e.target.closest('.board .media .fig, .board .strip .thumb');
+      if (!f || window.getSelection().toString()) return;
+      var im = f.querySelector('img');
+      if (!im) return;
+      box = document.createElement('div');
+      box.className = 'lightbox';
+      box.setAttribute('role', 'dialog');
+      box.innerHTML = '<img src="' + im.src + '" alt="' + esc(im.alt) + '" draggable="false">';
+      $('app').appendChild(box);
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  })();
 
   /* ---------- watermark + shield ----------
      Neither can stop a screenshot (the operating system takes those). The watermark makes a
